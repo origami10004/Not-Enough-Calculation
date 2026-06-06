@@ -1,0 +1,6 @@
+# item names
+item.necalc.prod_calc.name=Production Calculator
+
+# Keybindings
+necalc.key.category=Not Enough Calculation
+necalc.key.open_calc_gui=Open production calculator

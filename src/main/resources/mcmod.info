@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "necalc",
+  "name": "Not Enough Calculation",
+  "description": "Adds a utility tool to optimise the factory.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["Origami10004"],
+  "credits": "",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

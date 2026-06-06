@@ -1,0 +1,29 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "SBS",
+        "SRS",
+        "SGS"
+    ],
+    "key": {
+        "S": {
+            "type": "forge:ore_dict",
+            "ore": "stone"
+        },
+        "B": {
+            "type": "forge:ore_dict",
+            "ore": "dyeBlack"
+        },
+        "R": {
+            "item": "minecraft:redstone"
+        },
+        "G": {
+            "item": "minecraft:gold_ingot"
+        }
+    },
+    "result": {
+        "item": "necalc:prod_calc",
+        "data": 0,
+        "count": 1
+    }
+}
