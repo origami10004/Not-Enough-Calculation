@@ -4,3 +4,9 @@ item.necalc.prod_calc.name=Production Calculator
 # Keybindings
 necalc.key.category=Not Enough Calculation
 necalc.key.open_calc_gui=Open production calculator
+
+# gui
+necalc.tab.main=Production Planner
+necalc.tab.flowt=Flow Chart View
+necalc.tab.recipes=Recipe Manager
+necalc.tab.add=Add Recipe

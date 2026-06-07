@@ -22,7 +22,6 @@ public class ProdCalcItem extends Item {
 			// open GUI
 			Minecraft.getMinecraft().displayGuiScreen(new guiProductionCalc(playerIn.inventory));
 		}
-
 		return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
 	}
 }

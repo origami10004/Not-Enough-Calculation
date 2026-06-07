@@ -7,12 +7,12 @@ import org.lwjgl.input.Keyboard;
 
 public class KeyBindings {
 
-    private static final String CATEGORY = "necalc.key.category";
+	private static final String CATEGORY = "necalc.key.category";
 
-    public static final KeyBinding OPEN_CALC_GUI = new KeyBinding("necalc.key.open_calc_gui", Keyboard.KEY_EQUALS, CATEGORY);
+	public static final KeyBinding OPEN_CALC_GUI = new KeyBinding("necalc.key.open_calc_gui", Keyboard.KEY_EQUALS, CATEGORY);
 
-    public static void registerKeyBindings() {
-        // Open calculator GUI
-        ClientRegistry.registerKeyBinding(OPEN_CALC_GUI);
-    }
+	public static void registerKeyBindings() {
+		// Open calculator GUI
+		ClientRegistry.registerKeyBinding(OPEN_CALC_GUI);
+	}
 }

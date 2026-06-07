@@ -11,38 +11,38 @@ import org.apache.logging.log4j.Logger;
 import com.origami10004.necalc.proxy.commonProxy;
 
 @Mod(
-    modid = necalc.MODID,
-    //dependencies = "required-after:Forge@[14.23.5.2859,)",
-    useMetadata = true)
+	modid = necalc.MODID,
+	//dependencies = "required-after:Forge@[14.23.5.2859,)",
+	useMetadata = true)
 public class necalc {
-    public static final String MODID = "necalc";
+	public static final String MODID = "necalc";
 
-    @SidedProxy(clientSide = "com.origami10004.necalc.proxy.clientProxy", serverSide = "com.origami10004.necalc.proxy.serverProxy")
-    public static commonProxy proxy;
+	@SidedProxy(clientSide = "com.origami10004.necalc.proxy.clientProxy", serverSide = "com.origami10004.necalc.proxy.serverProxy")
+	public static commonProxy proxy;
 
-    @Mod.Instance
-    public static necalc instance;
-    
-    public static Logger logger;
+	@Mod.Instance
+	public static necalc instance;
+	
+	public static Logger logger;
 
-    @EventHandler
-    public void preInit(FMLPreInitializationEvent event)
-    {
-        logger = event.getModLog();
+	@EventHandler
+	public void preInit(FMLPreInitializationEvent event)
+	{
+		logger = event.getModLog();
 
-        proxy.preInit(event);
-    }
+		proxy.preInit(event);
+	}
 
-    @EventHandler
-    public void init(FMLInitializationEvent event)
-    {
+	@EventHandler
+	public void init(FMLInitializationEvent event)
+	{
 
-        proxy.init(event);
-    }
+		proxy.init(event);
+	}
 
-    @EventHandler
-    public void postInit(FMLPostInitializationEvent event)
-    {
-        proxy.postInit(event);
-    }
+	@EventHandler
+	public void postInit(FMLPostInitializationEvent event)
+	{
+		proxy.postInit(event);
+	}
 }
