@@ -9,9 +9,6 @@ import com.origami10004.necalc.ItemRegistry;
 
 public class commonProxy {
     public void preInit(FMLPreInitializationEvent event) {
-        // Register items
-        ItemRegistry.init();
-        MinecraftForge.EVENT_BUS.register(new ItemRegistry());
     }
 
     public void init(FMLInitializationEvent event) {

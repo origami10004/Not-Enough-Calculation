@@ -1,34 +1,56 @@
 package com.origami10004.necalc;
 
-import com.origami10004.necalc.items.prodCalcItem;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
+import com.origami10004.necalc.items.ProdCalcItem;
 
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
+import net.minecraftforge.registries.IForgeRegistry;
 
-public class ItemRegistry {
-    public static Item PRODUCTION_CALCULATOR;
+import org.jetbrains.annotations.NotNull;
 
-    public static void init() {
-        PRODUCTION_CALCULATOR = new prodCalcItem();
-    }
+@ObjectHolder(necalc.MODID)
+@EventBusSubscriber(modid = necalc.MODID)
+public final class ItemRegistry {
 
-    @SubscribeEvent
-    public void registerItems(net.minecraftforge.event.RegistryEvent.Register<Item> event) {
-        event.getRegistry().register(PRODUCTION_CALCULATOR);
-    }
+	// This is a reference to your prod calc item instance
+	public static final Item PROD_CALC = getNull();
 
-    @SubscribeEvent
-    public void registerRecipes(net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemCraftedEvent event) {
-        // Register crafting recipes here if needed
-    }
+	private static ImmutableList<Item> allSimpleItems;
 
-    @SubscribeEvent
-    @SideOnly(Side.CLIENT)
-    public void registerModels(net.minecraftforge.client.event.ModelRegistryEvent event) {
-        ModelLoader.setCustomModelResourceLocation(PRODUCTION_CALCULATOR, 0, new ModelResourceLocation(PRODUCTION_CALCULATOR.getRegistryName(), "inventory"));
-    }
+	public static ImmutableList<Item> getAllSimpleItems() {
+		return allSimpleItems;
+	}
+
+	@SubscribeEvent
+	public static void registerItems(final RegistryEvent.Register<Item> event) {
+		final IForgeRegistry<Item> registry = event.getRegistry();
+		final Builder<Item> simpleItems = ImmutableList.builder();
+		simpleItems.add(register(registry, "prod_calc", new ProdCalcItem(), CreativeTabs.TOOLS));
+		allSimpleItems = simpleItems.build();
+	}
+
+	private static <T extends Item> T register(final IForgeRegistry<Item> r, final String name, final T item, final CreativeTabs ct) {
+		item.setRegistryName(necalc.MODID, name);
+		item.setTranslationKey(necalc.MODID + "." + name.replace('/', '.'));
+		item.setCreativeTab(ct);
+		r.register(item);
+		return item;
+	}
+
+	/**
+	 * Helper to spoof nullability warnings for 1.12s poorly thought out `ObjectHolder` solution for
+	 * having references to registered game objects
+	 */
+	@NotNull
+	@SuppressWarnings("ConstantConditions")
+	private static <T> T getNull() {
+		return null;
+	}
 }
