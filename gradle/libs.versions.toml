@@ -1,0 +1,14 @@
+[versions]
+# Dependencies
+minecraft = "1.12.1"
+jei = "4.15.0.291"
+# Plugins
+retrofuturegradle = "1.4.5"
+idea-ext = "1.1.8"
+
+[libraries]
+jei = { group = "mezz.jei", name = "jei_1.12.2", version.ref = "jei" }
+
+[plugins]
+retrofuturagradle = { id = "com.gtnewhorizons.retrofuturagradle", version.ref = "retrofuturegradle" }
+idea-ext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "idea-ext" }

@@ -23,7 +23,7 @@ public class prodCalcItem extends Item {
         setHasSubtypes(true);
         setMaxDamage(0);
         setRegistryName(necalc.MODID, "prod_calc");
-		setUnlocalizedName(necalc.MODID + ".prod_calc");
+		setTranslationKey(necalc.MODID + ".prod_calc");
     }
 
 	 @Override
