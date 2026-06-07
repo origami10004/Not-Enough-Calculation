@@ -89,6 +89,8 @@ dependencies {
             })
         }
 
+    compileOnly(libs.jetbrains.annotations)
+
     compileOnly(libs.jei) { artifact { classifier = "api" } }
     runtimeOnly(deobf(libs.jei))
 }

@@ -2,12 +2,14 @@
 # Dependencies
 minecraft = "1.12.1"
 jei = "4.15.0.291"
+jetbrains-annotations = "26.1.0"
 # Plugins
 retrofuturegradle = "1.4.5"
 idea-ext = "1.1.8"
 
 [libraries]
 jei = { group = "mezz.jei", name = "jei_1.12.2", version.ref = "jei" }
+jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version.ref = "jetbrains-annotations" }
 
 [plugins]
 retrofuturagradle = { id = "com.gtnewhorizons.retrofuturagradle", version.ref = "retrofuturegradle" }
