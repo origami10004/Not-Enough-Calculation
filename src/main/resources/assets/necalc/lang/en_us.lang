@@ -6,7 +6,14 @@ necalc.key.category=Not Enough Calculation
 necalc.key.open_calc_gui=Open production calculator
 
 # gui
-necalc.tab.main=Production Planner
-necalc.tab.flowt=Flow Chart View
-necalc.tab.recipes=Recipe Manager
-necalc.tab.add=Add Recipe
+necalc.gui.tab.main=Production Planner
+necalc.gui.tab.flow=Flow Chart View
+necalc.gui.tab.recipes=Recipe Manager
+necalc.gui.tab.add=Add Recipe
+necalc.gui.target=Production Targets
+necalc.gui.rate=Rate:
+necalc.gui.rate.minute=/min
+necalc.gui.rate.second=/s
+necalc.gui.rate.ticks=/t
+necalc.gui.results=Required Production Rates
+necalc.gui.inventory=Inventory
