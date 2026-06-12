@@ -7,7 +7,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 
-abstract class guiCommon extends GuiScreen {
+abstract class GuiCommon extends GuiScreen {
 	protected static final int TAB_H			= 28;
 	protected static final int TAB_W			= 28;
 	protected static final int TAB_COUNT		= 4;
@@ -97,6 +97,13 @@ abstract class guiCommon extends GuiScreen {
 		drawRect(x + 1, y + 1, x + w - 1, y + h - 1, fillColor);
 	}
 
+	// I'm ngl idk what the opposite of indent is really
+	protected void drawRectPanelOutdent(int x, int y, int w, int h, int fillColor) {
+		drawRect(x, y, x + w - 1, y + h - 1, 0xFFFFFFFF);
+		drawRect(x + 1, y + 1, x + w, y + h, 0xFF373737);
+		drawRect(x + 1, y + 1, x + w - 1, y + h - 1, fillColor);
+	}
+
 	protected void drawButton(int x, int y, int w, int h, String label, int fillColor, int accentColor) {
 		drawRect(x, y, x + w, y + h, 0xFF565656);
 		drawRect(x + 1, y + 1, x + w - 1, y + h - 1, accentColor);
@@ -116,6 +123,15 @@ abstract class guiCommon extends GuiScreen {
 
 	protected void drawItemSlot(int x, int y, int color) {
 		drawRectPanelIndent(x, y, 18, 18, color);
+	}
+
+	/**
+	 * Important, arrow drawn uses y as the center of the arrow
+	 */
+	protected void drawArrow(int x, int midY, int color) {
+		drawRect(x, midY, x + 5, midY + 1, color);
+		drawRect(x + 2, midY - 1, x + 4, midY + 2, color);
+		drawRect(x + 2, midY - 2, x + 3, midY + 3, color);
 	}
 
 	protected void drawPlayerInventory(int x, int y, InventoryPlayer inv) {

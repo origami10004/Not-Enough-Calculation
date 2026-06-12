@@ -11,17 +11,17 @@ import org.apache.logging.log4j.Logger;
 import com.origami10004.necalc.proxy.commonProxy;
 
 @Mod(
-	modid = necalc.MODID,
+	modid = Necalc.MODID,
 	//dependencies = "required-after:Forge@[14.23.5.2859,)",
 	useMetadata = true)
-public class necalc {
+public class Necalc {
 	public static final String MODID = "necalc";
 
 	@SidedProxy(clientSide = "com.origami10004.necalc.proxy.clientProxy", serverSide = "com.origami10004.necalc.proxy.serverProxy")
 	public static commonProxy proxy;
 
 	@Mod.Instance
-	public static necalc instance;
+	public static Necalc instance;
 	
 	public static Logger logger;
 

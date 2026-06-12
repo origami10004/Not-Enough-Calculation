@@ -15,8 +15,8 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 import org.jetbrains.annotations.NotNull;
 
-@ObjectHolder(necalc.MODID)
-@EventBusSubscriber(modid = necalc.MODID)
+@ObjectHolder(Necalc.MODID)
+@EventBusSubscriber(modid = Necalc.MODID)
 public final class ItemRegistry {
 
 	// This is a reference to your prod calc item instance
@@ -37,8 +37,8 @@ public final class ItemRegistry {
 	}
 
 	private static <T extends Item> T register(final IForgeRegistry<Item> r, final String name, final T item, final CreativeTabs ct) {
-		item.setRegistryName(necalc.MODID, name);
-		item.setTranslationKey(necalc.MODID + "." + name.replace('/', '.'));
+		item.setRegistryName(Necalc.MODID, name);
+		item.setTranslationKey(Necalc.MODID + "." + name.replace('/', '.'));
 		item.setCreativeTab(ct);
 		r.register(item);
 		return item;

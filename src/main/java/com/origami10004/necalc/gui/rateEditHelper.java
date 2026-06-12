@@ -1,6 +1,6 @@
 package com.origami10004.necalc.gui;
 
-public class rateEditHelper {
+public class RateEditHelper {
 	private int activeSlot = -1;
 
 	public void openSlot(int slotIndex) {
@@ -10,7 +10,7 @@ public class rateEditHelper {
 		this.activeSlot = -1;
 	}
 
-	public void drawOverlay(guiProductionCalc parent, int mouseX, int mouseY) {
+	public void drawOverlay(GuiProductionCalc parent, int mouseX, int mouseY) {
 		// Implementation for drawing rate edit overlay
 	}
 }
