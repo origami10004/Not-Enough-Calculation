@@ -1,13 +1,11 @@
 package com.origami10004.necalc.proxy;
 
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 
-import com.origami10004.necalc.ItemRegistry;
 
-public class commonProxy {
+public abstract class commonProxy {
     public void preInit(FMLPreInitializationEvent event) {
     }
 

@@ -9,6 +9,11 @@ import com.origami10004.necalc.data.ProductionStep;
 
 import java.util.List;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import mcp.MethodsReturnNonnullByDefault;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class GuiProductionCalc extends GuiCommon {
 	// constants for GUI layout
 	private static final int GUI_WIDTH			= 184;

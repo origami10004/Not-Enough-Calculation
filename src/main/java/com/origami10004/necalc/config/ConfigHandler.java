@@ -5,6 +5,7 @@ import java.io.File;
 import net.minecraftforge.common.config.Configuration;
 
 public final class ConfigHandler {
+	// TODO switch to @Config
 	public static boolean enableItem = false;
 
 	private ConfigHandler() {
