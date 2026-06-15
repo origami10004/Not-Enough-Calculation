@@ -8,17 +8,17 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
-import com.origami10004.necalc.proxy.commonProxy;
+import com.origami10004.necalc.proxy.CommonProxy;
 
 @Mod(
 	modid = Necalc.MODID,
-	//dependencies = "required-after:Forge@[14.23.5.2859,)",
+	dependencies = "required-after:modularui@[2.4.2,);",
 	useMetadata = true)
 public class Necalc {
 	public static final String MODID = "necalc";
 
-	@SidedProxy(clientSide = "com.origami10004.necalc.proxy.clientProxy", serverSide = "com.origami10004.necalc.proxy.serverProxy")
-	public static commonProxy proxy;
+	@SidedProxy(clientSide = "com.origami10004.necalc.proxy.ClientProxy", serverSide = "com.origami10004.necalc.proxy.ServerProxy")
+	public static CommonProxy proxy;
 
 	@Mod.Instance
 	public static Necalc instance;

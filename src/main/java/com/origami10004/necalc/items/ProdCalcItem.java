@@ -8,6 +8,8 @@ import net.minecraft.item.*;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 
+import com.cleanroommc.modularui.factory.ClientGUI;
+
 import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 
@@ -25,7 +27,7 @@ public class ProdCalcItem extends Item {
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
 		if (worldIn.isRemote) {
 			// open GUI
-			Minecraft.getMinecraft().displayGuiScreen(new GuiProductionCalc(playerIn.inventory));
+			ClientGUI.open(new GuiProductionCalc());
 		}
 		return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
 	}

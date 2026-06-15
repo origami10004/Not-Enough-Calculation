@@ -8,6 +8,7 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 
 import org.lwjgl.input.Keyboard;
 
+import com.cleanroommc.modularui.factory.ClientGUI;
 import com.origami10004.necalc.gui.GuiProductionCalc;
 
 public class KeyInputHandler {
@@ -15,8 +16,7 @@ public class KeyInputHandler {
 	public void onKeyInput(net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent event) {
 		if (KeyBindings.OPEN_CALC_GUI.isPressed()) {
 			// Open the GUI here
-			Minecraft mc = Minecraft.getMinecraft();
-			mc.displayGuiScreen(new GuiProductionCalc(mc.player.inventory));
+			ClientGUI.open(new GuiProductionCalc());
 		}
 	}
 
@@ -29,7 +29,7 @@ public class KeyInputHandler {
 				Minecraft mc = Minecraft.getMinecraft();
 				if (mc.currentScreen instanceof GuiInventory || mc.currentScreen instanceof GuiContainerCreative) {
 					// Open GUI only when the player is in the inventory screen
-					mc.displayGuiScreen(new GuiProductionCalc(mc.player.inventory));
+					ClientGUI.open(new GuiProductionCalc());
 					event.setCanceled(true); 
 				}
 			}

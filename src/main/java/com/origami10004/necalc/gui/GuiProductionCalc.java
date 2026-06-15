@@ -5,7 +5,24 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.drawable.UITexture;
+import com.cleanroommc.modularui.screen.CustomModularScreen;
+import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.widget.ParentWidget;
+import com.cleanroommc.modularui.widgets.ButtonWidget;
+import com.cleanroommc.modularui.widgets.PageButton;
+import com.cleanroommc.modularui.widgets.PagedWidget;
+import com.cleanroommc.modularui.widgets.layout.Flow;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
+import com.cleanroommc.modularui.widgets.slot.PhantomItemSlot;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+
+import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.data.ProductionStep;
+import com.origami10004.necalc.proxy.ClientProxy;
 
 import java.util.List;
 
@@ -14,7 +31,15 @@ import mcp.MethodsReturnNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class GuiProductionCalc extends GuiCommon {
+public class GuiProductionCalc extends CustomModularScreen {
+	// GUI constants across all tabs
+	private static final int TAB_H = 28;
+	private static final int TAB_W = 28;
+	private static final int TAB_COUNT = 4;
+
+	private static final String[] TAB_ICONS = {"gui/main_tab.png", "gui/flow_tab.png", "gui/recipes_tab.png", "gui/add_tab.png"};
+	private static final String[] TAB_LABELS = {"tab.main", "tab.flow", "tab.recipes", "tab.add"};
+
 	// constants for GUI layout
 	private static final int GUI_WIDTH			= 184;
 	private static final int SLOT_SIZE			= 18;
@@ -33,14 +58,7 @@ public class GuiProductionCalc extends GuiCommon {
 
 	private static final int HIDE_SIZE = 12;
 
-	// Other constants
-	@Override
-	protected int getActiveTab() {
-		return 0;
-	}
-
 	// instance variables
-	private ContainerProductionCalc container;
 	private InventoryPlayer playerInv;
 
 	// Target scrolling
@@ -55,27 +73,145 @@ public class GuiProductionCalc extends GuiCommon {
 	private int gx, gy; // top left corner of the whole GUI
 	private int gui_height;
 
-	public GuiProductionCalc(InventoryPlayer playerInv) {
-		this.container = new ContainerProductionCalc(playerInv);
-		this.playerInv = playerInv;
+	public GuiProductionCalc() {
+		super("necalc");
 	}
 
 	@Override
-	public boolean doesGuiPauseGame() {
-		return false;
+	public ModularPanel buildUI(ModularGuiContext context) {
+		// Build the main panel with all subpanels
+		// int targetH	= 4 + TARGET_ROWS * SLOT_SIZE + 16;
+		// int tableH	= TABLE_VIS_ROWS * TABLE_ROW_H + 4;
+		// int invH	= 10 + 3 * SLOT_SIZE + 4 + SLOT_SIZE + 4;
+		// this.gui_height = TAB_H + 4 + targetH + 6 + tableH + 6 + invH + 24;
+		ModularPanel panel = ModularPanel.defaultPanel("production_calc").width(GUI_WIDTH);
+		PagedWidget.Controller pageController = new PagedWidget.Controller();
+
+		// Tab strip
+		Flow tabs = Flow.row()
+				.height(TAB_H)
+				.childPadding(1)
+				.coverChildrenHeight()
+				.name("tabs");
+		for (int i = 0; i < TAB_COUNT; i++) {
+			tabs.child(new PageButton(i, pageController)
+				.size(TAB_W, TAB_H)
+				.overlay(UITexture.builder().location(Necalc.MODID, TAB_ICONS[i]).nonOpaque().fullImage().build())
+				.tab(GuiTextures.TAB_TOP, i == 0 ? -1 : 0)
+				.name(TAB_LABELS[i])
+				.addTooltipLine(I18n.format("necalc.gui." + TAB_LABELS[i]))
+			);
+		}
+		panel.child(tabs);
+
+		// Paged content
+		panel.child(new PagedWidget<>()
+			.controller(pageController)
+			.name("pages")
+			.top(22)
+			.widthRel(1f)
+			.expanded()
+			.addPage(pageMain())
+			.addPage(buildStubPage("Flowchart coming soon!"))
+			.addPage(buildStubPage("Recipes coming soon!"))
+			.addPage(buildStubPage("Add recipes coming soon!"))
+		);
+		return panel;
 	}
 
+	// Tab 1: Main calculator page
+	private ParentWidget<?> pageMain() {
+		Flow page = Flow.col()
+				.name("Main page")
+				.sizeRel(1f)
+				.padding(4)
+				.childPadding(3);
+		page.child(IKey.str(I18n.format("necalc.gui.tab.main")).asWidget().scale(0.8f));
+		page.child(rateButtons());
+		page.child(targetSlots());
+
+		return page;
+	}
+
+	// Rate buttons section
+	private Flow rateButtons() {
+		String[] rateLabels = {"minute", "second", "ticks"};
+
+		Flow row = Flow.row()
+				.name("rate_buttons")
+				.height(12)
+				.childPadding(4)
+				.coverChildrenWidth();
+		row.child(IKey.str(I18n.format("necalc.gui.rate")).asWidget().scale(0.8f));
+		for (int i = 0; i < 3; i++) {
+			int id = i;
+			ButtonWidget<?> button = new ButtonWidget<>()
+					.name("rate_" + rateLabels[i])
+					.size(36, 10)
+					.child(IKey.str(I18n.format("necalc.gui.rate." + rateLabels[i])).asWidget().scale(0.8f))
+					.background((context, x, y, width, height, theme) -> {
+						if (ClientProxy.calc.getRateDisplay() == id) {
+							GuiTextures.MC_BUTTON_PRESSED.draw(context, x, y, width, height, theme);
+						} else {
+							GuiTextures.MC_BUTTON.draw(context, x, y, width, height, theme);
+						}
+					})
+					.hoverBackground((context, x, y, width, height, theme) -> {
+						if (ClientProxy.calc.getRateDisplay() == id) {
+							GuiTextures.MC_BUTTON_PRESSED.draw(context, x, y, width, height, theme);
+						} else {
+							GuiTextures.MC_BUTTON_HOVERED.draw(context, x, y, width, height, theme);
+						}
+					})
+					.padding(1)
+					.onMousePressed(b -> {
+						ClientProxy.calc.setRateDisplay(id);
+						return true;
+					});
+			row.child(button);
+		}
+		return row;
+	}
+
+	// Target slots table
+	private Flow targetSlots() {
+		Flow slots = Flow.col()
+				.name("target_slots");
+		for (int row = 0; row < TARGET_ROWS; row++) {
+			Flow rowWidget = Flow.row()
+					.name("target_row_" + row)
+					.height(SLOT_SIZE);
+			for (int col = 0; col < SLOTS_PER_ROW; col++) {
+				int index = row * SLOTS_PER_ROW + col;
+				rowWidget.child(new PhantomItemSlot()
+					.slot(ClientProxy.calc.getTargetSlots(), index)
+					.size(SLOT_SIZE, SLOT_SIZE)
+				);
+			}
+			slots.child(rowWidget);
+		}
+		return slots;
+	}
+
+
+
+	// Placeholder page for other tabs for now
+	private ParentWidget<?> buildStubPage(String message) {
+		return Flow.col()
+				.sizeRel(1f)
+				.child(IKey.str(message).asWidget().scale(0.8f).pos(8, 8));
+	}
+
+	/*
 	@Override
 	public void initGui() {
-		int targetH	= 4 + TARGET_ROWS * SLOT_SIZE + 16;
-		int tableH	= TABLE_VIS_ROWS * TABLE_ROW_H + 4;
-		int invH	= 10 + 3 * SLOT_SIZE + 4 + SLOT_SIZE + 4;
-		this.gui_height = TAB_H + 4 + targetH + 6 + tableH + 6 + invH + 24;
+		
 
 		this.gx = (this.width - GUI_WIDTH) / 2;
 		this.gy = (this.height - gui_height) / 2;
 	}
 
+	
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		this.drawDefaultBackground();
@@ -281,5 +417,5 @@ public class GuiProductionCalc extends GuiCommon {
 			int eyeY = rowY + (TABLE_ROW_H - 12) / 2;
 			drawEyeButton(eyeX, eyeY, true);
 		}
-	}
+	}*/
 }

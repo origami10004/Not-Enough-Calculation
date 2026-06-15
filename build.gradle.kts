@@ -79,6 +79,19 @@ repositories {
             includeGroup("curse.maven")
         }
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Cleanroom Maven"
+                url = uri("https://maven.cleanroommc.com")
+            }
+        }
+        filter {
+            includeGroup("com.cleanroommc")
+            includeGroup("zone.rong")
+            includeGroup("mezz")
+        }
+    }
 }
 
 dependencies {
@@ -93,6 +106,12 @@ dependencies {
 
     compileOnly(libs.jei) { artifact { classifier = "api" } }
     runtimeOnly(deobf(libs.jei))
+
+    val modularuiDep = implementation(rfg.deobf("com.cleanroommc:modularui:3.1.6"))
+    (modularuiDep as? ModuleDependency)?.apply {
+        isTransitive = false
+    }
+    runtimeOnly(rfg.deobf("zone.rong:mixinbooter:10.7"))
 }
 
 mcpTasks {
