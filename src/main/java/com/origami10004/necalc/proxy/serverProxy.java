@@ -1,6 +1,6 @@
 package com.origami10004.necalc.proxy;
 
 
-public class serverProxy extends commonProxy {
+public class ServerProxy extends CommonProxy {
 
 }

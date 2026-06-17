@@ -3,7 +3,6 @@ package com.origami10004.necalc.gui;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import com.origami10004.necalc.data.ProductionStep;
@@ -11,17 +10,16 @@ import com.origami10004.necalc.data.ProductionStep;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ContainerProductionCalc {
+public class CalculatorState {
 	private int targetNumRows = 1;
 	private int selectedRate = 0;
-	private int hiddenRecipes = 1;
 	private final Map<Integer, ItemStack> targetSlots = new HashMap<>();
 	private final Map<Integer, Double> targetRates = new HashMap<>();
 	private int rateDisplay = 0;
 	private int[] rateMultiplier = new int[] {1, 60, 1200};
 	private List<ProductionStep> recipeSteps;
 
-	ContainerProductionCalc(InventoryPlayer playerInv) {
+	public CalculatorState() {
 		targetSlots.put(0, new ItemStack(Blocks.DIAMOND_BLOCK));
 		targetRates.put(0, 0.3);
 		recipeSteps = new ArrayList<>();
@@ -58,11 +56,15 @@ public class ContainerProductionCalc {
 	}
 
 	public boolean hasHidden() {
-		return hiddenRecipes > 0;
+		return recipeSteps.stream()
+				.filter(r -> r.isHidden())
+				.count() > 0;
 	}
 
 	public int getHiddenCount() {
-		return hiddenRecipes;
+		return (int) recipeSteps.stream()
+				.filter(r -> r.isHidden())
+				.count();
 	}
 
 	public List<ProductionStep> getVisibleRecipes() {

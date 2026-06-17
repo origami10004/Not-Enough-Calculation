@@ -13,4 +13,8 @@ public class RateEditHelper {
 	public void drawOverlay(GuiProductionCalc parent, int mouseX, int mouseY) {
 		// Implementation for drawing rate edit overlay
 	}
+
+	public void mouseClicked(GuiProductionCalc parent, int mouseX, int mouseY, int mouseButton) {
+		// Implementation for handling mouse clicks on the rate edit overlay
+	}
 }

@@ -7,7 +7,7 @@ necalc.key.open_calc_gui=Open production calculator
 
 # gui
 necalc.gui.tab.main=Production Planner
-necalc.gui.tab.flow=Flow Chart View
+necalc.gui.tab.flow=Flow Chart View (Coming soon!)
 necalc.gui.tab.recipes=Recipe Manager
 necalc.gui.tab.add=Add Recipe
 necalc.gui.target=Production Targets

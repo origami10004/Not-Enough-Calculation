@@ -1,13 +1,14 @@
 package com.origami10004.necalc.gui;
 
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.inventory.Container;
 
-abstract class GuiCommon extends GuiScreen {
+abstract class GuiCommon extends GuiContainer {
 	protected static final int TAB_H			= 28;
 	protected static final int TAB_W			= 28;
 	protected static final int TAB_COUNT		= 4;
@@ -17,6 +18,11 @@ abstract class GuiCommon extends GuiScreen {
 	protected static final String[] TAB_LABELS = {"tab.main", "tab.flow", "tab.recipes", "tab.add"};
 	
 	protected abstract int getActiveTab();
+	private ItemStack inventoryHoverStack;
+
+	public GuiCommon(Container container) {
+		super(container);
+	}
 
 	protected void drawRectPanel(int x, int y, int w, int h, int fillColor) {
 		assert w > 6 && h > 6 : "Panel too small for borders";
@@ -104,10 +110,22 @@ abstract class GuiCommon extends GuiScreen {
 		drawRect(x + 1, y + 1, x + w - 1, y + h - 1, fillColor);
 	}
 
-	protected void drawButton(int x, int y, int w, int h, String label, int fillColor, int accentColor) {
+	protected void drawButton(int x, int y, int w, int h, String label, int mouseX, int mouseY, boolean pressed, boolean active) {
 		drawRect(x, y, x + w, y + h, 0xFF565656);
-		drawRect(x + 1, y + 1, x + w - 1, y + h - 1, accentColor);
-		drawRect(x + 2, y + 2, x + w - 1, y + h - 1, fillColor);
+
+		if (!active) {
+			drawRect(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF999999);
+			this.fontRenderer.drawString(label, x + (w - this.fontRenderer.getStringWidth(label)) / 2, y + (h - 7) / 2, 0xFF000000);
+			return;
+		}
+		boolean hovered = mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h;
+		int topleft = pressed ? 0xFF808080 : (hovered ? 0xFFCED7E9 : 0xFFE5E5E5);
+		int botright = pressed ? 0xFFE5E5E5 : (hovered ? 0xFF8EA3CC : 0xFF808080);
+		int color = pressed || !hovered ? 0xFFC6C6C6 : 0xFFA8B8D8;
+		drawRect(x + 1, y + 1, x + w - 1, y + h - 1, color);
+		drawRect(x + 1, y + 1, x + w - 2, y + h - 2, topleft);
+		drawRect(x + 2, y + 2, x + w - 1, y + h - 1, botright);
+		drawRect(x + 2, y + 2, x + w - 2, y + h - 2, color);
 		this.fontRenderer.drawString(label, x + (w - this.fontRenderer.getStringWidth(label)) / 2, y + (h - 7) / 2, 0xFF000000);
 	}
 
@@ -134,7 +152,8 @@ abstract class GuiCommon extends GuiScreen {
 		drawRect(x + 2, midY - 2, x + 3, midY + 3, color);
 	}
 
-	protected void drawPlayerInventory(int x, int y, InventoryPlayer inv) {
+	protected void drawPlayerInventory(int x, int y, int mouseX, int mouseY, InventoryPlayer inv) {
+		inventoryHoverStack = ItemStack.EMPTY;
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) {
 				int slotX = x + col * 18;
@@ -143,10 +162,11 @@ abstract class GuiCommon extends GuiScreen {
 
 				ItemStack stack = inv.getStackInSlot(col + row * 9 + 9);
 				if (!stack.isEmpty()) {
-					RenderHelper.enableGUIStandardItemLighting();
-					this.itemRender.renderItemAndEffectIntoGUI(stack, slotX + 1, slotY + 1);
-					this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, stack, slotX + 1, slotY + 1, null);
-					RenderHelper.disableStandardItemLighting();
+					if (mouseX >= slotX && mouseX < slotX + 18 && mouseY >= slotY && mouseY < slotY + 18) {
+						if (!stack.isEmpty()) {
+							inventoryHoverStack = stack;
+						}
+					}
 				}
 			}
 		}
@@ -157,38 +177,18 @@ abstract class GuiCommon extends GuiScreen {
 
 			ItemStack stack = inv.getStackInSlot(col);
 			if (!stack.isEmpty()) {
-				RenderHelper.enableGUIStandardItemLighting();
-				this.itemRender.renderItemAndEffectIntoGUI(stack, slotX + 1, slotY + 1);
-				this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, stack, slotX + 1, slotY + 1, null);
-				RenderHelper.disableStandardItemLighting();
+				if (mouseX >= slotX && mouseX < slotX + 18 && mouseY >= slotY && mouseY < slotY + 18) {
+					if (!stack.isEmpty()) {
+						inventoryHoverStack = stack;
+					}
+				}
 			}
 		}
 	}
 	
-	protected void drawPlayerInventoryTooltips(int x, int y, int mouseX, int mouseY, InventoryPlayer inv) {
-		for (int row = 0; row < 3; row++) {
-			for (int col = 0; col < 9; col++) {
-				int slotX = x + col * 18;
-				int slotY = y + row * 18;
-				if (mouseX >= slotX && mouseX < slotX + 18 && mouseY >= slotY && mouseY < slotY + 18) {
-					ItemStack stack = inv.getStackInSlot(col + row * 9 + 9);
-					if (!stack.isEmpty()) {
-						this.renderToolTip(stack, mouseX, mouseY);
-					}
-					return;
-				}
-			}
-		}
-		for (int col = 0; col < 9; col++) {
-			int slotX = x + col * 18;
-			int slotY = y + 58;
-			if (mouseX >= slotX && mouseX < slotX + 18 && mouseY >= slotY && mouseY < slotY + 18) {
-				ItemStack stack = inv.getStackInSlot(col);
-				if (!stack.isEmpty()) {
-					this.renderToolTip(stack, mouseX, mouseY);
-				}
-				return;
-			}
+	protected void drawPlayerInventoryTooltips(int mouseX, int mouseY) {
+		if (!inventoryHoverStack.isEmpty()) {
+			this.renderToolTip(inventoryHoverStack, mouseX, mouseY);
 		}
 	}
 }

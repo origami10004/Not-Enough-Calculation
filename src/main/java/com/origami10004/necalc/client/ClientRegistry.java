@@ -1,6 +1,7 @@
 package com.origami10004.necalc.client;
 
 import com.origami10004.necalc.*;
+import com.origami10004.necalc.config.ConfigHandler;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -16,6 +17,10 @@ public final class ClientRegistry {
 
 	@SubscribeEvent
 	public static void registerModels(final ModelRegistryEvent event) {
+		if (ConfigHandler.clientOnly) {
+			Necalc.logger.info("Client-only mode is enabled. Skipping model registration.");
+			return;
+		}
 		for (Item item : ItemRegistry.getAllSimpleItems()) registerBasicItemRenderer(item);
 	}
 
@@ -25,6 +30,10 @@ public final class ClientRegistry {
 
 	@SuppressWarnings({"ConstantConditions", "SameParameterValue"})
 	private static void registerItemRenderer(final Item item, final int meta, final String id) {
+		if (ConfigHandler.clientOnly) {
+			Necalc.logger.info("Client-only mode is enabled. Skipping render registration.");
+			return;
+		}
 		ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(item.getRegistryName(), id));
 	}
 }

@@ -2,6 +2,7 @@ package com.origami10004.necalc;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.origami10004.necalc.config.ConfigHandler;
 import com.origami10004.necalc.items.ProdCalcItem;
 
 import net.minecraft.creativetab.CreativeTabs;
@@ -34,6 +35,10 @@ public final class ItemRegistry {
 
 	@SubscribeEvent
 	public static void registerItems(final RegistryEvent.Register<Item> event) {
+		if (ConfigHandler.clientOnly) {
+			Necalc.logger.info("Client-only mode is enabled. Skipping item registration.");
+			return;
+		}
 		final IForgeRegistry<Item> registry = event.getRegistry();
 		final Builder<Item> simpleItems = ImmutableList.builder();
 		simpleItems.add(register(registry, "prod_calc", new ProdCalcItem(), CreativeTabs.TOOLS));
