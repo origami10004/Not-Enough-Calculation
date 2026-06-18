@@ -372,7 +372,7 @@ public class GuiProductionCalc extends GuiCommon {
 			int targetSlot = getTargetSlotAt(mouseX, mouseY);
 			if (targetSlot != -1) {
 				ItemStack heldItem = this.mc.player.inventory.getItemStack();
-				this.calcState.setTargetSlot(targetSlot, heldItem);
+				this.calcState.setTargetSlot(targetSlot, heldItem.copy());
 				this.calcState.setTargetSlotRate(targetSlot, 1 / this.calcState.getMultiplier());
 				return;
 			}

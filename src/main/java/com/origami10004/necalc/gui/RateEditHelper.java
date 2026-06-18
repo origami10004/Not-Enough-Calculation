@@ -68,9 +68,12 @@ public class RateEditHelper {
 	public void drawOverlay(int mouseX, int mouseY) {
 		if (!isOpen) return;
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(0, 0, 300); // Ensure the overlay is drawn above other GUI elements
 		this.parent.mc.getTextureManager().bindTexture(BG_TEXTURE);
 		this.parent.drawModalRectWithCustomSizedTexture(panelX, panelY, 0, 0, PANEL_W, PANEL_H, PANEL_W, PANEL_H);
 		this.rateInputField.drawTextBox();
+		GlStateManager.popMatrix();
 	}
 
 	public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {
