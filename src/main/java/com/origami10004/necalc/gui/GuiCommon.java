@@ -1,6 +1,7 @@
 package com.origami10004.necalc.gui;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.client.resources.I18n;
@@ -15,6 +16,8 @@ abstract class GuiCommon extends GuiContainer {
 	protected static final int TAB_LEFT_PAD = 4;
 
 	protected static final ResourceLocation TAB_ICONS = new ResourceLocation("necalc", "textures/gui/tab_icons.png");
+	protected static final ResourceLocation TAB_TEXTURE = new ResourceLocation("necalc", "textures/gui/tab.png");
+	protected static final ResourceLocation SLOT_TEXTURE = new ResourceLocation("necalc", "textures/gui/slot.png");
 	protected static final String[] TAB_LABELS = {"tab.main", "tab.flow", "tab.recipes", "tab.add"};
 	
 	protected abstract int getActiveTab();
@@ -57,43 +60,15 @@ abstract class GuiCommon extends GuiContainer {
 	}
 
 	private void drawTab(int x, int y, boolean active, int iconIndex) {
-		int gy = y;
-		int color;
-		if (!active) {
-			gy += 2;
-			color = 0xFF8B8B8B;
-		} else {
-			color = 0xFFC6C6C6;
-		}
-
-		// Black border
-		drawRect(x, gy + 2, x + TAB_W, y + TAB_H, 0xFF000000);
-		drawRect(x + 1, gy + 1, x + TAB_W - 1, gy + 2, 0xFF000000);
-		drawRect(x + 2, gy, x + TAB_W - 2, gy + 1, 0xFF000000);
-
-		// Lighter top left
-		drawRect(x + 1, gy + 2, x + 4, y + TAB_H, 0xFFFFFFFF);
-		drawRect(x + 2, gy + 1, x + TAB_W - 3, gy + 4, 0xFFFFFFFF);
-
-		// Darker right
-		drawRect(x + TAB_W - 3, gy + 3, x + TAB_W - 1, y + TAB_H, 0xFF555555);
-
-		// Fill
-		drawRect(x + 3, gy + 4, x + TAB_W - 3, y + TAB_H, color);
-		drawRect(x + 4, gy + 3, x + TAB_W - 3, y + TAB_H, color);
-
+		this.mc.getTextureManager().bindTexture(TAB_TEXTURE);
 		if (active) {
-			// Spillover
-			drawRect(x + 1, gy + 2, x + 3, y + TAB_H + 3, 0xFFFFFFFF);
-
-			drawRect(x + TAB_W - 3, gy + 3, x + TAB_W - 2, y + TAB_H + 3, 0xFF555555);
-			drawRect(x + TAB_W - 2, gy + 3, x + TAB_W - 1, y + TAB_H + 2, 0xFF555555);
-
-			drawRect(x + 3, gy + 4, x + TAB_W - 3, y + TAB_H + 3, color);
+			drawModalRectWithCustomSizedTexture(x, y, 0, 0, 28, 31, 56, 31);
+		} else {
+			drawModalRectWithCustomSizedTexture(x, y, 28, 0, 28, 31, 56, 31);
 		}
 
 		this.mc.getTextureManager().bindTexture(TAB_ICONS);
-		drawTexturedModalRect(x + 6, y + 9, iconIndex * 16, 0, 16, 16);
+		drawModalRectWithCustomSizedTexture(x + 6, y + 9, iconIndex * 16, 0, 16, 16, 80, 16);
 	}
 
 	protected void drawRectPanelIndent(int x, int y, int w, int h, int fillColor) {
@@ -139,8 +114,10 @@ abstract class GuiCommon extends GuiContainer {
 		}
 	}
 
-	protected void drawItemSlot(int x, int y, int color) {
-		drawRectPanelIndent(x, y, 18, 18, color);
+	protected void drawItemSlot(int x, int y) {
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		this.mc.getTextureManager().bindTexture(SLOT_TEXTURE);
+		drawModalRectWithCustomSizedTexture(x, y, 0, 0, 18, 18, 18, 18);
 	}
 
 	/**
@@ -158,7 +135,7 @@ abstract class GuiCommon extends GuiContainer {
 			for (int col = 0; col < 9; col++) {
 				int slotX = x + col * 18;
 				int slotY = y + row * 18;
-				this.drawItemSlot(slotX, slotY, 0xFF8B8B8B);
+				this.drawItemSlot(slotX, slotY);
 
 				ItemStack stack = inv.getStackInSlot(col + row * 9 + 9);
 				if (!stack.isEmpty()) {
@@ -173,7 +150,7 @@ abstract class GuiCommon extends GuiContainer {
 		for (int col = 0; col < 9; col++) {
 			int slotX = x + col * 18;
 			int slotY = y + 58;
-			this.drawItemSlot(slotX, slotY, 0xFF8B8B8B);
+			this.drawItemSlot(slotX, slotY);
 
 			ItemStack stack = inv.getStackInSlot(col);
 			if (!stack.isEmpty()) {

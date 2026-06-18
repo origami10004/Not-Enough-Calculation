@@ -11,6 +11,7 @@ necalc.gui.tab.flow=Flow Chart View (Coming soon!)
 necalc.gui.tab.recipes=Recipe Manager
 necalc.gui.tab.add=Add Recipe
 necalc.gui.target=Production Targets
+necalc.gui.target_help=Middle mouse click to edit rates
 necalc.gui.rate=Rate:
 necalc.gui.rate.minute=/min
 necalc.gui.rate.second=/s
