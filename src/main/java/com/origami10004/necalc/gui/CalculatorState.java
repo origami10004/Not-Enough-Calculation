@@ -5,7 +5,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
 import com.origami10004.necalc.Necalc;
+import com.origami10004.necalc.data.CalculationTarget;
 import com.origami10004.necalc.data.ProductionStep;
+import com.origami10004.necalc.data.TargetPersistence;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,14 +15,11 @@ import java.util.stream.Collectors;
 public class CalculatorState {
 	private int targetNumRows = 1;
 	private int selectedRate = 0;
-	private final Map<Integer, ItemStack> targetSlots = new HashMap<>();
-	private final Map<Integer, Double> targetRates = new HashMap<>();
+	private final Map<Integer, CalculationTarget> targets = new HashMap<>();
 	private int[] rateMultiplier = new int[] {1, 60, 1200};
 	private List<ProductionStep> recipeSteps;
 
 	public CalculatorState() {
-		targetSlots.put(0, new ItemStack(Blocks.DIAMOND_BLOCK));
-		targetRates.put(0, 0.3);
 		recipeSteps = new ArrayList<>();
 		recipeSteps.add(new ProductionStep(
 			Arrays.asList(new ItemStack(Items.DIAMOND, 9)),
@@ -30,6 +29,12 @@ public class CalculatorState {
 			0.3,
 			false
 		));
+	}
+
+	public void loadTargets() {
+		Map<Integer, CalculationTarget> loadedTargets = TargetPersistence.loadTargetData();
+		targets.clear();
+		targets.putAll(loadedTargets);
 	}
 
 	public int getTargetNumRows() {
@@ -47,24 +52,41 @@ public class CalculatorState {
 	}
 
 	public ItemStack getTargetSlot(int index) {
-		return targetSlots.getOrDefault(index, ItemStack.EMPTY);
+		return targets.getOrDefault(index, CalculationTarget.EMPTY).getTargetItem();
 	}
 
 	public boolean setTargetSlot(int index, ItemStack stack) {
-		ItemStack old = targetSlots.getOrDefault(index, ItemStack.EMPTY);
-		targetSlots.put(index, stack);
-		if (!ItemStack.areItemStacksEqual(old, stack)) recalculateRecipes();
-		return !ItemStack.areItemStacksEqual(old, stack);
+		CalculationTarget cur = targets.getOrDefault(index, null);
+		if (cur == null) {
+			targets.put(index, new CalculationTarget(stack, 1.0 / getMultiplier()));
+			TargetPersistence.saveTargetData(this.targets);
+			recalculateRecipes();
+			return true;
+		} else {
+			ItemStack old = cur.getTargetItem();
+			if (cur.setTargetItem(stack, 1.0 / getMultiplier())){
+				TargetPersistence.saveTargetData(this.targets);
+				recalculateRecipes();
+				return true;
+			}
+			return false;
+		}
 	}
 
 	public double getTargetSlotRate(int index) {
-		return targetRates.getOrDefault(index, 0.0) * rateMultiplier[selectedRate];
+		return targets.getOrDefault(index, CalculationTarget.EMPTY).getTargetRate() * rateMultiplier[selectedRate];
 	}
 	public boolean setTargetSlotRate(int index, double rate) {
-		double old = targetRates.getOrDefault(index, 0.0);
-		targetRates.put(index, rate);
-		if (old != rate) recalculateRecipes();
-		return old != rate;
+		// This function should never be called with an index that doesn't have a target item
+		CalculationTarget cur = targets.getOrDefault(index, null);
+		if (cur == null) return false;
+
+		if (cur.setTargetRate(rate / rateMultiplier[selectedRate])) {
+			TargetPersistence.saveTargetData(this.targets);
+			recalculateRecipes();
+			return true;
+		}
+		return false;
 	}
 
 	public boolean hasHidden() {

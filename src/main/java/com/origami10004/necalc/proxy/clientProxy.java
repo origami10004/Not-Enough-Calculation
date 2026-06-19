@@ -3,6 +3,7 @@ package com.origami10004.necalc.proxy;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 
 import com.origami10004.necalc.client.KeyBindings;
 import com.origami10004.necalc.client.KeyInputHandler;
@@ -24,5 +25,12 @@ public class ClientProxy extends CommonProxy {
         super.init(event);
 
         calcState = new CalculatorState();
+    }
+
+    @Override
+    public void postInit(FMLPostInitializationEvent event) {
+        super.postInit(event);
+
+        calcState.loadTargets();
     }
 }
