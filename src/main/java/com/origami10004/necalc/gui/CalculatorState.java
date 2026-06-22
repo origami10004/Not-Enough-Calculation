@@ -124,7 +124,7 @@ public class CalculatorState {
 	}
 
 	private void recalculateRecipes() {
-		// Placeholder for recipe recalculation logic based on target slots and rates
+		// TODO: Placeholder for recipe recalculation logic based on target slots and rates
 		Necalc.logger.info("Recalculating recipes with current target slots and rates...");
 	}
 }

@@ -12,13 +12,13 @@ import net.minecraft.inventory.Container;
 abstract class GuiCommon extends GuiContainer {
 	protected static final int TAB_H			= 28;
 	protected static final int TAB_W			= 28;
-	protected static final int TAB_COUNT		= 4;
+	protected static final int TAB_COUNT		= 5;
 	protected static final int TAB_LEFT_PAD = 4;
 
 	protected static final ResourceLocation TAB_ICONS = new ResourceLocation("necalc", "textures/gui/tab_icons.png");
 	protected static final ResourceLocation TAB_TEXTURE = new ResourceLocation("necalc", "textures/gui/tab.png");
 	protected static final ResourceLocation SLOT_TEXTURE = new ResourceLocation("necalc", "textures/gui/slot.png");
-	protected static final String[] TAB_LABELS = {"tab.main", "tab.flow", "tab.recipes", "tab.add"};
+	protected static final String[] TAB_LABELS = {"tab.main", "tab.flow", "tab.recipes", "tab.machine", "tab.add"};
 	
 	protected abstract int getActiveTab();
 	private ItemStack inventoryHoverStack;

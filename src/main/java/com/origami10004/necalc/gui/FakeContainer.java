@@ -7,7 +7,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
 public class FakeContainer extends Container{
-	public FakeContainer(InventoryPlayer playerInv) {
+	public FakeContainer(InventoryPlayer playerInv, boolean includeInventory, int invX, int invY) {
+		if (!includeInventory) return;
 		// Register 9 dummy slots that should not be shown in the GUI (InventoryPlayer indices 0..8)
 		for (int col = 0; col < 9; col++) {
 			addSlotToContainer(new Slot(playerInv, col, -999, -999));
@@ -18,14 +19,14 @@ public class FakeContainer extends Container{
 			for (int col = 0; col < 9; col++) {
 				addSlotToContainer(new Slot(playerInv,
 						col + row * 9 + 9,
-						9 + col * 18,
-						248 + row * 18));
+						invX + col * 18,
+						invY + row * 18));
 			}
 		}
 
 		// Register the 9 hotbar slots (InventoryPlayer indices 0..8)
 		for (int col = 0; col < 9; col++) {
-			addSlotToContainer(new Slot(playerInv, col, 9 + col * 18, 306));
+			addSlotToContainer(new Slot(playerInv, col, invX + col * 18, invY + 58));
 		}
 	}
 

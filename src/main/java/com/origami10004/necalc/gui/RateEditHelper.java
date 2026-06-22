@@ -36,6 +36,7 @@ public class RateEditHelper {
 		this.rateInputField = new GuiTextField(0, mc.fontRenderer, this.panelX + 25, this.panelY + 4, PANEL_W - 29, PANEL_H - 8);
 		this.rateInputField.setText(Double.toString(this.currentRate));
 		this.rateInputField.setCursorPositionEnd();
+		this.rateInputField.setFocused(true);
 		
 	}
 	public void close() {
@@ -59,10 +60,8 @@ public class RateEditHelper {
 		this.panelX = slotX - 5;
 		this.panelY = slotY - 5;
 		Minecraft mc = parent.mc;
-		this.rateInputField = new GuiTextField(0, mc.fontRenderer, this.panelX + 25, this.panelY + 4, PANEL_W - 29, PANEL_H - 8);
-		this.rateInputField.setText(Double.toString(this.currentRate));
-		this.rateInputField.setCursorPositionEnd();
-		this.rateInputField.setFocused(true);
+		this.rateInputField.x = this.panelX + 25;
+		this.rateInputField.y = this.panelY + 4;
 	}
 
 	public void drawOverlay(int mouseX, int mouseY) {

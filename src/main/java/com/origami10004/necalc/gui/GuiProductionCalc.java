@@ -73,7 +73,7 @@ public class GuiProductionCalc extends GuiCommon {
 	private int gx, gy; // top left corner of the whole GUI
 
 	public GuiProductionCalc(InventoryPlayer playerInv, CalculatorState calcState) {
-		super(new FakeContainer(playerInv));
+		super(new FakeContainer(playerInv, true, 9, 248));
 		this.playerInv = playerInv;
 		this.calcState = calcState;
 		this.container = (FakeContainer) inventorySlots;
@@ -442,6 +442,10 @@ public class GuiProductionCalc extends GuiCommon {
 			case 3:
 				this.editOverlay.close();
 				// mc.displayGuiScreen(new GuiAddRecipe(playerInv, container));
+				break;
+			case 4:
+				this.editOverlay.close();
+				mc.displayGuiScreen(new GuiRecipeEditor(playerInv, this, true));
 				break;
 		}
 	}

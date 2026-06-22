@@ -5,11 +5,14 @@ item.necalc.prod_calc.name=Production Calculator
 necalc.key.category=Not Enough Calculation
 necalc.key.open_calc_gui=Open production calculator
 
-# gui
+# gui tabs
 necalc.gui.tab.main=Production Planner
 necalc.gui.tab.flow=Flow Chart View (Coming soon!)
 necalc.gui.tab.recipes=Recipe Manager
+necalc.gui.tab.machine=Machine Speed Manager
 necalc.gui.tab.add=Add Recipe
+
+# main calculator gui
 necalc.gui.target=Production Targets
 necalc.gui.target_help=Middle mouse click to edit rates
 necalc.gui.rate=Rate:
@@ -20,3 +23,14 @@ necalc.gui.results=Required Production Rates
 necalc.gui.inventory=Inventory
 necalc.gui.show.some=Show Hidden Recipes (%d hidden)
 necalc.gui.show.none=Show Hidden Recipes (none)
+
+# recipe editor gui
+necalc.gui.recipe.add=New Recipe
+necalc.gui.recipe.edit=Edit Recipe
+necalc.gui.recipe.input=Inputs
+necalc.gui.recipe.machine=Machine
+necalc.gui.recipe.output=Outputs
+necalc.gui.recipe.time=Time in ticks
+necalc.gui.recipe.confirm=Confirm
+necalc.gui.recipe.cancel=Cancel
+necalc.gui.recipe.delete=Delete
