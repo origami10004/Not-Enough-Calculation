@@ -348,7 +348,7 @@ public class GuiProductionCalc extends GuiCommon {
 
 		// Tab handling
 		for (int i = 0; i < TAB_COUNT; i++) {
-			int tx = gx + 4 + i * (TAB_W + 2);
+			int tx = gx + TAB_LEFT_PAD + i * (TAB_W + 2);
 			if (mouseX >= tx && mouseX < tx + TAB_W && mouseY >= gy + 2 && mouseY < gy + 2 + TAB_H) {
 				onTabClicked(i);
 				return;
@@ -427,7 +427,7 @@ public class GuiProductionCalc extends GuiCommon {
 	}
 
 	// Helper functions
-	private void onTabClicked(int index) {
+	protected void onTabClicked(int index) {
 		switch (index) {
 			case 0:
 				break;

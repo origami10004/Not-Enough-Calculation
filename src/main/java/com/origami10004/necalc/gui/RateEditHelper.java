@@ -81,7 +81,7 @@ public class RateEditHelper {
 			this.rateInputField.mouseClicked(mouseX, mouseY, mouseButton);
 			return true;
 		}
-		return false;
+		return this.rateInputField.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 
 	public boolean keyTyped(GuiProductionCalc parent, char typedChar, int keyCode) {

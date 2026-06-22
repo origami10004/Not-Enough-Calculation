@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 
 import java.io.IOException;
+import org.lwjgl.input.Keyboard;
 
 import com.origami10004.necalc.proxy.ClientProxy;
 
@@ -73,7 +74,7 @@ public class GuiRecipeEditor extends GuiCommon {
 			this.timeInputField.setCursorPositionEnd();
 			this.timeInputField.setFocused(false);
 		} else {
-			this.timeInputField.x = this.gx + this.gx + GUI_WIDTH / 2;
+			this.timeInputField.x = this.gx + GUI_WIDTH / 2;
 			this.timeInputField.y = this.gy + 106;
 		}
 	}
@@ -124,7 +125,6 @@ public class GuiRecipeEditor extends GuiCommon {
 		if (!machineStack.isEmpty()) {
 			RenderHelper.enableGUIStandardItemLighting();
 			this.itemRender.renderItemAndEffectIntoGUI(machineStack, machineX + 1, machineY + 1);
-			this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, machineStack, machineX + 1, machineY + 1, machineStack.getCount() > 1 ? String.valueOf(machineStack.getCount()) : "");
 			RenderHelper.disableStandardItemLighting();
 		}
 
@@ -238,13 +238,100 @@ public class GuiRecipeEditor extends GuiCommon {
 	}
 
 	@Override
-	public void keyTyped(char typedChar, int keyCode) throws IOException{
-		if (keyCode == 1) { // Escape key
+	public void keyTyped(char typedChar, int keyCode) throws IOException {
+		if (Character.isDigit(typedChar) || keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_DELETE || keyCode == Keyboard.KEY_LEFT || keyCode == Keyboard.KEY_RIGHT || keyCode == Keyboard.KEY_ESCAPE) {
+			if (this.timeInputField.textboxKeyTyped(typedChar, keyCode)) return;
+		}
+		if (keyCode == Keyboard.KEY_ESCAPE) {
 			mc.displayGuiScreen(parent);
 			return;
 		}
 		super.keyTyped(typedChar, keyCode);
 	}
+
+	private void drawInputScrollBar(int x, int y, int height, int mouseX, int mouseY) {
+		// TODO: Implement input scroll bar drawing logic here
+	}
+
+	private void drawOutputScrollBar(int x, int y, int height, int mouseX, int mouseY) {
+		// TODO: Implement output scroll bar drawing logic here
+	}
+
+	@Override
+	public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+		for (int i = 0; i < TAB_COUNT; i++) {
+			int tx = gx + TAB_LEFT_PAD + i * (TAB_W + 2);
+			if (mouseX >= tx && mouseX < tx + TAB_W && mouseY >= gy + 2 && mouseY < gy + 2 + TAB_H) {
+				onTabClicked(i);
+				return;
+			}
+		}
+
+		if (this.timeInputField.mouseClicked(mouseX, mouseY, mouseButton)) return;
+
+		// Inputs
+		int inputSlot = getInputSlotAt(mouseX, mouseY);
+		if (inputSlot != -1) {
+			ItemStack heldItem = mc.player.inventory.getItemStack();
+			if (mouseButton == 0) {
+				this.recipeState.setInput(inputSlot, heldItem);
+			} else if (mouseButton == 1) {
+				ItemStack currentStack = this.recipeState.getInput(inputSlot);
+				if (!heldItem.isEmpty() && 
+						(currentStack.isEmpty() || ItemStack.areItemsEqual(heldItem, currentStack))) {
+					this.recipeState.alterInput(inputSlot, heldItem, 1, 1);
+				}
+			}
+			return;
+		}
+
+		// Machine
+		if (mouseX >= this.gx + 12 && mouseX < this.gx + 12 + SLOT_SIZE
+					&& mouseY >= this.machineY && mouseY < this.machineY + SLOT_SIZE) {
+			ItemStack heldItem = mc.player.inventory.getItemStack();
+			if (mouseButton == 0) {
+				this.recipeState.setMachine(heldItem);
+			}
+			return;
+		}
+
+		// Outputs
+		int outputSlot = getOutputSlotAt(mouseX, mouseY);
+		if (outputSlot != -1) {
+			ItemStack heldItem = mc.player.inventory.getItemStack();
+			if (mouseButton == 0) {
+				this.recipeState.setOutput(outputSlot, heldItem);
+			} else if (mouseButton == 1) {
+				ItemStack currentStack = this.recipeState.getOutput(outputSlot);
+				if (!heldItem.isEmpty() && 
+						(currentStack.isEmpty() || ItemStack.areItemsEqual(heldItem, currentStack))) {
+					this.recipeState.alterOutput(outputSlot, heldItem, 1, 1);
+				}
+			}
+			return;
+		}
+
+		// Buttons
+		if (mouseX >= this.gx + 12 && mouseX < this.gx + 12 + BUTTON_SIZE
+					&& mouseY >= this.buttonY && mouseY < this.buttonY + BUTTON_SIZE) {
+			this.recipeState.confirmRecipe(this.timeInputField.getText().isEmpty() ? 0 : Integer.parseInt(this.timeInputField.getText()));
+			mc.displayGuiScreen(parent);
+		}
+		if (mouseX >= this.gx + 32 && mouseX < this.gx + 32 + BUTTON_SIZE
+					&& mouseY >= this.buttonY && mouseY < this.buttonY + BUTTON_SIZE) {
+			mc.displayGuiScreen(parent);
+			return;
+		}
+		if (!this.isNewRecipe && mouseX >= this.gx + 52 && mouseX < this.gx + 52 + BUTTON_SIZE
+					&& mouseY >= this.buttonY && mouseY < this.buttonY + BUTTON_SIZE) {
+			this.recipeState.deleteRecipe();
+			mc.displayGuiScreen(parent);
+			return;
+		}
+
+		super.mouseClicked(mouseX, mouseY, mouseButton);
+	}
+
 
 	// Helper functions
 	private void onTabClicked(int index) {

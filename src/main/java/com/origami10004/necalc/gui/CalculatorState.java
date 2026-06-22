@@ -123,7 +123,7 @@ public class CalculatorState {
 		return rateMultiplier[selectedRate];
 	}
 
-	private void recalculateRecipes() {
+	public void recalculateRecipes() {
 		// TODO: Placeholder for recipe recalculation logic based on target slots and rates
 		Necalc.logger.info("Recalculating recipes with current target slots and rates...");
 	}

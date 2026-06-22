@@ -19,7 +19,7 @@ public class CalculationTarget {
 	public boolean setTargetItem(ItemStack targetItem, double rate) {
 		ItemStack old = this.targetItem;
 		this.targetItem = targetItem;
-		if (!ItemStack.areItemStacksEqual(old, targetItem)){
+		if (!ItemStack.areItemsEqual(old, targetItem)){
 			this.targetRate = rate;
 			return true;
 		}
