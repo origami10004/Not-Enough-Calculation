@@ -43,7 +43,7 @@ public class RecipeState {
 	public void setInput(int index, ItemStack stack) {
 		stagedRecipe.setInput(index, stack);
 	}
-	public void alterInput(int index, ItemStack stack, int inc, int mult) {
+	public void alterInput(int index, ItemStack stack, int inc, double mult) {
 		stagedRecipe.alterInput(index, stack, inc, mult);
 	}
 
@@ -63,7 +63,7 @@ public class RecipeState {
 	public void setOutput(int index, ItemStack stack) {
 		stagedRecipe.setOutput(index, stack);
 	}
-	public void alterOutput(int index, ItemStack stack, int inc, int mult) {
+	public void alterOutput(int index, ItemStack stack, int inc, double mult) {
 		stagedRecipe.alterOutput(index, stack, inc, mult);
 	}
 
@@ -72,7 +72,7 @@ public class RecipeState {
 	}
 
 	public void confirmRecipe(int time) {
-		if (stagedRecipe.isEmpty()){
+		if (!stagedRecipe.isValid()){
 			if (stagedId != -1) {
 				recipes.remove(stagedId);
 				ClientProxy.calcState.recalculateRecipes();
@@ -87,6 +87,7 @@ public class RecipeState {
 		} else {
 			recipes.set(stagedId, stagedRecipe.copy());
 		}
+		reset();
 		ClientProxy.calcState.recalculateRecipes();
 	}
 	public void deleteRecipe() {
@@ -95,5 +96,12 @@ public class RecipeState {
 			ClientProxy.calcState.recalculateRecipes();
 			reset();
 		}
+	}
+
+	public RecipeEntry getRecipe(int index) {
+		if (index < 0 || index >= recipes.size()) {
+			return RecipeEntry.EMPTY;
+		}
+		return recipes.get(index);
 	}
 }

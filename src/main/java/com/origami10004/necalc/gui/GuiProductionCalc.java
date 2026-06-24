@@ -437,7 +437,7 @@ public class GuiProductionCalc extends GuiCommon {
 				break;
 			case 2:
 				this.editOverlay.close();
-				// mc.displayGuiScreen(new GuiManageRecipes(playerInv, container));
+				mc.displayGuiScreen(new GuiManageRecipes(playerInv));
 				break;
 			case 3:
 				this.editOverlay.close();

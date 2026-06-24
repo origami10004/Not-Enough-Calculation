@@ -60,6 +60,10 @@ public class RecipeEntry {
 		return inputs.isEmpty() && outputs.isEmpty();
 	}
 
+	public boolean isValid() {
+		return !outputs.isEmpty() && !machine.isEmpty();
+	}
+
 	public void setInput(int index, ItemStack stack) {
 		if (index < 0) {
 			throw new IndexOutOfBoundsException("Invalid input index");
@@ -105,9 +109,10 @@ public class RecipeEntry {
 		} else {
 			int current = inputs.get(index).getCount();
 			int newCount = (int) ((current + inc) * mult);
-			if (newCount <= 0) {
-				inputs.remove(index);
-			} else {
+			if (mult == 0.5 && (current + inc) % 2 != 0) {
+				return; // Prevent halving odd numbers
+			}
+			if (newCount > 0) {
 				inputs.get(index).setCount(newCount);
 			}
 		}

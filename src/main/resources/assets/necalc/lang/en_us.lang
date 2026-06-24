@@ -34,3 +34,6 @@ necalc.gui.recipe.time=Time in ticks
 necalc.gui.recipe.confirm=Confirm
 necalc.gui.recipe.cancel=Cancel
 necalc.gui.recipe.delete=Delete
+
+# recipe manager gui
+necalc.gui.recipe_manager=Encoded Recipes

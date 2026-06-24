@@ -10,6 +10,7 @@ import net.minecraft.client.resources.I18n;
 
 import java.io.IOException;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import com.origami10004.necalc.proxy.ClientProxy;
 
@@ -181,7 +182,7 @@ public class GuiRecipeEditor extends GuiCommon {
 		drawTabTooltips(mouseX - this.guiLeft, mouseY - this.guiTop, this.gx - this.guiLeft, this.gy - this.guiTop);
 
 		// Inputs
-		int hoverSlot = getInputSlotAt(mouseX - this.guiLeft, mouseY - this.guiTop);
+		int hoverSlot = getInputSlotAt(mouseX, mouseY);
 		if (hoverSlot != -1) {
 			ItemStack stack = recipeState.getInput(hoverSlot);
 			if (!stack.isEmpty()) {
@@ -201,7 +202,7 @@ public class GuiRecipeEditor extends GuiCommon {
 		}
 
 		// Outputs
-		hoverSlot = getOutputSlotAt(mouseX - this.guiLeft, mouseY - this.guiTop);
+		hoverSlot = getOutputSlotAt(mouseX, mouseY);
 		if (hoverSlot != -1) {
 			ItemStack stack = recipeState.getOutput(hoverSlot);
 			if (!stack.isEmpty()) {
@@ -247,6 +248,53 @@ public class GuiRecipeEditor extends GuiCommon {
 			return;
 		}
 		super.keyTyped(typedChar, keyCode);
+	}
+
+	@Override
+	public void handleMouseInput() throws IOException {
+		int scroll = Mouse.getEventDWheel();
+		if (scroll != 0) {
+			int mouseX = Mouse.getEventX() * this.width / this.mc.displayWidth;
+			int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
+
+			boolean shiftPressed = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+			boolean ctrlPressed = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
+
+			int inputSlot = getInputSlotAt(mouseX, mouseY);
+			int outputSlot = getOutputSlotAt(mouseX, mouseY);
+
+			if (inputSlot != -1) {
+				if (shiftPressed && ctrlPressed) {
+					if (scroll > 0) {
+						this.recipeState.alterInput(inputSlot, ItemStack.EMPTY, 0, 2);
+					} else {
+						this.recipeState.alterInput(inputSlot, ItemStack.EMPTY, 0, 0.5);
+					}
+				} else if (shiftPressed) {
+					if (scroll > 0) {
+						this.recipeState.alterInput(inputSlot, ItemStack.EMPTY, 1, 1);
+					} else {
+						this.recipeState.alterInput(inputSlot, ItemStack.EMPTY, -1, 1);
+					}
+				}
+			}
+			if (outputSlot != -1) {
+				if (shiftPressed && ctrlPressed) {
+					if (scroll > 0) {
+						this.recipeState.alterOutput(outputSlot, ItemStack.EMPTY, 0, 2);
+					} else {
+						this.recipeState.alterOutput(outputSlot, ItemStack.EMPTY, 0, 0.5);
+					}
+				} else if (shiftPressed) {
+					if (scroll > 0) {
+						this.recipeState.alterOutput(outputSlot, ItemStack.EMPTY, 1, 1);
+					} else {
+						this.recipeState.alterOutput(outputSlot, ItemStack.EMPTY, -1, 1);
+					}
+				}
+			}
+		}
+		super.handleMouseInput();
 	}
 
 	private void drawInputScrollBar(int x, int y, int height, int mouseX, int mouseY) {
@@ -343,7 +391,7 @@ public class GuiRecipeEditor extends GuiCommon {
 				// mc.displayGuiScreen(new GuiFlowChart(playerInv, container));
 				break;
 			case 2:
-				// mc.displayGuiScreen(new GuiManageRecipes(playerInv, container));
+				mc.displayGuiScreen(new GuiManageRecipes(this.playerInv));
 				break;
 			case 3:
 				// mc.displayGuiScreen(new GuiAddRecipe(playerInv, container));
