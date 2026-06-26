@@ -9,7 +9,6 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import org.lwjgl.input.Keyboard;
 
 import com.origami10004.necalc.gui.GuiProductionCalc;
-import com.origami10004.necalc.proxy.ClientProxy;
 import com.origami10004.necalc.Necalc;
 
 public class KeyInputHandler {
@@ -19,7 +18,7 @@ public class KeyInputHandler {
 			// Open the GUI here
 			Necalc.logger.info("Opening Production Calculator GUI");
 			Minecraft mc = Minecraft.getMinecraft();
-			mc.displayGuiScreen(new GuiProductionCalc(mc.player.inventory, ClientProxy.calcState));
+			mc.displayGuiScreen(new GuiProductionCalc(mc.player.inventory));
 		}
 	}
 
@@ -33,7 +32,7 @@ public class KeyInputHandler {
 				if (mc.currentScreen instanceof GuiInventory || mc.currentScreen instanceof GuiContainerCreative) {
 					// Open GUI only when the player is in the inventory screen
 					Necalc.logger.info("Opening Production Calculator GUI");
-					mc.displayGuiScreen(new GuiProductionCalc(mc.player.inventory, ClientProxy.calcState));
+					mc.displayGuiScreen(new GuiProductionCalc(mc.player.inventory));
 					
 					event.setCanceled(true); 
 				}

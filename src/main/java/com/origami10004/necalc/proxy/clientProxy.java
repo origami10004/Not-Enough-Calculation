@@ -7,13 +7,10 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 
 import com.origami10004.necalc.client.KeyBindings;
 import com.origami10004.necalc.client.KeyInputHandler;
-import com.origami10004.necalc.config.ConfigHandler;
-import com.origami10004.necalc.gui.CalculatorState;
-import com.origami10004.necalc.gui.RecipeState;
+import com.origami10004.necalc.data.CalculatorState;
+import com.origami10004.necalc.data.RecipeState;
 
 public class ClientProxy extends CommonProxy {
-    public static CalculatorState calcState;
-    public static RecipeState recipeState;
     @Override
     public void preInit(FMLPreInitializationEvent event) {
         super.preInit(event);
@@ -26,15 +23,15 @@ public class ClientProxy extends CommonProxy {
     public void init(FMLInitializationEvent event) {
         super.init(event);
 
-        calcState = new CalculatorState();
-        recipeState = new RecipeState();
+        CalculatorState.init();
+        RecipeState.init();
     }
 
     @Override
     public void postInit(FMLPostInitializationEvent event) {
         super.postInit(event);
 
-        calcState.loadTargets();
-        recipeState.loadRecipes();
+        CalculatorState.loadTargets();
+        RecipeState.loadRecipes();
     }
 }

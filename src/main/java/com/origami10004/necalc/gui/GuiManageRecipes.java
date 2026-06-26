@@ -9,7 +9,7 @@ import net.minecraft.client.resources.I18n;
 import java.io.IOException;
 
 import com.origami10004.necalc.data.RecipeEntry;
-import com.origami10004.necalc.proxy.ClientProxy;
+import com.origami10004.necalc.data.RecipeState;
 
 public class GuiManageRecipes extends GuiCommon{
 	// GUI textures
@@ -29,14 +29,12 @@ public class GuiManageRecipes extends GuiCommon{
 
 	// instance variables
 	private InventoryPlayer playerInv;
-	private RecipeState recipeState;
 	private int gx, gy;
 	private int tableY;
 
 	public GuiManageRecipes(InventoryPlayer playerInv) {
 		super(new FakeContainer(playerInv, false, 0, 0));
 		this.playerInv = playerInv;
-		this.recipeState = ClientProxy.recipeState;
 	}
 
 	@Override
@@ -68,7 +66,7 @@ public class GuiManageRecipes extends GuiCommon{
 				int slotY = curY + row * SLOT_SIZE;
 				drawItemSlot(slotX, slotY);
 
-				RecipeEntry recipe = recipeState.getRecipe(index);
+				RecipeEntry recipe = RecipeState.getRecipe(index);
 				if (recipe != RecipeEntry.EMPTY) {
 					ItemStack output = recipe.getOutputs().get(0);
 					RenderHelper.enableGUIStandardItemLighting();
@@ -86,7 +84,7 @@ public class GuiManageRecipes extends GuiCommon{
 
 		int recipe = getRecipeAt(mouseX, mouseY);
 		if (recipe != -1) {
-			RecipeEntry entry = recipeState.getRecipe(recipe);
+			RecipeEntry entry = RecipeState.getRecipe(recipe);
 			if (entry != RecipeEntry.EMPTY) {
 				this.drawHoveringText(entry.getOutputs().get(0).getDisplayName(), mouseX - this.guiLeft, mouseY - this.guiTop);
 			}
@@ -105,9 +103,9 @@ public class GuiManageRecipes extends GuiCommon{
 
 		int recipe = getRecipeAt(mouseX, mouseY);
 		if (recipe != -1) {
-			RecipeEntry entry = recipeState.getRecipe(recipe);
+			RecipeEntry entry = RecipeState.getRecipe(recipe);
 			if (entry != RecipeEntry.EMPTY) {
-				recipeState.stageRecipe(recipe);
+				RecipeState.stageRecipe(recipe);
 				mc.displayGuiScreen(new GuiRecipeEditor(this.playerInv, this, false));
 			}
 		}
@@ -118,7 +116,7 @@ public class GuiManageRecipes extends GuiCommon{
 	private void onTabClicked(int tabIndex) {
 		switch (tabIndex) {
 			case 0:
-				mc.displayGuiScreen(new GuiProductionCalc(this.playerInv, ClientProxy.calcState));
+				mc.displayGuiScreen(new GuiProductionCalc(this.playerInv));
 				break;
 			case 1:
 				//mc.displayGuiScreen(new GuiFlowChart(this.playerInv));

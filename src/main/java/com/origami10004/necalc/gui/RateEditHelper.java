@@ -2,7 +2,7 @@ package com.origami10004.necalc.gui;
 
 import org.lwjgl.input.Keyboard;
 
-import com.origami10004.necalc.proxy.ClientProxy;
+import com.origami10004.necalc.data.CalculatorState;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
@@ -31,7 +31,7 @@ public class RateEditHelper {
 		isOpen = true;
 		this.panelX = slotX - 5;
 		this.panelY = slotY - 5;
-		this.currentRate = ClientProxy.calcState.getTargetSlotRate(slotIndex);
+		this.currentRate = CalculatorState.getTargetSlotRate(slotIndex);
 		Minecraft mc = parent.mc;
 		this.rateInputField = new GuiTextField(0, mc.fontRenderer, this.panelX + 25, this.panelY + 4, PANEL_W - 29, PANEL_H - 8);
 		this.rateInputField.setText(Double.toString(this.currentRate));
@@ -87,7 +87,7 @@ public class RateEditHelper {
 	public boolean keyTyped(GuiProductionCalc parent, char typedChar, int keyCode) {
 		if (!isOpen) return false;
 		if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
-			ClientProxy.calcState.setTargetSlotRate(activeSlot, Double.parseDouble(rateInputField.getText()) / ClientProxy.calcState.getMultiplier());
+			CalculatorState.setTargetSlotRate(activeSlot, Double.parseDouble(rateInputField.getText()) / CalculatorState.getMultiplier());
 			close();
 			return true;
 		}

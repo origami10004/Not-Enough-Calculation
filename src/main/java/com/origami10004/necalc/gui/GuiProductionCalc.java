@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.origami10004.necalc.Necalc;
+import com.origami10004.necalc.data.CalculatorState;
 import com.origami10004.necalc.data.ProductionStep;
 
 import mcp.MethodsReturnNonnullByDefault;
@@ -49,9 +50,7 @@ public class GuiProductionCalc extends GuiCommon {
 	}
 
 	// instance variables
-	private CalculatorState calcState;
 	private InventoryPlayer playerInv;
-	private FakeContainer container;
 
 	// Target scrolling
 	protected int targetScrollRow = 0;
@@ -72,11 +71,9 @@ public class GuiProductionCalc extends GuiCommon {
 
 	private int gx, gy; // top left corner of the whole GUI
 
-	public GuiProductionCalc(InventoryPlayer playerInv, CalculatorState calcState) {
+	public GuiProductionCalc(InventoryPlayer playerInv) {
 		super(new FakeContainer(playerInv, true, 9, 248));
 		this.playerInv = playerInv;
-		this.calcState = calcState;
-		this.container = (FakeContainer) inventorySlots;
 	}
 
 	@Override
@@ -112,7 +109,7 @@ public class GuiProductionCalc extends GuiCommon {
 		int width = this.fontRenderer.getStringWidth(I18n.format("necalc.gui.rate"));
 		this.fontRenderer.drawString(I18n.format("necalc.gui.rate"), this.gx + INDENT_L + 4, curY + 6, 0xFF000000);
 		String [] rateLabels = {I18n.format("necalc.gui.rate.minute"), I18n.format("necalc.gui.rate.second"), I18n.format("necalc.gui.rate.ticks")};
-		int selectedRate = this.calcState.getSelectedRate();
+		int selectedRate = CalculatorState.getDisplayRate();
 		this.rateBtnY = curY + 4;
 		for (int i = 0; i < 3; i++) {
 			this.drawButton(this.gx + INDENT_L + 4 + width + 4 + i * 34, rateBtnY, 30, 11, rateLabels[i], mouseX, mouseY, (i == selectedRate), true);
@@ -126,11 +123,11 @@ public class GuiProductionCalc extends GuiCommon {
 				int slotX = this.gx + INDENT_L + 4 + col * SLOT_SIZE;
 				this.drawItemSlot(slotX, this.targetGridY + row * SLOT_SIZE);
 
-				ItemStack curTarget = this.calcState.getTargetSlot(actual * SLOTS_PER_ROW + col);
+				ItemStack curTarget = CalculatorState.getTargetSlot(actual * SLOTS_PER_ROW + col);
 				if (!curTarget.isEmpty()) {
 					RenderHelper.enableGUIStandardItemLighting();
 					this.itemRender.renderItemAndEffectIntoGUI(curTarget, slotX + 1, this.targetGridY + row * SLOT_SIZE + 1);
-					this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, curTarget, slotX + 1, this.targetGridY + row * SLOT_SIZE + 1, Double.toString(this.calcState.getTargetSlotRate(actual * SLOTS_PER_ROW + col)));
+					this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, curTarget, slotX + 1, this.targetGridY + row * SLOT_SIZE + 1, Double.toString(CalculatorState.getTargetSlotRate(actual * SLOTS_PER_ROW + col)));
 					RenderHelper.disableStandardItemLighting();
 				}
 			}
@@ -144,7 +141,7 @@ public class GuiProductionCalc extends GuiCommon {
 		this.fontRenderer.drawString(I18n.format("necalc.gui.results"), this.gx + 8, curY + 7, 0xFF000000);
 		this.unhideX = this.gx + GUI_WIDTH - INDENT_R - HIDE_SIZE - 2;
 		this.unhideY = curY + 4;
-		this.drawEyeButton(unhideX, unhideY, mouseX, mouseY, this.calcState.hasHidden(), false);
+		this.drawEyeButton(unhideX, unhideY, mouseX, mouseY, CalculatorState.hasHidden(), false);
 		// Rates table
 		this.prodTableY = curY + 18;
 		this.drawProdTable(this.prodTableY, mouseX, mouseY);
@@ -173,8 +170,8 @@ public class GuiProductionCalc extends GuiCommon {
 		// Unhide button tooltip
 		if (mouseX >= unhideX && mouseX < unhideX + HIDE_SIZE && mouseY >= unhideY && mouseY < unhideY + HIDE_SIZE) {
 			String text;
-			if (this.calcState.hasHidden()) {
-				text = I18n.format("necalc.gui.show.some", this.calcState.getHiddenCount());
+			if (CalculatorState.hasHidden()) {
+				text = I18n.format("necalc.gui.show.some", CalculatorState.getHiddenCount());
 			} else {
 				text = I18n.format("necalc.gui.show.none");
 			}
@@ -183,7 +180,7 @@ public class GuiProductionCalc extends GuiCommon {
 
 		// Production step recipe tooltip (only show after hovering for a while)
 		if (hoveredRecipeRow != -1 && hoveredRecipeRowTicks > 20) {
-			List<ProductionStep> visible = this.calcState.getVisibleRecipes();
+			List<ProductionStep> visible = CalculatorState.getVisibleRecipes();
 			if (hoveredRecipeRow < visible.size()) {
 				ProductionStep step = visible.get(hoveredRecipeRow);
 				Necalc.logger.info("Hovering recipe row " + hoveredRecipeRow);
@@ -210,7 +207,7 @@ public class GuiProductionCalc extends GuiCommon {
 	}
 
 	private void drawTargetScrollBar(int x, int y, int height, int mouseX, int mouseY) {
-		int totalRows = calcState.getTargetNumRows();
+		int totalRows = CalculatorState.getTargetNumRows();
 		int thumbH, thumbY;
 		if (totalRows <= TARGET_ROWS) {
 			thumbH = height - 2;
@@ -241,7 +238,7 @@ public class GuiProductionCalc extends GuiCommon {
 	}
 
 	private void drawProdTable(int y, int mouseX, int mouseY) {
-		List<ProductionStep> visible = this.calcState.getVisibleRecipes();
+		List<ProductionStep> visible = CalculatorState.getVisibleRecipes();
 		int maxScroll = Math.max(0, visible.size() - TABLE_VIS_ROWS);
 		this.prodScrollRow = Math.max(0, Math.min(this.prodScrollRow, maxScroll));
 
@@ -285,7 +282,7 @@ public class GuiProductionCalc extends GuiCommon {
 			if (input != null) {
 				RenderHelper.enableGUIStandardItemLighting();
 				this.itemRender.renderItemAndEffectIntoGUI(input, rowX + 2, iconY);
-				this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, input, rowX + 2, iconY, String.format("%.1f", this.calcState.getMultiplier() * step.getPrimaryInputRate()));
+				this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, input, rowX + 2, iconY, String.format("%.1f", CalculatorState.getMultiplier() * step.getPrimaryInputRate()));
 				RenderHelper.disableStandardItemLighting();
 				if (rowHovered) {
 					if (mouseX >= rowX + 2 && mouseX < rowX + 2 + 16 && mouseY >= iconY && mouseY < iconY + 16) {
@@ -321,7 +318,7 @@ public class GuiProductionCalc extends GuiCommon {
 			ItemStack output = step.getPrimaryOutput();
 			RenderHelper.enableGUIStandardItemLighting();
 			this.itemRender.renderItemAndEffectIntoGUI(output, outputIconX, iconY);
-			this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, output, outputIconX, iconY, String.format("%.1f", this.calcState.getMultiplier() * step.getPrimaryOutputRate()));
+			this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, output, outputIconX, iconY, String.format("%.1f", CalculatorState.getMultiplier() * step.getPrimaryOutputRate()));
 			RenderHelper.disableStandardItemLighting();
 			if (rowHovered) {
 				if (mouseX >= outputIconX && mouseX < outputIconX + 16 && mouseY >= iconY && mouseY < iconY + 16) {
@@ -362,7 +359,7 @@ public class GuiProductionCalc extends GuiCommon {
 				int btnX = this.gx + INDENT_L + 4 + width + 4 + i * 34;
 				if (mouseX >= btnX && mouseX < btnX + 30 && mouseY >= this.rateBtnY
 							&& mouseY < this.rateBtnY + 11) {
-					this.calcState.setSelectedRate(i); return;
+					CalculatorState.setDisplayRate(i); return;
 				}
 			}
 		}
@@ -372,14 +369,14 @@ public class GuiProductionCalc extends GuiCommon {
 			int targetSlot = getTargetSlotAt(mouseX, mouseY);
 			if (targetSlot != -1) {
 				ItemStack heldItem = this.mc.player.inventory.getItemStack();
-				this.calcState.setTargetSlot(targetSlot, heldItem.copy());
+				CalculatorState.setTargetSlot(targetSlot, heldItem.copy());
 				return;
 			}
 		}
 		// Target slot edit (middle click)
 		if (mouseButton == 2) {
 			int targetSlot = getTargetSlotAt(mouseX, mouseY);
-			if (targetSlot != -1 && !this.calcState.getTargetSlot(targetSlot).isEmpty()) {
+			if (targetSlot != -1 && !CalculatorState.getTargetSlot(targetSlot).isEmpty()) {
 				int slotScreenX = this.gx + INDENT_L + 4 + (targetSlot % SLOTS_PER_ROW) * SLOT_SIZE;
 				int slotScreenY = this.targetGridY + (targetSlot / SLOTS_PER_ROW - this.targetScrollRow) * SLOT_SIZE;
 				editOverlay.openSlot(targetSlot, slotScreenX, slotScreenY);
@@ -390,7 +387,7 @@ public class GuiProductionCalc extends GuiCommon {
 		if (mouseButton == 0
                 && mouseX >= this.unhideX && mouseX < this.unhideX + HIDE_SIZE
                 && mouseY >= this.unhideY && mouseY < this.unhideY + HIDE_SIZE) {
-            this.calcState.showAllRecipes();
+            CalculatorState.showAllRecipes();
             return;
         }
 
@@ -398,7 +395,7 @@ public class GuiProductionCalc extends GuiCommon {
 		if (mouseButton == 0) {
 			int prodRow = getProdRowAt(mouseX, mouseY);
 			if (prodRow != -1) {
-				List<ProductionStep> visible = this.calcState.getVisibleRecipes();
+				List<ProductionStep> visible = CalculatorState.getVisibleRecipes();
 				int rowX = gx + INDENT_L + 1;
 				int rowW = GUI_WIDTH - INDENT_L - INDENT_R - 2;
 				if (visible.size() > TABLE_VIS_ROWS) rowW -= SB_W + 2;
@@ -407,7 +404,7 @@ public class GuiProductionCalc extends GuiCommon {
 				int eyeY = rowY + (TABLE_ROW_H - HIDE_SIZE) / 2;
 				if (mouseX >= eyeX && mouseX < eyeX + HIDE_SIZE
 						&& mouseY >= eyeY && mouseY < eyeY + HIDE_SIZE) {
-					calcState.hideRecipe(prodRow);
+					CalculatorState.hideRecipe(prodRow);
 					return;
 				}
 			}
