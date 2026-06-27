@@ -114,6 +114,7 @@ public class RecipePersistence {
 					continue;
 				}
 				ItemStack machineStack = new ItemStack(machineItem, 1, recipe.machine.meta);
+				MachineState.addMachine(machineStack);
 				if (recipe.machine.nbt != null && recipe.machine.nbt.isJsonObject()) {
 					try {
 						NBTTagCompound nbt = JsonToNBT.getTagFromJson(recipe.machine.nbt.toString());

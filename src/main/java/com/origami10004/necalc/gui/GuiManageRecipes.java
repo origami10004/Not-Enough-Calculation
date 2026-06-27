@@ -86,7 +86,7 @@ public class GuiManageRecipes extends GuiCommon{
 		if (recipe != -1) {
 			RecipeEntry entry = RecipeState.getRecipe(recipe);
 			if (entry != RecipeEntry.EMPTY) {
-				this.drawHoveringText(entry.getOutputs().get(0).getDisplayName(), mouseX - this.guiLeft, mouseY - this.guiTop);
+				renderToolTip(entry.getOutputs().get(0), mouseX - this.guiLeft, mouseY - this.guiTop);
 			}
 		}
 	}
@@ -124,7 +124,7 @@ public class GuiManageRecipes extends GuiCommon{
 			case 2:
 				break;
 			case 3:
-				// mc.displayGuiScreen(new GuiAddRecipe(playerInv, container));
+				mc.displayGuiScreen(new GuiManageMachines(this.playerInv));
 				break;
 			case 4:
 				mc.displayGuiScreen(new GuiRecipeEditor(this.playerInv, this, true));

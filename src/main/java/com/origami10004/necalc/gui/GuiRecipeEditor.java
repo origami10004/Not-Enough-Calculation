@@ -184,7 +184,7 @@ public class GuiRecipeEditor extends GuiCommon {
 		if (hoverSlot != -1) {
 			ItemStack stack = RecipeState.getInput(hoverSlot);
 			if (!stack.isEmpty()) {
-				this.drawHoveringText(stack.getDisplayName(), mouseX - this.guiLeft, mouseY - this.guiTop);
+				renderToolTip(stack, mouseX - this.guiLeft, mouseY - this.guiTop);
 				return;
 			}
 		}
@@ -194,7 +194,7 @@ public class GuiRecipeEditor extends GuiCommon {
 					&& mouseY >= this.machineY && mouseY < this.machineY + SLOT_SIZE) {
 			ItemStack stack = RecipeState.getMachine();
 			if (!stack.isEmpty()) {
-				this.drawHoveringText(stack.getDisplayName(), mouseX - this.guiLeft, mouseY - this.guiTop);
+				renderToolTip(stack, mouseX - this.guiLeft, mouseY - this.guiTop);
 				return;
 			}
 		}
@@ -204,7 +204,7 @@ public class GuiRecipeEditor extends GuiCommon {
 		if (hoverSlot != -1) {
 			ItemStack stack = RecipeState.getOutput(hoverSlot);
 			if (!stack.isEmpty()) {
-				this.drawHoveringText(stack.getDisplayName(), mouseX - this.guiLeft, mouseY - this.guiTop);
+				renderToolTip(stack, mouseX - this.guiLeft, mouseY - this.guiTop);
 				return;
 			}
 		}
@@ -392,7 +392,7 @@ public class GuiRecipeEditor extends GuiCommon {
 				mc.displayGuiScreen(new GuiManageRecipes(this.playerInv));
 				break;
 			case 3:
-				// mc.displayGuiScreen(new GuiAddRecipe(playerInv, container));
+				mc.displayGuiScreen(new GuiManageMachines(this.playerInv));
 				break;
 			case 4:
 				break;

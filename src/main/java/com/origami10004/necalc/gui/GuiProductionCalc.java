@@ -183,7 +183,6 @@ public class GuiProductionCalc extends GuiCommon {
 			List<ProductionStep> visible = CalculatorState.getVisibleRecipes();
 			if (hoveredRecipeRow < visible.size()) {
 				ProductionStep step = visible.get(hoveredRecipeRow);
-				Necalc.logger.info("Hovering recipe row " + hoveredRecipeRow);
 				//this.drawRecipeTooltip(step, mouseX, mouseY);
 			}
 		}
@@ -414,7 +413,7 @@ public class GuiProductionCalc extends GuiCommon {
 
 	@Override
 	public void keyTyped(char typedChar, int keyCode) throws IOException{
-		if (editOverlay.keyTyped(this, typedChar, keyCode)) return;
+		if (editOverlay.keyTyped(typedChar, keyCode)) return;
 		super.keyTyped(typedChar, keyCode);
 	}
 
@@ -438,7 +437,7 @@ public class GuiProductionCalc extends GuiCommon {
 				break;
 			case 3:
 				this.editOverlay.close();
-				// mc.displayGuiScreen(new GuiAddRecipe(playerInv, container));
+				mc.displayGuiScreen(new GuiManageMachines(playerInv));
 				break;
 			case 4:
 				this.editOverlay.close();

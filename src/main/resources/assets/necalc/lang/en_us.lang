@@ -37,3 +37,8 @@ necalc.gui.recipe.delete=Delete
 
 # recipe manager gui
 necalc.gui.recipe_manager=Encoded Recipes
+
+# Machine manager gui
+necalc.gui.machine_manager=Machine manager
+necalc.gui.machine_speed=Machine speed: %d
+necalc.gui.machine_help=Use this menu to edit machine speeds for all recipes using the machine
