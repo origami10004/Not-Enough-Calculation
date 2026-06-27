@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.origami10004.necalc.Necalc;
+
+import java.util.HashSet;
+
 import net.minecraft.item.ItemStack;
 
 public class RecipeEntry {
 	private ArrayList<ItemStack> inputs;
 	private ArrayList<ItemStack> outputs;
+	private HashSet<ItemKey> inputKeys;
+	private HashSet<ItemKey> outputKeys;
 	private ItemStack machine;
 	private int time;
 
@@ -17,18 +23,24 @@ public class RecipeEntry {
 	public RecipeEntry() {
 		this.inputs = new ArrayList<>();
 		this.outputs = new ArrayList<>();
+		this.inputKeys = new HashSet<>();
+		this.outputKeys = new HashSet<>();
 		this.machine = ItemStack.EMPTY;
 		this.time = 0;
 	}
 	public RecipeEntry(ArrayList<ItemStack> inputs, ItemStack machine, ArrayList<ItemStack> outputs, int time) {
 		this.inputs = new ArrayList<>();
+		this.inputKeys = new HashSet<>();
 		for (ItemStack stack : inputs) {
 			this.inputs.add(stack.copy());
+			this.inputKeys.add(new ItemKey(stack));
 		}
 		this.machine = machine.copy();
 		this.outputs = new ArrayList<>();
+		this.outputKeys = new HashSet<>();
 		for (ItemStack stack : outputs) {
 			this.outputs.add(stack.copy());
+			this.outputKeys.add(new ItemKey(stack));
 		}
 		this.time = time;
 	}
@@ -67,15 +79,23 @@ public class RecipeEntry {
 	public void setInput(int index, ItemStack stack) {
 		if (index < 0) {
 			throw new IndexOutOfBoundsException("Invalid input index");
-		} else if (index >= inputs.size()) {
+		}
+		if (inputKeys.contains(new ItemKey(stack))) {
+			return;
+		}
+		if (index >= inputs.size()) {
 			if (stack.isEmpty()) return;
 			inputs.add(stack.copy());
+			inputKeys.add(new ItemKey(stack));
 		} else {
 			if (stack.isEmpty()) {
 				inputs.remove(index);
+				inputKeys.remove(new ItemKey(stack));
 				return;
 			}
+			inputKeys.remove(new ItemKey(inputs.get(index)));
 			inputs.set(index, stack.copy());
+			inputKeys.add(new ItemKey(stack));
 		}
 	}
 
@@ -86,15 +106,23 @@ public class RecipeEntry {
 	public void setOutput(int index, ItemStack stack) {
 		if (index < 0) {
 			throw new IndexOutOfBoundsException("Invalid output index");
-		} else if (index >= outputs.size()) {
+		}
+		if (outputKeys.contains(new ItemKey(stack))) {
+			return;
+		}
+		if (index >= outputs.size()) {
 			if (stack.isEmpty()) return;
 			outputs.add(stack.copy());
+			outputKeys.add(new ItemKey(stack));
 		} else {
 			if (stack.isEmpty()) {
 				outputs.remove(index);
+				outputKeys.remove(new ItemKey(stack));
 				return;
 			}
+			outputKeys.remove(new ItemKey(outputs.get(index)));
 			outputs.set(index, stack.copy());
+			outputKeys.add(new ItemKey(stack));
 		}
 	}
 
@@ -136,39 +164,4 @@ public class RecipeEntry {
 			}
 		}
 	}
-
-	public void clean() {
-		Map <ItemKey, Integer> inputMap = new HashMap<>();
-		ArrayList<ItemStack> newInputs = new ArrayList<>();
-		for (ItemStack stack : inputs) {
-			if (stack.isEmpty()) continue;
-			ItemKey key = new ItemKey(stack);
-			if (!inputMap.containsKey(key)) {
-				inputMap.put(key, newInputs.size());
-				newInputs.add(stack.copy());
-			} else {
-				int idx = inputMap.get(key);
-				newInputs.get(idx).setCount(newInputs.get(idx).getCount() + stack.getCount());
-			}
-		}
-		inputs.clear();
-		inputs.addAll(newInputs);
-
-		Map <ItemKey, Integer> outputMap = new HashMap<>();
-		ArrayList<ItemStack> newOutputs = new ArrayList<>();
-		for (ItemStack stack : outputs) {
-			if (stack.isEmpty()) continue;
-			ItemKey key = new ItemKey(stack);
-			if (!outputMap.containsKey(key)) {
-				outputMap.put(key, newOutputs.size());
-				newOutputs.add(stack.copy());
-			} else {
-				int idx = outputMap.get(key);
-				newOutputs.get(idx).setCount(newOutputs.get(idx).getCount() + stack.getCount());
-			}
-		}
-		outputs.clear();
-		outputs.addAll(newOutputs);
-	}
-
 }

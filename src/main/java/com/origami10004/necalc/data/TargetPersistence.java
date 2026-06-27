@@ -27,14 +27,23 @@ public class TargetPersistence {
 		public int meta;
 		public JsonElement nbt;
 		public double rate;
+		public TargetData(ItemKey item, double rate) {
+			this.item = item.registryName;
+			this.meta = item.meta;
+			if (item.nbt != null) {
+				this.nbt = new JsonParser().parse(item.nbt.toString());
+			} else {
+				this.nbt = null;
+			}
+			this.rate = rate;
+		}
 	}
 	private static class Wrapper {
 		public List<TargetData> targets;
 	}
 	public static void saveTargetData(Map<Integer, CalculationTarget> targetSlots) {
-		if (SAVE_FILE.getParentFile() != null) {
-			SAVE_FILE.getParentFile().mkdirs();
-		}
+		SAVE_FILE.getParentFile().mkdirs();
+
 		Map <ItemKey, Double> compressedData = new HashMap<>();
 		for (Integer index : targetSlots.keySet()) {
 			ItemStack stack = targetSlots.get(index).getTargetItem();
@@ -49,16 +58,7 @@ public class TargetPersistence {
 		Wrapper wrapper = new Wrapper();
 		wrapper.targets = new ArrayList<>();
 		for (Map.Entry<ItemKey, Double> entry : compressedData.entrySet()) {
-			TargetData data = new TargetData();
-			data.item = entry.getKey().registryName;
-			data.meta = entry.getKey().meta;
-			if (entry.getKey().nbt != null) {
-				data.nbt = new JsonParser().parse(entry.getKey().nbt.toString());
-			} else {
-				data.nbt = null;
-			}
-			data.rate = entry.getValue();
-			wrapper.targets.add(data);
+			wrapper.targets.add(new TargetData(entry.getKey(), entry.getValue()));
 		}
 		try (FileWriter writer = new FileWriter(SAVE_FILE)) {
 			GSON.toJson(wrapper, writer);

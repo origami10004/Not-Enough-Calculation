@@ -10,17 +10,16 @@ public class RecipeState {
 	private static int stagedId;
 
 	public static void init() {
-		recipes = new ArrayList<>();
-		stagedRecipe = RecipeEntry.EMPTY;
+		stagedRecipe = RecipeEntry.EMPTY.copy();
 	}
 
 	public static void loadRecipes() {
-		// TODO: Implement recipe loading logic here
+		recipes = RecipePersistence.loadRecipeData();
 	}
 
 	public static void reset() {
 		RecipeState.stagedId = -1;
-		RecipeState.stagedRecipe = RecipeEntry.EMPTY;
+		RecipeState.stagedRecipe = RecipeEntry.EMPTY.copy();
 	}
 
 	public static void stageRecipe(int index) {
@@ -72,24 +71,26 @@ public class RecipeState {
 		if (!stagedRecipe.isValid()){
 			if (stagedId != -1) {
 				recipes.remove(stagedId);
+				RecipePersistence.saveRecipeData(recipes);
 				CalculatorState.recalculateRecipes();
 			}
 			reset();
 			return;
 		}
 		stagedRecipe.setTime(time);
-		stagedRecipe.clean();
 		if (stagedId == -1) {
 			recipes.add(stagedRecipe.copy());
 		} else {
 			recipes.set(stagedId, stagedRecipe.copy());
 		}
 		reset();
+		RecipePersistence.saveRecipeData(recipes);
 		CalculatorState.recalculateRecipes();
 	}
 	public static void deleteRecipe() {
 		if (stagedId != -1) {
 			recipes.remove(stagedId);
+			RecipePersistence.saveRecipeData(recipes);
 			CalculatorState.recalculateRecipes();
 			reset();
 		}

@@ -16,7 +16,6 @@ public class KeyInputHandler {
 	public void onKeyInput(net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent event) {
 		if (KeyBindings.OPEN_CALC_GUI.isPressed()) {
 			// Open the GUI here
-			Necalc.logger.info("Opening Production Calculator GUI");
 			Minecraft mc = Minecraft.getMinecraft();
 			mc.displayGuiScreen(new GuiProductionCalc(mc.player.inventory));
 		}
@@ -31,7 +30,6 @@ public class KeyInputHandler {
 				Minecraft mc = Minecraft.getMinecraft();
 				if (mc.currentScreen instanceof GuiInventory || mc.currentScreen instanceof GuiContainerCreative) {
 					// Open GUI only when the player is in the inventory screen
-					Necalc.logger.info("Opening Production Calculator GUI");
 					mc.displayGuiScreen(new GuiProductionCalc(mc.player.inventory));
 					
 					event.setCanceled(true); 
