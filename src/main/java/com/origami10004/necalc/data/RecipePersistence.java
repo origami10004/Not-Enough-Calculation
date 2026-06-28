@@ -27,22 +27,22 @@ public class RecipePersistence {
 	private static class MachineData {
 		public String item;
 		public int meta;
-		public JsonElement nbt;
 		public MachineData(ItemStack stack) {
 			this.item = stack.getItem().getRegistryName().toString();
 			this.meta = stack.getMetadata();
+		}
+	}
+	private static class ItemData extends MachineData{
+		public int count;
+		public JsonElement nbt;
+		public ItemData(ItemStack stack) {
+			super(stack);
+			this.count = stack.getCount();
 			if (stack.getTagCompound() != null) {
 				this.nbt = new JsonParser().parse(stack.getTagCompound().toString());
 			} else {
 				this.nbt = null;
 			}
-		}
-	}
-	private static class ItemData extends MachineData{
-		public int count;
-		public ItemData(ItemStack stack) {
-			super(stack);
-			this.count = stack.getCount();
 		}
 	}
 	private static class Recipe {
@@ -115,14 +115,7 @@ public class RecipePersistence {
 				}
 				ItemStack machineStack = new ItemStack(machineItem, 1, recipe.machine.meta);
 				MachineState.addMachine(machineStack);
-				if (recipe.machine.nbt != null && recipe.machine.nbt.isJsonObject()) {
-					try {
-						NBTTagCompound nbt = JsonToNBT.getTagFromJson(recipe.machine.nbt.toString());
-						machineStack.setTagCompound(nbt);
-					} catch (Exception e) {
-						Necalc.logger.warn("Failed to parse NBT for machine {}: {}", recipe.machine.item, e.getMessage());
-					}
-				}
+
 				ArrayList<ItemStack> outputs = new ArrayList<>();
 				for (ItemData outputData : recipe.outputs) {
 					ResourceLocation itemLoc = new ResourceLocation(outputData.item);

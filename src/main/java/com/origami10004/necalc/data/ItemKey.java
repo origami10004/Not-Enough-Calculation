@@ -4,13 +4,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import java.util.*;
 
-public class ItemKey {
-	public String registryName;
-	public int meta;
+public class ItemKey extends MachineKey{
 	public NBTTagCompound nbt;
 	public ItemKey(ItemStack stack) {
-		this.registryName = stack.getItem().getRegistryName().toString();
-		this.meta = stack.getMetadata();
+		super(stack);
 		this.nbt = stack.getTagCompound();
 	}
 	@Override

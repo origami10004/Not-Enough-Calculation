@@ -6,10 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.origami10004.necalc.Necalc;
-import com.origami10004.necalc.data.ItemKey;
+import com.origami10004.necalc.data.MachineKey;
 import com.origami10004.necalc.data.MachineState;
-import com.origami10004.necalc.data.RecipeEntry;
-import com.origami10004.necalc.data.RecipeState;
 
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -71,7 +69,7 @@ public class GuiManageMachines extends GuiCommon {
 		curY += 17;
 
 		this.tableY = curY;
-		List<Map.Entry<ItemKey, Integer>> machineKeys = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
+		List<Map.Entry<MachineKey, Integer>> machineKeys = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
 		for (int row = 0; row < ROWS; row++) {
 			for (int col = 0; col < COLS; col++) {
 				int index = row * COLS + col;
@@ -80,7 +78,7 @@ public class GuiManageMachines extends GuiCommon {
 				drawItemSlot(slotX, slotY);
 
 				if (index < machineKeys.size()) {
-					Map.Entry<ItemKey, Integer> entry = machineKeys.get(index);
+					Map.Entry<MachineKey, Integer> entry = machineKeys.get(index);
 					ResourceLocation machineLoc = new ResourceLocation(entry.getKey().registryName);
 					Item machine = Item.REGISTRY.getObject(machineLoc);
 					if (machine == null) {
@@ -88,9 +86,7 @@ public class GuiManageMachines extends GuiCommon {
 						continue;
 					}
 					ItemStack stack = new ItemStack(machine, 1, entry.getKey().meta);
-					if (entry.getKey().nbt != null) {
-						stack.setTagCompound(entry.getKey().nbt);
-					}
+
 					RenderHelper.enableGUIStandardItemLighting();
 					this.itemRender.renderItemAndEffectIntoGUI(stack, slotX + 1, slotY + 1);
 					RenderHelper.disableStandardItemLighting();
@@ -103,7 +99,7 @@ public class GuiManageMachines extends GuiCommon {
 
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-		List<Map.Entry<ItemKey, Integer>> machineKeys = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
+		List<Map.Entry<MachineKey, Integer>> machineKeys = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
 		ITooltipFlag flag = this.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
 
 		if (editor.hovered(mouseX, mouseY)) {
@@ -115,14 +111,11 @@ public class GuiManageMachines extends GuiCommon {
 		int index = getMachineAt(mouseX, mouseY);
 		if (index != -1) {
 			if (index < machineKeys.size()) {
-				Map.Entry<ItemKey, Integer> entry = machineKeys.get(index);
+				Map.Entry<MachineKey, Integer> entry = machineKeys.get(index);
 				ResourceLocation machineLoc = new ResourceLocation(entry.getKey().registryName);
 				Item machine = Item.REGISTRY.getObject(machineLoc);
 				if (machine != null) {
 					ItemStack stack = new ItemStack(machine, 1, entry.getKey().meta);
-					if (entry.getKey().nbt != null) {
-						stack.setTagCompound(entry.getKey().nbt);
-					}
 					
 					List<String> tooltip = stack.getTooltip(this.mc.player, flag);
 					tooltip.add(1, I18n.format("necalc.gui.machine_speed", entry.getValue()));

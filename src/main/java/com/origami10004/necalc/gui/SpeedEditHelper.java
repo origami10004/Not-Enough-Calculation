@@ -5,10 +5,9 @@ import java.util.List;
 import java.util.Map;
 import org.lwjgl.input.Keyboard;
 
-import com.origami10004.necalc.data.ItemKey;
+import com.origami10004.necalc.data.MachineKey;
 import com.origami10004.necalc.data.MachineState;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
@@ -24,7 +23,7 @@ public class SpeedEditHelper {
 	private int panelX = 0;
 	private int panelY = 0;
 	private GuiTextField speedInputField;
-	private ItemKey machine;
+	private MachineKey machine;
 
 	public SpeedEditHelper(GuiManageMachines parent) {
 		this.parent = parent;
@@ -35,7 +34,7 @@ public class SpeedEditHelper {
 		isOpen = true;
 		this.panelX = slotX - 5;
 		this.panelY = slotY - 5;
-		List<Map.Entry<ItemKey, Integer>> entries = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
+		List<Map.Entry<MachineKey, Integer>> entries = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
 		this.machine = entries.get(slotIndex).getKey();
 		int currentSpeed = entries.get(slotIndex).getValue();
 		this.speedInputField = new GuiTextField(0, parent.mc.fontRenderer, this.panelX + 25, this.panelY + 4, PANEL_W - 29, PANEL_H - 8);
