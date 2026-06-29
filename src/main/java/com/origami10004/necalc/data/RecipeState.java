@@ -1,6 +1,7 @@
 package com.origami10004.necalc.data;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.minecraft.item.ItemStack;
 
@@ -101,5 +102,9 @@ public class RecipeState {
 			return RecipeEntry.EMPTY;
 		}
 		return recipes.get(index);
+	}
+
+	public static List<RecipeEntry> getRecipes() {
+		return recipes;
 	}
 }

@@ -5,6 +5,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
 import com.origami10004.necalc.Necalc;
+import com.origami10004.necalc.calculator.Solver;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,17 +16,11 @@ public class CalculatorState {
 	private static int[] rateMultiplier = new int[] {1, 60, 1200};
 	private static List<ProductionStep> recipeSteps;
 
+	private static boolean cached = false;
+
 	public static void init() {
 		recipeSteps = new ArrayList<>();
-		// These are placeholder recipes
-		recipeSteps.add(new ProductionStep(
-			Arrays.asList(new ItemStack(Items.DIAMOND, 9)),
-			Arrays.asList(new ItemStack(Blocks.DIAMOND_BLOCK, 1)),
-			new ItemStack(Blocks.CRAFTING_TABLE),
-			1.0,
-			0.3,
-			false
-		));
+		cached = false;
 	}
 
 	public static void loadTargets() {
@@ -46,6 +41,11 @@ public class CalculatorState {
 		int old = displayRate;
 		CalculatorState.displayRate = newRate;
 		return old != newRate;
+	}
+
+	public static List<CalculationTarget> getTargets() {
+		return targets.values().stream()
+				.collect(Collectors.toList());
 	}
 
 	public static ItemStack getTargetSlot(int index) {
@@ -86,28 +86,33 @@ public class CalculatorState {
 	}
 
 	public static boolean hasHidden() {
+		getResult();
 		return recipeSteps.stream()
 				.filter(r -> r.isHidden())
 				.count() > 0;
 	}
 
 	public static int getHiddenCount() {
+		getResult();
 		return (int) recipeSteps.stream()
 				.filter(r -> r.isHidden())
 				.count();
 	}
 
 	public static void showAllRecipes() {
+		getResult();
 		recipeSteps.forEach(r -> r.show());
 	}
 
 	public static List<ProductionStep> getVisibleRecipes() {
+		getResult();
 		return recipeSteps.stream()
 				.filter(r -> !r.isHidden())
 				.collect(Collectors.toList());
 	}
 
 	public static void hideRecipe(int index) {
+		getResult();
 		if (index < 0 || index >= recipeSteps.size()) return;
 		recipeSteps.stream()
 				.filter(r -> !r.isHidden())
@@ -120,7 +125,13 @@ public class CalculatorState {
 	}
 
 	public static void recalculateRecipes() {
-		// TODO: Placeholder for recipe recalculation logic based on target slots and rates
-		Necalc.logger.info("Recalculating recipes with current target slots and rates...");
+		cached = false;
+	}
+
+	private static void getResult() {
+		if (cached) return;
+		recipeSteps.clear();
+		recipeSteps.addAll(Solver.solve());
+		cached = true;
 	}
 }
