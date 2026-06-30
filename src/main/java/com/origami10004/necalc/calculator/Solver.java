@@ -63,6 +63,9 @@ public class Solver {
 			}
 		}
 
+		int n = relevantRecipes.size();
+		
+
 
 		
 

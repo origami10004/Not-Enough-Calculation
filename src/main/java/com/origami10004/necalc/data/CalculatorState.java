@@ -12,9 +12,10 @@ import java.util.stream.Collectors;
 
 public class CalculatorState {
 	private static int displayRate = 0;
-	private static final Map<Integer, CalculationTarget> targets = new HashMap<>();
+	private static final List<CalculationTarget> targets = new ArrayList<>();
 	private static int[] rateMultiplier = new int[] {1, 60, 1200};
 	private static List<ProductionStep> recipeSteps;
+	private static HashSet<ItemKey> targetItems = new HashSet<>();
 
 	private static boolean cached = false;
 
@@ -24,9 +25,11 @@ public class CalculatorState {
 	}
 
 	public static void loadTargets() {
-		Map<Integer, CalculationTarget> loadedTargets = TargetPersistence.loadTargetData();
+		List<CalculationTarget> loadedTargets = TargetPersistence.loadTargetData();
 		targets.clear();
-		targets.putAll(loadedTargets);
+		targets.addAll(loadedTargets);
+		targetItems.clear();
+		targets.forEach(target -> targetItems.add(new ItemKey(target.getTargetItem())));
 	}
 
 	public static int getTargetNumRows() {
@@ -44,39 +47,58 @@ public class CalculatorState {
 	}
 
 	public static List<CalculationTarget> getTargets() {
-		return targets.values().stream()
-				.collect(Collectors.toList());
+		return targets;
 	}
 
 	public static ItemStack getTargetSlot(int index) {
-		return targets.getOrDefault(index, CalculationTarget.EMPTY).getTargetItem();
+		if (index < 0 || index >= targets.size()) {
+			return ItemStack.EMPTY;
+		}
+		return targets.get(index).getTargetItem();
 	}
 
 	public static boolean setTargetSlot(int index, ItemStack stack) {
-		CalculationTarget cur = targets.getOrDefault(index, null);
-		if (cur == null) {
-			targets.put(index, new CalculationTarget(stack, 1.0 / getMultiplier()));
-			TargetPersistence.saveTargetData(CalculatorState.targets);
-			recalculateRecipes();
-			return true;
-		} else {
-			if (cur.setTargetItem(stack, 1.0 / getMultiplier())){
+		if (index < 0) {
+			return false;
+		} else{
+			ItemKey cur = new ItemKey(stack);
+			if (stack.isEmpty()) {
+				if (index >= targets.size()) return false;
+				CalculationTarget old = targets.get(index);
+				targetItems.remove(new ItemKey(old.getTargetItem()));
+				targets.remove(index);
 				TargetPersistence.saveTargetData(CalculatorState.targets);
 				recalculateRecipes();
 				return true;
 			}
-			return false;
+			if (targetItems.contains(cur)) return false;
+			if (index >= targets.size()) {
+				targets.add(new CalculationTarget(stack, 1.0 / getMultiplier()));
+				targetItems.add(cur);
+			} else {
+				CalculationTarget old = targets.get(index);
+				targetItems.remove(new ItemKey(old.getTargetItem()));
+				targets.set(index, new CalculationTarget(stack, 1.0 / getMultiplier()));
+				targetItems.add(cur);
+			}
+			TargetPersistence.saveTargetData(CalculatorState.targets);
+			recalculateRecipes();
+			return true;
 		}
 	}
 
 	public static double getTargetSlotRate(int index) {
-		return targets.getOrDefault(index, CalculationTarget.EMPTY).getTargetRate() * rateMultiplier[displayRate];
+		if (index < 0 || index >= targets.size()) {
+			return 0.0;
+		}
+		return targets.get(index).getTargetRate() * rateMultiplier[displayRate];
 	}
 	public static boolean setTargetSlotRate(int index, double rate) {
 		// This function should never be called with an index that doesn't have a target item
-		CalculationTarget cur = targets.getOrDefault(index, null);
-		if (cur == null) return false;
-
+		if (index < 0 || index >= targets.size()) {
+			return false;
+		}
+		CalculationTarget cur = targets.get(index);
 		if (cur.setTargetRate(rate / rateMultiplier[displayRate])) {
 			TargetPersistence.saveTargetData(CalculatorState.targets);
 			recalculateRecipes();
@@ -126,10 +148,12 @@ public class CalculatorState {
 
 	public static void recalculateRecipes() {
 		cached = false;
+		Necalc.logger.info("Recalculating");
 	}
 
 	private static void getResult() {
 		if (cached) return;
+		Necalc.logger.info("Actually calculating lmao");
 		recipeSteps.clear();
 		recipeSteps.addAll(Solver.solve());
 		cached = true;

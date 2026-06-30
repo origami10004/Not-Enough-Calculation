@@ -41,24 +41,15 @@ public class TargetPersistence {
 	private static class Wrapper {
 		public List<TargetData> targets;
 	}
-	public static void saveTargetData(Map<Integer, CalculationTarget> targetSlots) {
+	public static void saveTargetData(List<CalculationTarget> targetSlots) {
 		SAVE_FILE.getParentFile().mkdirs();
-
-		Map <ItemKey, Double> compressedData = new HashMap<>();
-		for (Integer index : targetSlots.keySet()) {
-			ItemStack stack = targetSlots.get(index).getTargetItem();
-			if (stack == null || stack.isEmpty()) continue;
-
-			double rate = targetSlots.get(index).getTargetRate();
-			ItemKey key = new ItemKey(stack);
-
-			compressedData.put(key, compressedData.getOrDefault(key, 0.0) + rate);
-		}
 
 		Wrapper wrapper = new Wrapper();
 		wrapper.targets = new ArrayList<>();
-		for (Map.Entry<ItemKey, Double> entry : compressedData.entrySet()) {
-			wrapper.targets.add(new TargetData(entry.getKey(), entry.getValue()));
+		for (CalculationTarget target : targetSlots) {
+			if (target.getTargetItem().isEmpty()) continue;
+			ItemKey key = new ItemKey(target.getTargetItem());
+			wrapper.targets.add(new TargetData(key, target.getTargetRate()));
 		}
 		try (FileWriter writer = new FileWriter(SAVE_FILE)) {
 			GSON.toJson(wrapper, writer);
@@ -67,8 +58,8 @@ public class TargetPersistence {
 		}
 	}
 
-	public static Map<Integer, CalculationTarget> loadTargetData() {
-		Map<Integer, CalculationTarget> targetSlots = new HashMap<>();
+	public static List<CalculationTarget> loadTargetData() {
+		List<CalculationTarget> targetSlots = new ArrayList<>();
 		if (!SAVE_FILE.exists()) return targetSlots;
 
 		try (FileReader reader = new FileReader(SAVE_FILE)) {
@@ -92,7 +83,7 @@ public class TargetPersistence {
 						Necalc.logger.warn("Failed to parse NBT for item {}: {}", data.item, e.getMessage());
 					}
 				}
-				targetSlots.put(index, new CalculationTarget(stack, data.rate));
+				targetSlots.add(new CalculationTarget(stack, data.rate));
 				index++;
 			}
 		} catch (IOException e) {
