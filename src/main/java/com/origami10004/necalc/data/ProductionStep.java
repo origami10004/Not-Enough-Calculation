@@ -13,16 +13,23 @@ public class ProductionStep {
 	private ItemStack machine;
 	private double machineCount;
 	private double recipePerMinute;
-	private boolean unknownRates;
 	private boolean hidden = false;
 
-	public ProductionStep(List<ItemStack> inputs, List<ItemStack> outputs, ItemStack machine, double machineCount, double recipePerMinute, boolean unknownRates) {
+	public ProductionStep(List<ItemStack> inputs, List<ItemStack> outputs, ItemStack machine, double machineCount, double recipePerMinute) {
 		this.inputs = inputs;
 		this.outputs = outputs;
 		this.machine = machine;
 		this.machineCount = machineCount;
 		this.recipePerMinute = recipePerMinute;
-		this.unknownRates = unknownRates;
+	}
+
+	public ProductionStep(RecipeEntry recipe, double machineCount, double recipePerMinute) {
+		this.inputs = recipe.getInputs();
+		this.outputs = recipe.getOutputs();
+		this.machine = recipe.getMachine();
+		this.machineCount = machineCount;
+		this.recipePerMinute = recipePerMinute;
+
 	}
 
 	// View management
@@ -71,10 +78,5 @@ public class ProductionStep {
 
 	public double getPrimaryOutputRate() {
 		return recipePerMinute * outputs.get(0).getCount();
-	}
-
-	// Unknown rates
-	public boolean isUnknown() {
-		return unknownRates;
 	}
 }

@@ -1,10 +1,6 @@
 package com.origami10004.necalc.data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.origami10004.necalc.Necalc;
 
 import java.util.HashSet;
 
@@ -26,7 +22,7 @@ public class RecipeEntry {
 		this.inputKeys = new HashSet<>();
 		this.outputKeys = new HashSet<>();
 		this.machine = ItemStack.EMPTY;
-		this.time = 0;
+		this.time = 1;
 	}
 	public RecipeEntry(ArrayList<ItemStack> inputs, ItemStack machine, ArrayList<ItemStack> outputs, int time) {
 		this.inputs = new ArrayList<>();
@@ -42,7 +38,7 @@ public class RecipeEntry {
 			this.outputs.add(stack.copy());
 			this.outputKeys.add(new ItemKey(stack));
 		}
-		this.time = time;
+		this.time = Math.max(time, 1);
 	}
 	public RecipeEntry copy() {
 		return new RecipeEntry(this.inputs, this.machine, this.outputs, this.time);
@@ -65,7 +61,7 @@ public class RecipeEntry {
 	}
 
 	public void setTime(int time) {
-		this.time = time;
+		this.time = Math.max(time, 1);
 	}
 	
 	public boolean isEmpty() {

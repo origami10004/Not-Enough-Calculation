@@ -86,7 +86,7 @@ public class RateEditHelper {
 	public boolean keyTyped(char typedChar, int keyCode) {
 		if (!isOpen) return false;
 		if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
-			CalculatorState.setTargetSlotRate(activeSlot, Double.parseDouble(rateInputField.getText()) / CalculatorState.getMultiplier());
+			CalculatorState.setTargetSlotRate(activeSlot, Double.parseDouble(rateInputField.getText()));
 			close();
 			return true;
 		}

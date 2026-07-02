@@ -1,11 +1,9 @@
 package com.origami10004.necalc.data;
 
-import net.minecraft.init.Items;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
 import com.origami10004.necalc.Necalc;
-import com.origami10004.necalc.calculator.Solver;
+import com.origami10004.necalc.calc.Solver;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -73,12 +71,12 @@ public class CalculatorState {
 			}
 			if (targetItems.contains(cur)) return false;
 			if (index >= targets.size()) {
-				targets.add(new CalculationTarget(stack, 1.0 / getMultiplier()));
+				targets.add(new CalculationTarget(stack, getMultiplier()));
 				targetItems.add(cur);
 			} else {
 				CalculationTarget old = targets.get(index);
 				targetItems.remove(new ItemKey(old.getTargetItem()));
-				targets.set(index, new CalculationTarget(stack, 1.0 / getMultiplier()));
+				targets.set(index, new CalculationTarget(stack, getMultiplier()));
 				targetItems.add(cur);
 			}
 			TargetPersistence.saveTargetData(CalculatorState.targets);
@@ -91,7 +89,7 @@ public class CalculatorState {
 		if (index < 0 || index >= targets.size()) {
 			return 0.0;
 		}
-		return targets.get(index).getTargetRate() * rateMultiplier[displayRate];
+		return targets.get(index).getTargetRate() / getMultiplier();
 	}
 	public static boolean setTargetSlotRate(int index, double rate) {
 		// This function should never be called with an index that doesn't have a target item
@@ -99,7 +97,7 @@ public class CalculatorState {
 			return false;
 		}
 		CalculationTarget cur = targets.get(index);
-		if (cur.setTargetRate(rate / rateMultiplier[displayRate])) {
+		if (cur.setTargetRate(rate * getMultiplier())) {
 			TargetPersistence.saveTargetData(CalculatorState.targets);
 			recalculateRecipes();
 			return true;
@@ -155,7 +153,9 @@ public class CalculatorState {
 		if (cached) return;
 		Necalc.logger.info("Actually calculating lmao");
 		recipeSteps.clear();
-		recipeSteps.addAll(Solver.solve());
+		Solver.solve();
+		recipeSteps.addAll(Solver.steps);
+
 		cached = true;
 	}
 }

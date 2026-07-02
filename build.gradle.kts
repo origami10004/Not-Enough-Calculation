@@ -1,12 +1,14 @@
 import org.jetbrains.gradle.ext.Gradle
 import org.jetbrains.gradle.ext.runConfigurations
 import org.jetbrains.gradle.ext.settings
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     idea
     java
     alias { libs.plugins.idea.ext }
     alias { libs.plugins.retrofuturagradle }
+    id("com.gradleup.shadow") version "8.3.0"
 }
 
 val modId: String by project
@@ -93,6 +95,9 @@ dependencies {
 
     compileOnly(libs.jei) { artifact { classifier = "api" } }
     runtimeOnly(deobf(libs.jei))
+
+    shadow("org.hipparchus:hipparchus-optim:3.1")
+    implementation("org.hipparchus:hipparchus-optim:3.1")
 }
 
 mcpTasks {
@@ -142,5 +147,23 @@ idea {
 tasks {
     processIdeaSettings {
         dependsOn(generateModMetadata)
+    }
+
+    shadowJar {
+        configurations = listOf(project.configurations.shadow.get())
+        archiveClassifier.set("shaded") 
+        mergeServiceFiles()
+
+        relocate("org.hipparchus", "com.origami10004.necalc.shaded.hipparchus")
+    }
+
+    reobfJar {
+        dependsOn(shadowJar)
+        
+        inputJar.set(shadowJar.flatMap { it.archiveFile }) 
+    }
+
+    build {
+        dependsOn(reobfJar)
     }
 }

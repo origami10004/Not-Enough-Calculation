@@ -30,11 +30,14 @@ public class SpeedEditHelper {
 	}
 
 	public void openSlot(int slotIndex, int slotX, int slotY) {
+		List<Map.Entry<MachineKey, Integer>> entries = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
+		if (slotIndex < 0 || slotIndex >= entries.size()) {
+			return;
+		}
 		this.activeSlot = slotIndex;
 		isOpen = true;
 		this.panelX = slotX - 5;
 		this.panelY = slotY - 5;
-		List<Map.Entry<MachineKey, Integer>> entries = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
 		this.machine = entries.get(slotIndex).getKey();
 		int currentSpeed = entries.get(slotIndex).getValue();
 		this.speedInputField = new GuiTextField(0, parent.mc.fontRenderer, this.panelX + 25, this.panelY + 4, PANEL_W - 29, PANEL_H - 8);

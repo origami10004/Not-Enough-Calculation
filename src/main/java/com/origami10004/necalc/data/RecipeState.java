@@ -71,6 +71,7 @@ public class RecipeState {
 	public static void confirmRecipe(int time) {
 		if (!stagedRecipe.isValid()){
 			if (stagedId != -1) {
+				MachineState.removeMachine(recipes.get(stagedId).getMachine());
 				recipes.remove(stagedId);
 				RecipePersistence.saveRecipeData(recipes);
 				CalculatorState.recalculateRecipes();
@@ -80,8 +81,11 @@ public class RecipeState {
 		}
 		stagedRecipe.setTime(time);
 		if (stagedId == -1) {
+			MachineState.addMachine(stagedRecipe.getMachine());
 			recipes.add(stagedRecipe.copy());
 		} else {
+			MachineState.removeMachine(recipes.get(stagedId).getMachine());
+			MachineState.addMachine(stagedRecipe.getMachine());
 			recipes.set(stagedId, stagedRecipe.copy());
 		}
 		reset();
@@ -90,6 +94,7 @@ public class RecipeState {
 	}
 	public static void deleteRecipe() {
 		if (stagedId != -1) {
+			MachineState.removeMachine(recipes.get(stagedId).getMachine());
 			recipes.remove(stagedId);
 			RecipePersistence.saveRecipeData(recipes);
 			CalculatorState.recalculateRecipes();

@@ -272,7 +272,7 @@ public class GuiProductionCalc extends GuiCommon {
 				}
 			}
 
-			int rowBg = rowHovered ? 0xFFA8B8D8 : (step.isUnknown() ? 0xFFDCCE36 : 0xFFC6C6C6);
+			int rowBg = rowHovered ? 0xFFA8B8D8 : 0xFFC6C6C6;
 			drawRectPanelOutdent(rowX, rowY, rowW, TABLE_ROW_H, rowBg);
 
 			// Primary input and rate
@@ -281,7 +281,7 @@ public class GuiProductionCalc extends GuiCommon {
 			if (input != null) {
 				RenderHelper.enableGUIStandardItemLighting();
 				this.itemRender.renderItemAndEffectIntoGUI(input, rowX + 2, iconY);
-				this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, input, rowX + 2, iconY, String.format("%.1f", CalculatorState.getMultiplier() * step.getPrimaryInputRate()));
+				this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, input, rowX + 2, iconY, String.format("%.1f", step.getPrimaryInputRate() / CalculatorState.getMultiplier()));
 				RenderHelper.disableStandardItemLighting();
 				if (rowHovered) {
 					if (mouseX >= rowX + 2 && mouseX < rowX + 2 + 16 && mouseY >= iconY && mouseY < iconY + 16) {
@@ -317,7 +317,7 @@ public class GuiProductionCalc extends GuiCommon {
 			ItemStack output = step.getPrimaryOutput();
 			RenderHelper.enableGUIStandardItemLighting();
 			this.itemRender.renderItemAndEffectIntoGUI(output, outputIconX, iconY);
-			this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, output, outputIconX, iconY, String.format("%.1f", CalculatorState.getMultiplier() * step.getPrimaryOutputRate()));
+			this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, output, outputIconX, iconY, String.format("%.1f", step.getPrimaryOutputRate() / CalculatorState.getMultiplier()));
 			RenderHelper.disableStandardItemLighting();
 			if (rowHovered) {
 				if (mouseX >= outputIconX && mouseX < outputIconX + 16 && mouseY >= iconY && mouseY < iconY + 16) {
