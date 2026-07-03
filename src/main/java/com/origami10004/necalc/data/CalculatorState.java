@@ -31,7 +31,7 @@ public class CalculatorState {
 	}
 
 	public static int getTargetNumRows() {
-		return targets.size() / 8;
+		return targets.size() / 8 + 1;
 	}
 
 	public static int getDisplayRate() {

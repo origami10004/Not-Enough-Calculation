@@ -2,11 +2,18 @@ package com.origami10004.necalc.gui;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.inventory.Container;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+import java.util.List;
 
 abstract class GuiCommon extends GuiContainer {
 	protected static final int TAB_H			= 28;
@@ -17,6 +24,7 @@ abstract class GuiCommon extends GuiContainer {
 	protected static final ResourceLocation TAB_ICONS = new ResourceLocation("necalc", "textures/gui/tab_icons.png");
 	protected static final ResourceLocation TAB_TEXTURE = new ResourceLocation("necalc", "textures/gui/tab.png");
 	protected static final ResourceLocation SLOT_TEXTURE = new ResourceLocation("necalc", "textures/gui/slot.png");
+	protected static final ResourceLocation SCROLL_TEXTURE = new ResourceLocation("necalc", "textures/gui/scroll.png");
 	protected static final String[] TAB_LABELS = {"tab.main", "tab.flow", "tab.recipes", "tab.machine", "tab.add"};
 	
 	protected abstract int getActiveTab();
@@ -165,6 +173,112 @@ abstract class GuiCommon extends GuiContainer {
 	protected void drawPlayerInventoryTooltips(int mouseX, int mouseY) {
 		if (!inventoryHoverStack.isEmpty()) {
 			this.renderToolTip(inventoryHoverStack, mouseX, mouseY);
+		}
+	}
+
+	protected void drawItemExtraInfoTooltip(int mouseX, int mouseY, ItemStack stack, String extraInfo) {
+		ITooltipFlag flag = this.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
+
+		List<String> tooltip = stack.getTooltip(this.mc.player, flag);
+		tooltip.add(1, extraInfo);
+		this.drawHoveringText(tooltip, mouseX, mouseY);
+	}
+
+	private static final DecimalFormat ONE_DECIMAL = new DecimalFormat("##.#", DecimalFormatSymbols.getInstance(Locale.ROOT));
+	private static final DecimalFormat TWO_DECIMAL = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ROOT));
+	protected String formatValue(double value) {
+		if (value == 0) {
+			return "";
+		}
+		if (value < 1000) {
+			// Normal
+			if (value >= 100) {
+				return String.valueOf((int) value);
+			} else if (value >= 10) {
+				return ONE_DECIMAL.format(value);
+			} else {
+				return TWO_DECIMAL.format(value);
+			}
+		} else if (value < 1000000) {
+			// Thousands
+			if (value >= 100000) {
+				return String.format("%.0fK", value / 1000);
+			} else if (value >= 10000) {
+				return String.format("%.1fK", value / 1000);
+			} else {
+				return String.format("%.2fK", value / 1000);
+			}
+		} else if (value < 1000000000) {
+			// Millions
+			if (value >= 100000000) {
+				return String.format("%.0fM", value / 1000000);
+			} else if (value >= 10000000) {
+				return String.format("%.1fM", value / 1000000);
+			} else {
+				return String.format("%.2fM", value / 1000000);
+			}
+		} else if (value < 1000000000000L) {
+			// Billions
+			if (value >= 100000000000L) {
+				return String.format("%.0fB", value / 1000000000);
+			} else if (value >= 10000000000L) {
+				return String.format("%.1fB", value / 1000000000);
+			} else {
+				return String.format("%.2fB", value / 1000000000);
+			}
+		} else {
+			// Trillions
+			if (value >= 100000000000000L) {
+				return String.format("%.0fT", value / 1000000000000L);
+			} else if (value >= 10000000000000L) {
+				return String.format("%.1fT", value / 1000000000000L);
+			} else {
+				return String.format("%.2fT", value / 1000000000000L);
+			}
+		}
+	}
+
+	protected void drawSlotWithCustomCount(ItemStack stack, int x, int y, double count) {
+		if (stack.isEmpty()) return;
+
+		RenderHelper.enableGUIStandardItemLighting();
+		this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
+		RenderHelper.disableStandardItemLighting();
+		String text = formatValue(count);
+		if (text == "") return;
+
+		GlStateManager.disableDepth();
+		GlStateManager.disableBlend();
+		GlStateManager.pushMatrix();
+
+		float scale;
+		if (text.length() > 3) {
+			scale = 0.5f;
+		} else {
+			scale = 0.75f;
+		}
+		GlStateManager.scale(scale, scale, 1.0f);
+
+		int width = this.fontRenderer.getStringWidth(text);
+
+		float textX = ((x + 16) / scale) - width;
+		float textY = ((y + 16) / scale) - 8;
+
+		this.fontRenderer.drawStringWithShadow(text, textX, textY, 0xFFFFFF);
+
+		GlStateManager.popMatrix();
+		GlStateManager.enableBlend();
+		GlStateManager.enableDepth();
+	}
+
+	protected void drawScrollbar(int x, int y, int w, int h, float scrollPercent, boolean active) {
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		this.mc.getTextureManager().bindTexture(SCROLL_TEXTURE);
+		double scrollY = y + (h - 9) * scrollPercent;
+		if (active) {
+			drawModalRectWithCustomSizedTexture(x, (int) scrollY, 0, 0, 12, 9, 24, 9);
+		} else {
+			drawModalRectWithCustomSizedTexture(x, (int) scrollY, 12, 0, 12, 9, 24, 9);
 		}
 	}
 }

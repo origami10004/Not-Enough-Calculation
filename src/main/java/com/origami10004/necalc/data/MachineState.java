@@ -56,4 +56,8 @@ public class MachineState {
 	public static void loadMachines() {
 		MachinePersistence.loadMachineData();
 	}
+
+	public static int getMachineRows() {
+		return machineSpeed.size() / 8 + 1;
+	}
 }

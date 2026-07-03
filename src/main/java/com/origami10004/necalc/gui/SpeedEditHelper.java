@@ -56,7 +56,7 @@ public class SpeedEditHelper {
 	public void reInit(int gx, int tableY) {
 		if (!isOpen) return;
 		int slotX = gx + 8 + (this.activeSlot % GuiManageMachines.COLS) * 18;
-		int slotY = tableY + (this.activeSlot / GuiManageMachines.COLS) * 18;
+		int slotY = tableY + (this.activeSlot / GuiManageMachines.COLS - this.parent.scrollRow) * 18;
 		this.panelX = slotX - 5;
 		this.panelY = slotY - 5;
 		this.speedInputField.x = this.panelX + 25;
@@ -85,7 +85,12 @@ public class SpeedEditHelper {
 	public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {
 		if (!isOpen) return false;
 		if (mouseX >= panelX && mouseX < panelX + PANEL_W && mouseY >= panelY && mouseY < panelY + PANEL_H) {
-			this.speedInputField.mouseClicked(mouseX, mouseY, mouseButton);
+			if (mouseButton == 1) {
+				this.speedInputField.setText("");
+				this.speedInputField.setFocused(true);
+			} else {
+				this.speedInputField.mouseClicked(mouseX, mouseY, mouseButton);
+			}
 			return true;
 		}
 		return this.speedInputField.mouseClicked(mouseX, mouseY, mouseButton);

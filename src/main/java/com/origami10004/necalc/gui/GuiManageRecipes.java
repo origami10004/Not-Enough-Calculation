@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 
 import java.io.IOException;
+import org.lwjgl.input.Mouse;
 
 import com.origami10004.necalc.data.RecipeEntry;
 import com.origami10004.necalc.data.RecipeState;
@@ -31,6 +32,8 @@ public class GuiManageRecipes extends GuiCommon{
 	private InventoryPlayer playerInv;
 	private int gx, gy;
 	private int tableY;
+	private int scrollRow = 0;
+	private float scrollPercent = 0.0f;
 
 	public GuiManageRecipes(InventoryPlayer playerInv) {
 		super(new FakeContainer(playerInv, false, 0, 0));
@@ -61,7 +64,7 @@ public class GuiManageRecipes extends GuiCommon{
 		this.tableY = curY;
 		for (int row = 0; row < ROWS; row++) {
 			for (int col = 0; col < COLS; col++) {
-				int index = row * COLS + col;
+				int index = (row + this.scrollRow) * COLS + col;
 				int slotX = this.gx + 8 + col * SLOT_SIZE;
 				int slotY = curY + row * SLOT_SIZE;
 				drawItemSlot(slotX, slotY);
@@ -75,6 +78,7 @@ public class GuiManageRecipes extends GuiCommon{
 				}
 			}
 		}
+		drawRecipeScrollBar();
 	}
 
 	@Override
@@ -111,6 +115,38 @@ public class GuiManageRecipes extends GuiCommon{
 		}
 	}
 
+	@Override
+	public void handleMouseInput() throws IOException {
+		int scroll = Mouse.getEventDWheel();
+		if (scroll != 0) {
+			int scrollRows = Math.max(0, RecipeState.getRecipeRows() - ROWS);
+			if (scrollRows <= 0) return;
+			if (scroll > 0) {
+				this.scrollRow = Math.max(0, this.scrollRow - 1);
+			} else {
+				this.scrollRow = Math.min(scrollRows, this.scrollRow + 1);
+			}
+			this.scrollPercent = (float) this.scrollRow / scrollRows;
+			return;
+		}
+		super.handleMouseInput();
+	}
+
+	private void drawRecipeScrollBar() {
+		int totalRows = RecipeState.getRecipeRows();
+
+		int sbX = this.gx + 175;
+		int sbY = this.gy + TAB_H + 18;
+		int width = 12;
+		int height = 142;
+		if (totalRows <= ROWS) {
+			this.scrollPercent = 0.0f;
+			this.scrollRow = 0;
+		}
+
+		drawScrollbar(sbX, sbY, width, height, this.scrollPercent, totalRows > ROWS);
+	}
+
 
 	// Helper functions
 	private void onTabClicked(int tabIndex) {
@@ -135,7 +171,7 @@ public class GuiManageRecipes extends GuiCommon{
 	private int getRecipeAt(int mouseX, int mouseY) {
 		for (int row = 0; row < ROWS; row++) {
 			for (int col = 0; col < COLS; col++) {
-				int index = row * COLS + col;
+				int index = (row + this.scrollRow) * COLS + col;
 				int slotX = this.gx + 8 + col * SLOT_SIZE;
 				int slotY = this.tableY + row * SLOT_SIZE;
 				if (mouseX >= slotX && mouseX < slotX + SLOT_SIZE && mouseY >= slotY && mouseY < slotY + SLOT_SIZE) {

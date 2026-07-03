@@ -112,4 +112,14 @@ public class RecipeState {
 	public static List<RecipeEntry> getRecipes() {
 		return recipes;
 	}
+
+	public static int getInputRows() {
+		return stagedRecipe.getInputs().size() / 8 + 1;
+	}
+	public static int getOutputRows() {
+		return stagedRecipe.getOutputs().size() / 8 + 1;
+	}
+	public static int getRecipeRows() {
+		return recipes.size() / 8 + 1;
+	}
 }

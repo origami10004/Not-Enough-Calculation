@@ -40,13 +40,16 @@ public class GuiRecipeEditor extends GuiCommon {
 	private final GuiCommon parent;
 	private final InventoryPlayer playerInv;
 	private final boolean isNewRecipe;
-	private int inputScrollRow = 0;
-	private int outputScrollRow = 0;
 	private int inputGrid;
 	private int outputGrid;
 	private int machineY;
 	private int buttonY;
 	private GuiTextField timeInputField;
+
+	private int inputScrollRow = 0;
+	private float inputScrollPercent = 0.0f;
+	private int outputScrollRow = 0;
+	private float outputScrollPercent = 0.0f;
 
 	private int gx, gy;
 
@@ -106,13 +109,11 @@ public class GuiRecipeEditor extends GuiCommon {
 
 				ItemStack curStack = RecipeState.getInput(actual * SLOTS_PER_ROW + col);
 				if (!curStack.isEmpty()) {
-					RenderHelper.enableGUIStandardItemLighting();
-					this.itemRender.renderItemAndEffectIntoGUI(curStack, slotX + 1, slotY + 1);
-					this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, curStack, slotX + 1, slotY + 1, curStack.getCount() > 1 ? String.valueOf(curStack.getCount()) : "");
-					RenderHelper.disableStandardItemLighting();
+					drawSlotWithCustomCount(curStack, slotX + 1, slotY + 1, curStack.getCount() == 1 ? 0 : curStack.getCount());
 				}
 			}
 		}
+		drawInputScrollBar();
 		curY += IO_ROWS * SLOT_SIZE + 18;
 
 		// machine
@@ -146,13 +147,11 @@ public class GuiRecipeEditor extends GuiCommon {
 
 				ItemStack curStack = RecipeState.getOutput(actual * SLOTS_PER_ROW + col);
 				if (!curStack.isEmpty()) {
-					RenderHelper.enableGUIStandardItemLighting();
-					this.itemRender.renderItemAndEffectIntoGUI(curStack, slotX + 1, slotY + 1);
-					this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, curStack, slotX + 1, slotY + 1, curStack.getCount() > 1 ? String.valueOf(curStack.getCount()) : "");
-					RenderHelper.disableStandardItemLighting();
+					drawSlotWithCustomCount(curStack, slotX + 1, slotY + 1, curStack.getCount() == 1 ? 0 : curStack.getCount());
 				}
 			}
 		}
+		drawOutputScrollBar();
 		curY += IO_ROWS * SLOT_SIZE + 14;
 
 		// Buttons
@@ -268,12 +267,14 @@ public class GuiRecipeEditor extends GuiCommon {
 					} else {
 						RecipeState.alterInput(inputSlot, ItemStack.EMPTY, 0, 0.5);
 					}
+					return;
 				} else if (shiftPressed) {
 					if (scroll > 0) {
 						RecipeState.alterInput(inputSlot, ItemStack.EMPTY, 1, 1);
 					} else {
 						RecipeState.alterInput(inputSlot, ItemStack.EMPTY, -1, 1);
 					}
+					return;
 				}
 			}
 			if (outputSlot != -1) {
@@ -283,24 +284,69 @@ public class GuiRecipeEditor extends GuiCommon {
 					} else {
 						RecipeState.alterOutput(outputSlot, ItemStack.EMPTY, 0, 0.5);
 					}
+					return;
 				} else if (shiftPressed) {
 					if (scroll > 0) {
 						RecipeState.alterOutput(outputSlot, ItemStack.EMPTY, 1, 1);
 					} else {
 						RecipeState.alterOutput(outputSlot, ItemStack.EMPTY, -1, 1);
 					}
+					return;
 				}
+			}
+
+			if (mouseX >= this.gx + 8 && mouseX < this.gx + GUI_WIDTH - 8
+					&& mouseY >= this.gy + TAB_H + 16 && mouseY < this.gy + TAB_H + 65) {
+				int scrollRows = Math.max(0, RecipeState.getInputRows() - IO_ROWS);
+				if (scrollRows <= 0) return;
+				if (scroll > 0) {
+					this.inputScrollRow = Math.max(0, this.inputScrollRow - 1);
+				} else {
+					this.inputScrollRow = Math.min(this.inputScrollRow + 1, Math.max(0, RecipeState.getInputRows() - IO_ROWS));
+				}
+				this.inputScrollPercent = (float) this.inputScrollRow / (RecipeState.getInputRows() - IO_ROWS);
+				return;
+			}
+			if (mouseX >= this.gx + 8 && mouseX < this.gx + GUI_WIDTH - 8
+					&& mouseY >= this.gy + TAB_H + 94 && mouseY < this.gy + TAB_H + 143) {
+				int scrollRows = Math.max(0, RecipeState.getOutputRows() - IO_ROWS);
+				if (scrollRows <= 0) return;
+				if (scroll > 0) {
+					this.outputScrollRow = Math.max(0, this.outputScrollRow - 1);
+				} else {
+					this.outputScrollRow = Math.min(this.outputScrollRow + 1, Math.max(0, RecipeState.getOutputRows() - IO_ROWS));
+				}
+				this.outputScrollPercent = (float) this.outputScrollRow / (RecipeState.getOutputRows() - IO_ROWS);
+				return;
 			}
 		}
 		super.handleMouseInput();
 	}
 
-	private void drawInputScrollBar(int x, int y, int height, int mouseX, int mouseY) {
-		// TODO: Implement input scroll bar drawing logic here
+	private void drawInputScrollBar() {
+		int totalRows = RecipeState.getInputRows();
+		int sbX = this.gx + 159;
+		int sbY = this.gy + TAB_H + 30;
+		int width = 12;
+		int height = 34;
+		if (totalRows <= IO_ROWS) {
+			this.inputScrollRow = 0;
+			this.inputScrollPercent = 0.0f;
+		}
+		drawScrollbar(sbX, sbY, width, height, this.inputScrollPercent, totalRows > IO_ROWS);
 	}
 
-	private void drawOutputScrollBar(int x, int y, int height, int mouseX, int mouseY) {
-		// TODO: Implement output scroll bar drawing logic here
+	private void drawOutputScrollBar() {
+		int totalRows = RecipeState.getOutputRows();
+		int sbX = this.gx + 159;
+		int sbY = this.gy + TAB_H + 108;
+		int width = 12;
+		int height = 34;
+		if (totalRows <= IO_ROWS) {
+			this.outputScrollRow = 0;
+			this.outputScrollPercent = 0.0f;
+		}
+		drawScrollbar(sbX, sbY, width, height, this.outputScrollPercent, totalRows > IO_ROWS);
 	}
 
 	@Override
@@ -313,6 +359,16 @@ public class GuiRecipeEditor extends GuiCommon {
 			}
 		}
 
+		if (mouseX >= timeInputField.x && mouseX < timeInputField.x + timeInputField.width
+				&& mouseY >= timeInputField.y && mouseY < timeInputField.y + timeInputField.height) {
+			if (mouseButton == 1) {
+				this.timeInputField.setText("");
+				this.timeInputField.setFocused(true);
+			} else {
+				this.timeInputField.mouseClicked(mouseX, mouseY, mouseButton);
+			}
+			return;
+		}
 		if (this.timeInputField.mouseClicked(mouseX, mouseY, mouseButton)) return;
 
 		// Inputs
@@ -360,7 +416,7 @@ public class GuiRecipeEditor extends GuiCommon {
 		// Buttons
 		if (mouseX >= this.gx + 12 && mouseX < this.gx + 12 + BUTTON_SIZE
 					&& mouseY >= this.buttonY && mouseY < this.buttonY + BUTTON_SIZE) {
-			RecipeState.confirmRecipe(this.timeInputField.getText().isEmpty() ? 0 : Integer.parseInt(this.timeInputField.getText()));
+			RecipeState.confirmRecipe(this.timeInputField.getText().isEmpty() ? 1 : Integer.parseInt(this.timeInputField.getText()));
 			mc.displayGuiScreen(parent);
 		}
 		if (mouseX >= this.gx + 32 && mouseX < this.gx + 32 + BUTTON_SIZE

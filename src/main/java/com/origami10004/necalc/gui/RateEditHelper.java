@@ -52,6 +52,9 @@ public class RateEditHelper {
 	public double getNewRate() {
 		return currentRate;
 	}
+	public boolean hovered(int mouseX, int mouseY) {
+		return isOpen && mouseX >= panelX && mouseX < panelX + PANEL_W && mouseY >= panelY && mouseY < panelY + PANEL_H;
+	}
 
 	public void reInit(int gx, int targetY) {
 		if (!isOpen) return;
@@ -77,7 +80,12 @@ public class RateEditHelper {
 	public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {
 		if (!isOpen) return false;
 		if (mouseX >= panelX && mouseX < panelX + PANEL_W && mouseY >= panelY && mouseY < panelY + PANEL_H) {
-			this.rateInputField.mouseClicked(mouseX, mouseY, mouseButton);
+			if (mouseButton == 1) {
+				this.rateInputField.setText("");
+				this.rateInputField.setFocused(true);
+			} else {
+				this.rateInputField.mouseClicked(mouseX, mouseY, mouseButton);
+			}
 			return true;
 		}
 		return this.rateInputField.mouseClicked(mouseX, mouseY, mouseButton);
@@ -86,7 +94,12 @@ public class RateEditHelper {
 	public boolean keyTyped(char typedChar, int keyCode) {
 		if (!isOpen) return false;
 		if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
-			CalculatorState.setTargetSlotRate(activeSlot, Double.parseDouble(rateInputField.getText()));
+			String text = rateInputField.getText();
+			if (text == "") {
+				CalculatorState.setTargetSlotRate(activeSlot, CalculatorState.getMultiplier());
+			} else {
+				CalculatorState.setTargetSlotRate(activeSlot, Double.parseDouble(rateInputField.getText()));
+			}
 			close();
 			return true;
 		}

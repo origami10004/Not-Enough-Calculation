@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.lwjgl.input.Mouse;
 
 import com.origami10004.necalc.Necalc;
+import com.origami10004.necalc.data.CalculatorState;
 import com.origami10004.necalc.data.MachineKey;
 import com.origami10004.necalc.data.MachineState;
 
@@ -38,6 +40,8 @@ public class GuiManageMachines extends GuiCommon {
 	private int gx, gy;
 	private int tableY;
 	private SpeedEditHelper editor;
+	protected int scrollRow = 0;
+	private float scrollPercent = 0.0f;
 
 	public GuiManageMachines(InventoryPlayer playerInv) {
 		super(new FakeContainer(playerInv, false, 0, 0));
@@ -72,7 +76,7 @@ public class GuiManageMachines extends GuiCommon {
 		List<Map.Entry<MachineKey, Integer>> machineKeys = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
 		for (int row = 0; row < ROWS; row++) {
 			for (int col = 0; col < COLS; col++) {
-				int index = row * COLS + col;
+				int index = (row + this.scrollRow) * COLS + col;
 				int slotX = this.gx + 8 + col * SLOT_SIZE;
 				int slotY = curY + row * SLOT_SIZE;
 				drawItemSlot(slotX, slotY);
@@ -93,15 +97,14 @@ public class GuiManageMachines extends GuiCommon {
 				}
 			}
 		}
-
+		drawMachineScrollBar();
 		editor.drawOverlay(mouseX, mouseY);
 	}
 
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 		List<Map.Entry<MachineKey, Integer>> machineKeys = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
-		ITooltipFlag flag = this.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
-
+		
 		if (editor.hovered(mouseX, mouseY)) {
 			return;
 		}
@@ -117,9 +120,9 @@ public class GuiManageMachines extends GuiCommon {
 				if (machine != null) {
 					ItemStack stack = new ItemStack(machine, 1, entry.getKey().meta);
 					
-					List<String> tooltip = stack.getTooltip(this.mc.player, flag);
-					tooltip.add(1, I18n.format("necalc.gui.machine_speed", entry.getValue()));
-					this.drawHoveringText(tooltip, mouseX - this.guiLeft, mouseY - this.guiTop);
+					drawItemExtraInfoTooltip(mouseX - this.guiLeft,
+							mouseY - this.guiTop, stack,
+							I18n.format("necalc.gui.machine_speed", entry.getValue()));
 				}
 			}
 		}
@@ -151,9 +154,41 @@ public class GuiManageMachines extends GuiCommon {
 
 		int machine = getMachineAt(mouseX, mouseY);
 		if (machine != -1 && mouseButton == 0) {
-			this.editor.openSlot(machine, this.gx + 8 + (machine % COLS) * SLOT_SIZE, this.tableY + (machine / COLS) * SLOT_SIZE);
+			this.editor.openSlot(machine, this.gx + 8 + (machine % COLS) * SLOT_SIZE, this.tableY + (machine / COLS - this.scrollRow) * SLOT_SIZE);
 		}
 		super.mouseClicked(mouseX, mouseY, mouseButton);
+	}
+
+	@Override
+	public void handleMouseInput() throws IOException {
+		int scroll = Mouse.getEventDWheel();
+		if (scroll != 0) {
+			int mouseX = Mouse.getEventX() * this.width / this.mc.displayWidth;
+			int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
+
+			int scrollRows = Math.max(0, MachineState.getMachineRows() - ROWS);
+			if (scrollRows <= 0) return;
+			if (scroll > 0) {
+				this.scrollRow = Math.max(0, this.scrollRow - 1);
+			} else {
+				this.scrollRow = Math.min(scrollRows, this.scrollRow + 1);
+			}
+			this.scrollPercent = (float) this.scrollRow / scrollRows;
+			return;
+		}
+		super.handleMouseInput();
+	}
+
+	private void drawMachineScrollBar() {
+		int sbX = this.gx + 175;
+		int sbY = this.gy + TAB_H + 18;
+		int width = 12;
+		int height = 142;
+		if (MachineState.getMachineRows() <= ROWS) {
+			this.scrollPercent = 0.0f;
+			this.scrollRow = 0;
+		}
+		this.drawScrollbar(sbX, sbY, width, height, this.scrollPercent, MachineState.getMachineRows() > ROWS);
 	}
 
 	@Override
@@ -185,7 +220,7 @@ public class GuiManageMachines extends GuiCommon {
 	private int getMachineAt(int mouseX, int mouseY) {
 		for (int row = 0; row < ROWS; row++) {
 			for (int col = 0; col < COLS; col++) {
-				int index = row * COLS + col;
+				int index = (row + this.scrollRow) * COLS + col;
 				int slotX = this.gx + 8 + col * SLOT_SIZE;
 				int slotY = this.tableY + row * SLOT_SIZE;
 				if (mouseX >= slotX && mouseX < slotX + SLOT_SIZE && mouseY >= slotY && mouseY < slotY + SLOT_SIZE) {
