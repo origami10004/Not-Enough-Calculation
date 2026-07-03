@@ -1,0 +1,44 @@
+# item names
+item.necalc.prod_calc.name=生产计算器
+
+# Keybindings
+necalc.key.category=Not Enough Calculation
+necalc.key.open_calc_gui=打开生产计算器
+
+# gui tabs
+necalc.gui.tab.main=生产计划
+necalc.gui.tab.flow=流程图视图（即将推出！）
+necalc.gui.tab.recipes=配方管理器
+necalc.gui.tab.machine=机器速度管理器
+necalc.gui.tab.add=添加配方
+
+# main calculator gui
+necalc.gui.target=生产目标
+necalc.gui.target_help=点击鼠标中键编辑速率
+necalc.gui.rate=速率：
+necalc.gui.rate.minute=/min
+necalc.gui.rate.second=/s
+necalc.gui.rate.ticks=/t
+necalc.gui.results=所需生产速率
+necalc.gui.inventory=物品栏
+necalc.gui.show.some=显示隐藏配方（%d）
+necalc.gui.show.none=显示隐藏配方（无）
+
+# recipe editor gui
+necalc.gui.recipe.add=新建配方
+necalc.gui.recipe.edit=编辑配方
+necalc.gui.recipe.input=输入
+necalc.gui.recipe.machine=机器
+necalc.gui.recipe.output=输出
+necalc.gui.recipe.time=时间（刻）
+necalc.gui.recipe.confirm=确认
+necalc.gui.recipe.cancel=取消
+necalc.gui.recipe.delete=删除
+
+# recipe manager gui
+necalc.gui.recipe_manager=已编码配方
+
+# Machine manager gui
+necalc.gui.machine_manager=机器管理器
+necalc.gui.machine_speed=机器速度：%d
+necalc.gui.machine_help=使用此菜单编辑所有使用该机器的配方的机器速度
