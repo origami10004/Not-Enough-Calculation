@@ -146,12 +146,10 @@ public class CalculatorState {
 
 	public static void recalculateRecipes() {
 		cached = false;
-		Necalc.logger.info("Recalculating");
 	}
 
 	private static void getResult() {
 		if (cached) return;
-		Necalc.logger.info("Actually calculating lmao");
 		recipeSteps.clear();
 		Solver.solve();
 		recipeSteps.addAll(Solver.steps);

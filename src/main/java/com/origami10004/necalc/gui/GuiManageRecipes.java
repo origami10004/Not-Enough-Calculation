@@ -34,6 +34,7 @@ public class GuiManageRecipes extends GuiCommon{
 	private int tableY;
 	private int scrollRow = 0;
 	private float scrollPercent = 0.0f;
+	private boolean draggingScroll = false;
 
 	public GuiManageRecipes(InventoryPlayer playerInv) {
 		super(new FakeContainer(playerInv, false, 0, 0));
@@ -113,6 +114,34 @@ public class GuiManageRecipes extends GuiCommon{
 				mc.displayGuiScreen(new GuiRecipeEditor(this.playerInv, this, false));
 			}
 		}
+
+		if (mouseX >= this.gx + 174 && mouseX < this.gx + 188 && mouseY >= this.gy + TAB_H + 17 && mouseY < this.gy + TAB_H + 161) {
+			if (mouseButton == 0) {
+				this.draggingScroll = true;
+				this.scrollPercent = updateScroll(mouseY, this.gy + TAB_H + 17, 144);
+				int scrollRows = Math.max(0, RecipeState.getRecipeRows() - ROWS);
+				this.scrollRow = (int) (this.scrollPercent * scrollRows);
+			}
+			return;
+		}
+		super.mouseClicked(mouseX, mouseY, mouseButton);
+	}
+
+	@Override
+	public void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+		if (this.draggingScroll) {
+			this.scrollPercent = updateScroll(mouseY, this.gy + TAB_H + 17, 144);
+			int scrollRows = Math.max(0, RecipeState.getRecipeRows() - ROWS);
+			this.scrollRow = (int) (this.scrollPercent * scrollRows);
+			return;
+		}
+		super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+	}
+
+	@Override
+	public void mouseReleased(int mouseX, int mouseY, int state) {
+		this.draggingScroll = false;
+		super.mouseReleased(mouseX, mouseY, state);
 	}
 
 	@Override

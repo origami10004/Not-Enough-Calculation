@@ -6,6 +6,7 @@ import org.lwjgl.input.Mouse;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.data.CalculatorState;
 import com.origami10004.necalc.data.ProductionStep;
 
@@ -51,8 +52,10 @@ public class GuiProductionCalc extends GuiCommon {
 	// Target scrolling
 	protected int targetScrollRow = 0;
 	private float targetScrollPercent = 0.0f;
+	private boolean draggingTargetScroll = false;
 	private int prodScrollRow = 0;
 	private float prodScrollPercent = 0.0f;
+	private boolean draggingProdScroll = false;
 	private final RateEditHelper editOverlay = new RateEditHelper(this);
 
 	// Recipe hovering
@@ -436,12 +439,62 @@ public class GuiProductionCalc extends GuiCommon {
 					CalculatorState.hideRecipe(prodRow);
 					this.prodScrollRow = Math.min(this.prodScrollRow, Math.max(0, CalculatorState.getVisibleRecipes().size() - TABLE_VIS_ROWS));
 					this.prodScrollPercent = (float) this.prodScrollRow / Math.max(1, CalculatorState.getVisibleRecipes().size() - TABLE_VIS_ROWS);
+					return;
 				}
+			}
+		}
+
+		// target scroll
+		if (mouseX >= this.gx + 158 && mouseX < this.gx + 172 && mouseY >= this.gy + TAB_H + 35 && mouseY < this.gy + TAB_H + 71) {
+			if (mouseButton == 0) {
+				this.draggingTargetScroll = true;
+				this.targetScrollPercent = updateScroll(mouseY, this.gy + TAB_H + 35, 36);
+				this.targetScrollRow = (int) (this.targetScrollPercent * Math.max(0, CalculatorState.getTargetNumRows() - TARGET_ROWS));
+			}
+			return;
+		}
+
+		// production scroll
+		if (CalculatorState.getVisibleRecipes().size() > TABLE_VIS_ROWS &&
+				mouseX >= this.gx + 162 && mouseX < this.gx + 176
+				&& mouseY >= this.gy + TAB_H + 91 && mouseY < this.gy + TAB_H + 203) {
+			if (mouseButton == 0) {
+				this.draggingProdScroll = true;
+				this.prodScrollPercent = updateScroll(mouseY, this.gy + TAB_H + 91, 112);
+				this.prodScrollRow = (int) (this.prodScrollPercent * (CalculatorState.getVisibleRecipes().size() - TABLE_VIS_ROWS));
 			}
 			return;
 		}
 
 		super.mouseClicked(mouseX, mouseY, mouseButton);
+	}
+
+	@Override
+	public void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+		if (this.draggingTargetScroll) {
+			this.targetScrollPercent = updateScroll(mouseY, this.gy + TAB_H + 35, 36);
+			this.targetScrollRow = (int) (this.targetScrollPercent * Math.max(0, CalculatorState.getTargetNumRows() - TARGET_ROWS));
+			return;
+		}
+		if (this.draggingProdScroll) {
+			this.prodScrollPercent = updateScroll(mouseY, this.gy + TAB_H + 91, 112);
+			this.prodScrollRow = (int) (this.prodScrollPercent * Math.max(0, CalculatorState.getVisibleRecipes().size() - TABLE_VIS_ROWS));
+			return;
+		}
+		super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+	}
+
+	@Override
+	public void mouseReleased(int mouseX, int mouseY, int state) {
+		if (this.draggingTargetScroll) {
+			this.draggingTargetScroll = false;
+			return;
+		}
+		if (this.draggingProdScroll) {
+			this.draggingProdScroll = false;
+			return;
+		}
+		super.mouseReleased(mouseX, mouseY, state);
 	}
 
 	@Override

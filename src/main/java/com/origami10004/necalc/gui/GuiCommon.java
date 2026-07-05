@@ -281,4 +281,10 @@ abstract class GuiCommon extends GuiContainer {
 			drawModalRectWithCustomSizedTexture(x, (int) scrollY, 12, 0, 12, 9, 24, 9);
 		}
 	}
+
+	protected float updateScroll(int mouseY, int y, int h) {
+		int mouseYpos = mouseY - 4;
+		int correctH = h - 9;
+		return Math.max(0, Math.min(1, (mouseYpos - y) / (float) correctH));
+	}
 }

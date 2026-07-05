@@ -48,8 +48,10 @@ public class GuiRecipeEditor extends GuiCommon {
 
 	private int inputScrollRow = 0;
 	private float inputScrollPercent = 0.0f;
+	private boolean draggingInputScroll = false;
 	private int outputScrollRow = 0;
 	private float outputScrollPercent = 0.0f;
+	private boolean draggingOutputScroll = false;
 
 	private int gx, gy;
 
@@ -431,7 +433,56 @@ public class GuiRecipeEditor extends GuiCommon {
 			return;
 		}
 
+		// input scroll
+		if (mouseX >= this.gx + 158 && mouseX < this.gx + 172
+					&& mouseY >= this.gy + TAB_H + 29 && mouseY < this.gy + TAB_H + 65) {
+			if (mouseButton == 0) {
+				this.draggingInputScroll = true;
+				this.inputScrollPercent = updateScroll(mouseY, this.gy + TAB_H + 29, 36);
+				this.inputScrollRow = (int) (this.inputScrollPercent * Math.max(0, RecipeState.getInputRows() - IO_ROWS));
+			}
+			return;
+		}
+
+		// output scroll
+		if (mouseX >= this.gx + 158 && mouseX < this.gx + 172
+					&& mouseY >= this.gy + TAB_H + 107 && mouseY < this.gy + TAB_H + 143) {
+			if (mouseButton == 0) {
+				this.draggingOutputScroll = true;
+				this.outputScrollPercent = updateScroll(mouseY, this.gy + TAB_H + 107, 36);
+				this.outputScrollRow = (int) (this.outputScrollPercent * Math.max(0, RecipeState.getOutputRows() - IO_ROWS));
+			}
+			return;
+		}
 		super.mouseClicked(mouseX, mouseY, mouseButton);
+	}
+
+	@Override
+	public void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+		if (this.draggingInputScroll) {
+			this.inputScrollPercent = updateScroll(mouseY, this.gy + TAB_H + 29, 36);
+			this.inputScrollRow = (int) (this.inputScrollPercent * Math.max(0, RecipeState.getInputRows() - IO_ROWS));
+			return;
+		}
+		if (this.draggingOutputScroll) {
+			this.outputScrollPercent = updateScroll(mouseY, this.gy + TAB_H + 107, 36);
+			this.outputScrollRow = (int) (this.outputScrollPercent * Math.max(0, RecipeState.getOutputRows() - IO_ROWS));
+			return;
+		}
+		super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+	}
+
+	@Override
+	public void mouseReleased(int mouseX, int mouseY, int state) {
+		if (this.draggingInputScroll) {
+			this.draggingInputScroll = false;
+			return;
+		}
+		if (this.draggingOutputScroll) {
+			this.draggingOutputScroll = false;
+			return;
+		}
+		super.mouseReleased(mouseX, mouseY, state);
 	}
 
 
