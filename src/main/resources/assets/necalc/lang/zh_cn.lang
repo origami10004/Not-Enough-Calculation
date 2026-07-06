@@ -20,7 +20,7 @@ necalc.gui.rate.minute=/min
 necalc.gui.rate.second=/s
 necalc.gui.rate.ticks=/t
 necalc.gui.target_rate=速率：%.2f
-necalc.gui.machine_count=數量：%.2f
+necalc.gui.machine_count=数量：%.2f
 necalc.gui.results=所需生产速率
 necalc.gui.inventory=物品栏
 necalc.gui.show.some=显示隐藏配方（%d）
@@ -43,4 +43,4 @@ necalc.gui.recipe_manager=已编码配方
 # Machine manager gui
 necalc.gui.machine_manager=机器管理器
 necalc.gui.machine_speed=机器速度：%d
-necalc.gui.machine_help=使用此菜单编辑所有使用该机器的配方的机器速度
+necalc.gui.machine_help=使用此菜单编辑所有配方中该机器的速度
