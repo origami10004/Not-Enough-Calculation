@@ -1,11 +1,9 @@
 package com.origami10004.necalc.gui;
 
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 
 import java.io.IOException;
@@ -13,6 +11,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import com.origami10004.necalc.data.RecipeState;
+import com.origami10004.necalc.data.ingredient.*;
 
 // This class is used for both the recipe editor and the new recipe GUI as they share very similar layout
 public class GuiRecipeEditor extends GuiCommon {
@@ -109,10 +108,8 @@ public class GuiRecipeEditor extends GuiCommon {
 				int slotY = this.inputGrid + row * SLOT_SIZE;
 				this.drawItemSlot(slotX, slotY);
 
-				ItemStack curStack = RecipeState.getInput(actual * SLOTS_PER_ROW + col);
-				if (!curStack.isEmpty()) {
-					drawSlotWithCustomCount(curStack, slotX + 1, slotY + 1, curStack.getCount() == 1 ? 0 : curStack.getCount());
-				}
+				Ingredients curIng = RecipeState.getInput(actual * SLOTS_PER_ROW + col);
+				curIng.renderValue(this, slotX + 1, slotY + 1);
 			}
 		}
 		drawInputScrollBar();
@@ -123,12 +120,7 @@ public class GuiRecipeEditor extends GuiCommon {
 		int machineX = this.gx + 12;
 		this.machineY = curY + 10;
 		this.drawItemSlot(machineX, machineY);
-		ItemStack machineStack = RecipeState.getMachine();
-		if (!machineStack.isEmpty()) {
-			RenderHelper.enableGUIStandardItemLighting();
-			this.itemRender.renderItemAndEffectIntoGUI(machineStack, machineX + 1, machineY + 1);
-			RenderHelper.disableStandardItemLighting();
-		}
+		RecipeState.getMachine().render(this, machineX + 1, machineY + 1);
 
 		// time entry
 		this.fontRenderer.drawString(I18n.format("necalc.gui.recipe.time"), this.gx + GUI_WIDTH / 2, curY, 0xFF000000);
@@ -147,10 +139,8 @@ public class GuiRecipeEditor extends GuiCommon {
 				int slotY = this.outputGrid + row * SLOT_SIZE;
 				this.drawItemSlot(slotX, slotY);
 
-				ItemStack curStack = RecipeState.getOutput(actual * SLOTS_PER_ROW + col);
-				if (!curStack.isEmpty()) {
-					drawSlotWithCustomCount(curStack, slotX + 1, slotY + 1, curStack.getCount() == 1 ? 0 : curStack.getCount());
-				}
+				Ingredients curIng = RecipeState.getOutput(actual * SLOTS_PER_ROW + col);
+				curIng.renderValue(this, slotX + 1, slotY + 1);
 			}
 		}
 		drawOutputScrollBar();
@@ -183,31 +173,23 @@ public class GuiRecipeEditor extends GuiCommon {
 		// Inputs
 		int hoverSlot = getInputSlotAt(mouseX, mouseY);
 		if (hoverSlot != -1) {
-			ItemStack stack = RecipeState.getInput(hoverSlot);
-			if (!stack.isEmpty()) {
-				renderToolTip(stack, mouseX - this.guiLeft, mouseY - this.guiTop);
-				return;
-			}
+			Ingredients ing = RecipeState.getInput(hoverSlot);
+			this.drawHoveringText(ing.getTooltip(this.mc), mouseX - this.guiLeft, mouseY - this.guiTop);
 		}
 
 		// Machine
 		if (mouseX >= this.gx + 12 && mouseX < this.gx + 12 + SLOT_SIZE
 					&& mouseY >= this.machineY && mouseY < this.machineY + SLOT_SIZE) {
-			ItemStack stack = RecipeState.getMachine();
-			if (!stack.isEmpty()) {
-				renderToolTip(stack, mouseX - this.guiLeft, mouseY - this.guiTop);
-				return;
-			}
+			Ingredients ing = RecipeState.getMachine();
+			this.drawHoveringText(ing.getTooltip(this.mc), mouseX - this.guiLeft, mouseY - this.guiTop);
 		}
 
 		// Outputs
 		hoverSlot = getOutputSlotAt(mouseX, mouseY);
 		if (hoverSlot != -1) {
-			ItemStack stack = RecipeState.getOutput(hoverSlot);
-			if (!stack.isEmpty()) {
-				renderToolTip(stack, mouseX - this.guiLeft, mouseY - this.guiTop);
-				return;
-			}
+			Ingredients ing = RecipeState.getOutput(hoverSlot);
+			this.drawHoveringText(ing.getTooltip(this.mc), mouseX - this.guiLeft, mouseY - this.guiTop);
+			return;
 		}
 
 		// Buttons
@@ -265,16 +247,16 @@ public class GuiRecipeEditor extends GuiCommon {
 			if (inputSlot != -1) {
 				if (shiftPressed && ctrlPressed) {
 					if (scroll > 0) {
-						RecipeState.alterInput(inputSlot, ItemStack.EMPTY, 0, 2);
+						RecipeState.alterInput(inputSlot, Ingredients.EMPTY, 0, 2);
 					} else {
-						RecipeState.alterInput(inputSlot, ItemStack.EMPTY, 0, 0.5);
+						RecipeState.alterInput(inputSlot, Ingredients.EMPTY, 0, 0.5);
 					}
 					return;
 				} else if (shiftPressed) {
 					if (scroll > 0) {
-						RecipeState.alterInput(inputSlot, ItemStack.EMPTY, 1, 1);
+						RecipeState.alterInput(inputSlot, Ingredients.EMPTY, 1, 1);
 					} else {
-						RecipeState.alterInput(inputSlot, ItemStack.EMPTY, -1, 1);
+						RecipeState.alterInput(inputSlot, Ingredients.EMPTY, -1, 1);
 					}
 					return;
 				}
@@ -282,16 +264,16 @@ public class GuiRecipeEditor extends GuiCommon {
 			if (outputSlot != -1) {
 				if (shiftPressed && ctrlPressed) {
 					if (scroll > 0) {
-						RecipeState.alterOutput(outputSlot, ItemStack.EMPTY, 0, 2);
+						RecipeState.alterOutput(outputSlot, Ingredients.EMPTY, 0, 2);
 					} else {
-						RecipeState.alterOutput(outputSlot, ItemStack.EMPTY, 0, 0.5);
+						RecipeState.alterOutput(outputSlot, Ingredients.EMPTY, 0, 0.5);
 					}
 					return;
 				} else if (shiftPressed) {
 					if (scroll > 0) {
-						RecipeState.alterOutput(outputSlot, ItemStack.EMPTY, 1, 1);
+						RecipeState.alterOutput(outputSlot, Ingredients.EMPTY, 1, 1);
 					} else {
-						RecipeState.alterOutput(outputSlot, ItemStack.EMPTY, -1, 1);
+						RecipeState.alterOutput(outputSlot, Ingredients.EMPTY, -1, 1);
 					}
 					return;
 				}
@@ -376,13 +358,13 @@ public class GuiRecipeEditor extends GuiCommon {
 		// Inputs
 		int inputSlot = getInputSlotAt(mouseX, mouseY);
 		if (inputSlot != -1) {
-			ItemStack heldItem = mc.player.inventory.getItemStack();
+			Ingredients heldItem = IngredientManager.of(mc.player.inventory.getItemStack());
 			if (mouseButton == 0) {
 				RecipeState.setInput(inputSlot, heldItem);
 			} else if (mouseButton == 1) {
-				ItemStack currentStack = RecipeState.getInput(inputSlot);
+				Ingredients currentIng = RecipeState.getInput(inputSlot);
 				if (!heldItem.isEmpty() && 
-						(currentStack.isEmpty() || ItemStack.areItemsEqual(heldItem, currentStack))) {
+						(currentIng.isEmpty() || currentIng.equals(heldItem))) {
 					RecipeState.alterInput(inputSlot, heldItem, 1, 1);
 				}
 			}
@@ -392,7 +374,7 @@ public class GuiRecipeEditor extends GuiCommon {
 		// Machine
 		if (mouseX >= this.gx + 12 && mouseX < this.gx + 12 + SLOT_SIZE
 					&& mouseY >= this.machineY && mouseY < this.machineY + SLOT_SIZE) {
-			ItemStack heldItem = mc.player.inventory.getItemStack();
+			Ingredients heldItem = IngredientManager.of(mc.player.inventory.getItemStack());
 			if (mouseButton == 0) {
 				RecipeState.setMachine(heldItem);
 			}
@@ -402,13 +384,13 @@ public class GuiRecipeEditor extends GuiCommon {
 		// Outputs
 		int outputSlot = getOutputSlotAt(mouseX, mouseY);
 		if (outputSlot != -1) {
-			ItemStack heldItem = mc.player.inventory.getItemStack();
+			Ingredients heldItem = IngredientManager.of(mc.player.inventory.getItemStack());
 			if (mouseButton == 0) {
 				RecipeState.setOutput(outputSlot, heldItem);
 			} else if (mouseButton == 1) {
-				ItemStack currentStack = RecipeState.getOutput(outputSlot);
+				Ingredients currentIng = RecipeState.getOutput(outputSlot);
 				if (!heldItem.isEmpty() && 
-						(currentStack.isEmpty() || ItemStack.areItemsEqual(heldItem, currentStack))) {
+						(currentIng.isEmpty() || currentIng.equals(heldItem))) {
 					RecipeState.alterOutput(outputSlot, heldItem, 1, 1);
 				}
 			}

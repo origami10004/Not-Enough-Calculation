@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import org.lwjgl.input.Keyboard;
 
-import com.origami10004.necalc.data.MachineKey;
 import com.origami10004.necalc.data.MachineState;
+import com.origami10004.necalc.data.ingredient.Ingredients;
 
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
@@ -23,14 +23,14 @@ public class SpeedEditHelper {
 	private int panelX = 0;
 	private int panelY = 0;
 	private GuiTextField speedInputField;
-	private MachineKey machine;
+	private Ingredients machine;
 
 	public SpeedEditHelper(GuiManageMachines parent) {
 		this.parent = parent;
 	}
 
 	public void openSlot(int slotIndex, int slotX, int slotY) {
-		List<Map.Entry<MachineKey, Integer>> entries = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
+		List<Map.Entry<Ingredients, Integer>> entries = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
 		if (slotIndex < 0 || slotIndex >= entries.size()) {
 			return;
 		}

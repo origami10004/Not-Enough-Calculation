@@ -14,29 +14,25 @@ import org.hipparchus.optim.nonlinear.scalar.GoalType;
 import com.origami10004.necalc.data.ProductionStep;
 import com.origami10004.necalc.data.RecipeEntry;
 import com.origami10004.necalc.Necalc;
-import com.origami10004.necalc.data.CalculationTarget;
 import com.origami10004.necalc.data.CalculatorState;
-import com.origami10004.necalc.data.ItemKey;
-import com.origami10004.necalc.data.MachineKey;
 import com.origami10004.necalc.data.RecipeState;
 import com.origami10004.necalc.data.MachineState;
-
-import net.minecraft.item.ItemStack;
+import com.origami10004.necalc.data.ingredient.*;
 
 public class Solver {
-	private static List<CalculationTarget> targets;
+	private static List<Ingredients> targets;
 	private static List<RecipeEntry> recipes;
 
-	private static HashMap<ItemKey, Integer> itemToId;
+	private static HashMap<Ingredients, Integer> itemToId;
 	private static HashMap<Integer, Integer> recipeToId;
-	private static ArrayList<ItemKey> idToItem;
+	private static ArrayList<Ingredients> idToItem;
 	private static ArrayList<Integer> idToRecipe;
-	private static List<ItemKey> inputItems;
+	private static List<Ingredients> inputItems;
 
-	private static HashMap<ItemKey, ArrayList<Integer>> itemToRecipe;
+	private static HashMap<Ingredients, ArrayList<Integer>> itemToRecipe;
 
 	public static List<ProductionStep> steps;
-	public static LinkedHashMap<ItemKey, Double> inputRates;
+	public static LinkedHashMap<Ingredients, Double> inputRates;
 
 	private static void preprocess() {
 		itemToId = new HashMap<>();
@@ -47,20 +43,18 @@ public class Solver {
 
 		itemToRecipe = new HashMap<>();
  		for (int i = 0; i < recipes.size(); i++) {
-			List<ItemStack> outputs = recipes.get(i).getOutputs();
-			for (ItemStack output : outputs) {
-				ItemKey key = new ItemKey(output);
-				itemToRecipe.computeIfAbsent(key, k -> new ArrayList<>()).add(i);
+			List<Ingredients> outputs = recipes.get(i).getOutputs();
+			for (Ingredients output : outputs) {
+				itemToRecipe.computeIfAbsent(output.copy(), k -> new ArrayList<>()).add(i);
 			}
 		}
-		Queue<ItemKey> bfsq = new LinkedList<>();
+		Queue<Ingredients> bfsq = new LinkedList<>();
 
-		for (CalculationTarget target : targets) {
-			ItemKey key = new ItemKey(target.getTargetItem());
-			bfsq.add(key);
+		for (Ingredients target : targets) {
+			bfsq.add(target);
 		}
 		while (!bfsq.isEmpty()) {
-			ItemKey current = bfsq.poll();
+			Ingredients current = bfsq.poll();
 			if (itemToId.containsKey(current)) {
 				continue;
 			}
@@ -72,8 +66,8 @@ public class Solver {
 						recipeToId.put(recipeIndex, idToRecipe.size());
 						idToRecipe.add(recipeIndex);
 						RecipeEntry recipe = recipes.get(recipeIndex);
-						for (ItemStack input : recipe.getInputs()) {
-							bfsq.add(new ItemKey(input));
+						for (Ingredients input : recipe.getInputs()) {
+							bfsq.add(input.copy());
 						}
 					}
 				}
@@ -105,31 +99,28 @@ public class Solver {
 		// Recipes table
 		for (int i = 0; i < n; i++) {
 			RecipeEntry recipe = recipes.get(idToRecipe.get(i));
-			MachineKey machine = new MachineKey(recipe.getMachine());
+			Ingredients machine = recipe.getMachine();
 			int speed = MachineState.getMachineSpeeds().getOrDefault(machine, 1);
 			double craftsPerMinute = ((double)(1200 * speed)) / recipe.getTime();
 
-			for (ItemStack output : recipe.getOutputs()) {
-				ItemKey key = new ItemKey(output);
-				Integer itemId = itemToId.get(key);
-				if (itemId != null) matrix[itemId][i] += ((double)output.getCount()) * craftsPerMinute;
+			for (Ingredients output : recipe.getOutputs()) {
+				Integer itemId = itemToId.get(output);
+				if (itemId != null) matrix[itemId][i] += ((double)output.getValue()) * craftsPerMinute;
 			}
-			for (ItemStack input : recipe.getInputs()) {
-				ItemKey key = new ItemKey(input);
-				Integer itemId = itemToId.get(key);
-				if (itemId != null) matrix[itemId][i] -= ((double)input.getCount()) * craftsPerMinute;
+			for (Ingredients input : recipe.getInputs()) {
+				Integer itemId = itemToId.get(input);
+				if (itemId != null) matrix[itemId][i] -= ((double)input.getValue()) * craftsPerMinute;
 			}
 		}
 
 		// Rates input
-		for (CalculationTarget target : targets) {
-			ItemKey key = new ItemKey(target.getTargetItem());
-			Integer itemId = itemToId.get(key);
-			if (itemId != null) rates[itemId] = target.getTargetRate();
+		for (Ingredients target : targets) {
+			Integer itemId = itemToId.get(target);
+			if (itemId != null) rates[itemId] = target.getValue();
 			else {
 				// If this happens, none of recipes produce target item, treat it as input item
-				inputRates.put(key, target.getTargetRate());
-				inputItems.remove(key);
+				inputRates.put(target, target.getValue());
+				inputItems.remove(target);
 			}
 		}
 		
@@ -153,15 +144,20 @@ public class Solver {
 				if (machineCount < 1e-9) continue;
 
 				RecipeEntry recipe = recipes.get(idToRecipe.get(i));
-				MachineKey machineKey = new MachineKey(recipe.getMachine());
-				int speed = MachineState.getMachineSpeeds().getOrDefault(machineKey, 1);
+				int speed = MachineState.getMachineSpeeds().getOrDefault(recipe.getMachine(), 1);
 				double craftsPerMinute = ((double)(1200 * speed)) / recipe.getTime();
 				double recipePerMinute = machineCount * craftsPerMinute;
 
 				steps.add(new ProductionStep(recipe, machineCount, recipePerMinute));
+
+				for (Ingredients input : recipe.getInputs()) {
+					if (inputItems.contains(input)) {
+						double inputRate = ((double)input.getValue()) * recipePerMinute;
+						inputRates.put(input, inputRates.getOrDefault(input, 0.0) + inputRate);
+					}
+				}
 			}
 
-			// TODO: Add input item rates
 		} catch (Exception e) {
 			Necalc.logger.error("Error during optimization: " + e.getMessage());
 		}

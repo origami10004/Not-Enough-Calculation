@@ -1,21 +1,23 @@
 package com.origami10004.necalc.gui;
 
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.inventory.Container;
+
+import com.origami10004.necalc.data.ingredient.Ingredients;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.List;
 
-abstract class GuiCommon extends GuiContainer {
+public abstract class GuiCommon extends GuiContainer {
 	protected static final int TAB_H			= 28;
 	protected static final int TAB_W			= 28;
 	protected static final int TAB_COUNT		= 5;
@@ -176,10 +178,9 @@ abstract class GuiCommon extends GuiContainer {
 		}
 	}
 
-	protected void drawItemExtraInfoTooltip(int mouseX, int mouseY, ItemStack stack, String extraInfo) {
-		ITooltipFlag flag = this.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
-
-		List<String> tooltip = stack.getTooltip(this.mc.player, flag);
+	protected void drawItemExtraInfoTooltip(int mouseX, int mouseY, Ingredients ing, String extraInfo) {
+		
+		List<String> tooltip = ing.getTooltip(this.mc);
 		tooltip.add(1, extraInfo);
 		this.drawHoveringText(tooltip, mouseX, mouseY);
 	}
@@ -238,39 +239,6 @@ abstract class GuiCommon extends GuiContainer {
 		}
 	}
 
-	protected void drawSlotWithCustomCount(ItemStack stack, int x, int y, double count) {
-		if (stack.isEmpty()) return;
-
-		RenderHelper.enableGUIStandardItemLighting();
-		this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
-		RenderHelper.disableStandardItemLighting();
-		String text = formatValue(count);
-		if (text == "") return;
-
-		GlStateManager.disableDepth();
-		GlStateManager.disableBlend();
-		GlStateManager.pushMatrix();
-
-		float scale;
-		if (text.length() > 3) {
-			scale = 0.5f;
-		} else {
-			scale = 0.75f;
-		}
-		GlStateManager.scale(scale, scale, 1.0f);
-
-		int width = this.fontRenderer.getStringWidth(text);
-
-		float textX = ((x + 16) / scale) - width;
-		float textY = ((y + 16) / scale) - 8;
-
-		this.fontRenderer.drawStringWithShadow(text, textX, textY, 0xFFFFFF);
-
-		GlStateManager.popMatrix();
-		GlStateManager.enableBlend();
-		GlStateManager.enableDepth();
-	}
-
 	protected void drawScrollbar(int x, int y, int w, int h, float scrollPercent, boolean active) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(SCROLL_TEXTURE);
@@ -286,5 +254,13 @@ abstract class GuiCommon extends GuiContainer {
 		int mouseYpos = mouseY - 4;
 		int correctH = h - 9;
 		return Math.max(0, Math.min(1, (mouseYpos - y) / (float) correctH));
+	}
+
+	public RenderItem getItemRender() {
+		return this.itemRender;
+	}
+
+	public FontRenderer getFontRenderer() {
+		return this.fontRenderer;
 	}
 }

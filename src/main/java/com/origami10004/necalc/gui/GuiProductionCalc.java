@@ -6,9 +6,9 @@ import org.lwjgl.input.Mouse;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.data.CalculatorState;
 import com.origami10004.necalc.data.ProductionStep;
+import com.origami10004.necalc.data.ingredient.*;
 
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.resources.I18n;
@@ -61,7 +61,7 @@ public class GuiProductionCalc extends GuiCommon {
 	// Recipe hovering
 	private int hoveredRecipeRow = -1;
 	private int hoveredRecipeRowTicks = 0;
-	private ItemStack hoveredStepStack = ItemStack.EMPTY;
+	private Ingredients hoveredStepStack = Ingredients.EMPTY;
 	private double hoveredStepValue = 0.0;
 	private boolean hoverMachine = false;
 
@@ -126,12 +126,8 @@ public class GuiProductionCalc extends GuiCommon {
 				int slotX = this.gx + INDENT_L + 4 + col * SLOT_SIZE;
 				this.drawItemSlot(slotX, this.targetGridY + row * SLOT_SIZE);
 
-				ItemStack curTarget = CalculatorState.getTargetSlot(actual * SLOTS_PER_ROW + col);
-				if (!curTarget.isEmpty()) {
-					drawSlotWithCustomCount(curTarget, slotX + 1,
-							this.targetGridY + row * SLOT_SIZE + 1,
-							CalculatorState.getTargetSlotRate(actual * SLOTS_PER_ROW + col));
-				}
+				Ingredients curTarget = CalculatorState.getTargetSlot(actual * SLOTS_PER_ROW + col);
+				curTarget.renderValue(this, slotX + 1, this.targetGridY + row * SLOT_SIZE + 1, CalculatorState.getTargetSlotRate(actual * SLOTS_PER_ROW + col));
 			}
 		}
 		//Target scrollbar
@@ -172,10 +168,11 @@ public class GuiProductionCalc extends GuiCommon {
 		// Target table tooltips
 		int targetSlot = getTargetSlotAt(mouseX, mouseY);
 		if (targetSlot != -1) {
-			ItemStack stack = CalculatorState.getTargetSlot(targetSlot);
-			if (!stack.isEmpty()) {
+			Ingredients ing = CalculatorState.getTargetSlot(targetSlot);
+			if (!ing.isEmpty()) {
 				double rate = CalculatorState.getTargetSlotRate(targetSlot);
-				this.drawItemExtraInfoTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, stack,
+				
+				this.drawItemExtraInfoTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, ing,
 						I18n.format("necalc.gui.target_rate", rate));
 			}
 		}
@@ -270,7 +267,7 @@ public class GuiProductionCalc extends GuiCommon {
 
 		int rowX = this.gx + INDENT_L + 1;
 		int rowW = GUI_WIDTH - INDENT_L - INDENT_R - 2;
-		hoveredStepStack = ItemStack.EMPTY;
+		hoveredStepStack = Ingredients.EMPTY;
 
 		// Scrollbar if needed and adjust row width accordingly
 		if (visible.size() > TABLE_VIS_ROWS) {
@@ -307,10 +304,10 @@ public class GuiProductionCalc extends GuiCommon {
 			drawRectPanelOutdent(rowX, rowY, rowW, TABLE_ROW_H, rowBg);
 
 			// Primary input and rate
-			ItemStack input = step.getPrimaryInput();
+			Ingredients input = step.getPrimaryInput();
 			int iconY = rowY + 2;
 			if (input != null) {
-				drawSlotWithCustomCount(input, rowX + 2, iconY, step.getPrimaryInputRate() / CalculatorState.getMultiplier());
+				input.renderValue(this, rowX + 2, iconY, step.getPrimaryInputRate() / CalculatorState.getMultiplier());
 				if (rowHovered) {
 					if (mouseX >= rowX + 2 && mouseX < rowX + 2 + 16 && mouseY >= iconY && mouseY < iconY + 16) {
 						hoveredStepStack = input;
@@ -329,11 +326,11 @@ public class GuiProductionCalc extends GuiCommon {
 
 			// Machine (machine cannot be empty)
 			int machineIconX = rowX + 40;
-			drawSlotWithCustomCount(step.getMachine(), machineIconX, iconY, step.getMachineCount());
+			step.getMachine().renderValue(this, machineIconX, iconY);
 			if (rowHovered) {
 				if (mouseX >= machineIconX && mouseX < machineIconX + 16 && mouseY >= iconY && mouseY < iconY + 16) {
 					hoveredStepStack = step.getMachine();
-					hoveredStepValue = step.getMachineCount();
+					hoveredStepValue = step.getMachine().getValue();
 					hoverMachine = true;
 				}
 			}
@@ -343,8 +340,8 @@ public class GuiProductionCalc extends GuiCommon {
 
 			// Primary output and rate (output cannot be empty)
 			int outputIconX = rowX + 72;
-			ItemStack output = step.getPrimaryOutput();
-			drawSlotWithCustomCount(output, outputIconX, iconY, step.getPrimaryOutputRate() / CalculatorState.getMultiplier());
+			Ingredients output = step.getPrimaryOutput();
+			output.renderValue(this, outputIconX, iconY, step.getPrimaryOutputRate() / CalculatorState.getMultiplier());
 			if (rowHovered) {
 				if (mouseX >= outputIconX && mouseX < outputIconX + 16 && mouseY >= iconY && mouseY < iconY + 16) {
 					hoveredStepStack = output;
@@ -398,7 +395,7 @@ public class GuiProductionCalc extends GuiCommon {
 			if (mouseButton == 0) {
 				// left click: set target slot to held item
 				ItemStack heldItem = this.mc.player.inventory.getItemStack();
-				CalculatorState.setTargetSlot(targetSlot, heldItem.copy());
+				CalculatorState.setTargetSlot(targetSlot, IngredientManager.of(heldItem));
 				if (this.targetScrollRow > CalculatorState.getTargetNumRows() - TARGET_ROWS) {
 					this.targetScrollRow = Math.max(0, CalculatorState.getTargetNumRows() - TARGET_ROWS);
 					this.targetScrollPercent = (float) this.targetScrollRow / Math.max(1, CalculatorState.getTargetNumRows() - TARGET_ROWS);

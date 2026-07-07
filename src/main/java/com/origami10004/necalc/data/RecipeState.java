@@ -3,7 +3,7 @@ package com.origami10004.necalc.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.item.ItemStack;
+import com.origami10004.necalc.data.ingredient.Ingredients;
 
 public class RecipeState {
 	private static ArrayList<RecipeEntry> recipes;
@@ -31,37 +31,37 @@ public class RecipeState {
 		RecipeState.stagedId = index;
 	}
 
-	public static ItemStack getInput(int index) {
+	public static Ingredients getInput(int index) {
 		if (index < 0 || index >= stagedRecipe.getInputs().size()) {
-			return ItemStack.EMPTY;
+			return Ingredients.EMPTY;
 		}
 		return stagedRecipe.getInputs().get(index);
 	}
-	public static void setInput(int index, ItemStack stack) {
-		stagedRecipe.setInput(index, stack);
+	public static void setInput(int index, Ingredients ingredient) {
+		stagedRecipe.setInput(index, ingredient);
 	}
-	public static void alterInput(int index, ItemStack stack, int inc, double mult) {
-		stagedRecipe.alterInput(index, stack, inc, mult);
+	public static void alterInput(int index, Ingredients ingredient, int inc, double mult) {
+		stagedRecipe.alterInput(index, ingredient, inc, mult);
 	}
 
-	public static ItemStack getMachine() {
+	public static Ingredients getMachine() {
 		return stagedRecipe.getMachine();
 	}
-	public static void setMachine(ItemStack stack) {
-		stagedRecipe.setMachine(stack);
+	public static void setMachine(Ingredients ingredient) {
+		stagedRecipe.setMachine(ingredient);
 	}
 
-	public static ItemStack getOutput(int index) {
+	public static Ingredients getOutput(int index) {
 		if (index < 0 || index >= stagedRecipe.getOutputs().size()) {
-			return ItemStack.EMPTY;
+			return Ingredients.EMPTY;
 		}
 		return stagedRecipe.getOutputs().get(index);
 	}
-	public static void setOutput(int index, ItemStack stack) {
-		stagedRecipe.setOutput(index, stack);
+	public static void setOutput(int index, Ingredients ingredient) {
+		stagedRecipe.setOutput(index, ingredient);
 	}
-	public static void alterOutput(int index, ItemStack stack, int inc, double mult) {
-		stagedRecipe.alterOutput(index, stack, inc, mult);
+	public static void alterOutput(int index, Ingredients ingredient, int inc, double mult) {
+		stagedRecipe.alterOutput(index, ingredient, inc, mult);
 	}
 
 	public static int getTime() {

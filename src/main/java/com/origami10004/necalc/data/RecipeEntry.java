@@ -1,17 +1,17 @@
 package com.origami10004.necalc.data;
 
-import java.util.ArrayList;
+import com.origami10004.necalc.Necalc;
+import com.origami10004.necalc.data.ingredient.Ingredients;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
-import net.minecraft.item.ItemStack;
-
 public class RecipeEntry {
-	private ArrayList<ItemStack> inputs;
-	private ArrayList<ItemStack> outputs;
-	private HashSet<ItemKey> inputKeys;
-	private HashSet<ItemKey> outputKeys;
-	private ItemStack machine;
+	private ArrayList<Ingredients> inputs;
+	private ArrayList<Ingredients> outputs;
+	private HashSet<Ingredients> inputKeys;
+	private HashSet<Ingredients> outputKeys;
+	private Ingredients machine;
 	private int time;
 
 	public static final RecipeEntry EMPTY = new RecipeEntry();
@@ -21,22 +21,24 @@ public class RecipeEntry {
 		this.outputs = new ArrayList<>();
 		this.inputKeys = new HashSet<>();
 		this.outputKeys = new HashSet<>();
-		this.machine = ItemStack.EMPTY;
+		this.machine = Ingredients.EMPTY;
 		this.time = 1;
 	}
-	public RecipeEntry(ArrayList<ItemStack> inputs, ItemStack machine, ArrayList<ItemStack> outputs, int time) {
+	public RecipeEntry(ArrayList<Ingredients> inputs, Ingredients machine, ArrayList<Ingredients> outputs, int time) {
 		this.inputs = new ArrayList<>();
 		this.inputKeys = new HashSet<>();
-		for (ItemStack stack : inputs) {
-			this.inputs.add(stack.copy());
-			this.inputKeys.add(new ItemKey(stack));
+		for (Ingredients ing : inputs) {
+			ing = ing.copy();
+			this.inputs.add(ing);
+			this.inputKeys.add(ing);
 		}
 		this.machine = machine.copy();
 		this.outputs = new ArrayList<>();
 		this.outputKeys = new HashSet<>();
-		for (ItemStack stack : outputs) {
-			this.outputs.add(stack.copy());
-			this.outputKeys.add(new ItemKey(stack));
+		for (Ingredients ing : outputs) {
+			ing = ing.copy();
+			this.outputs.add(ing);
+			this.outputKeys.add(ing);
 		}
 		this.time = Math.max(time, 1);
 	}
@@ -44,15 +46,15 @@ public class RecipeEntry {
 		return new RecipeEntry(this.inputs, this.machine, this.outputs, this.time);
 	}
 
-	public ArrayList<ItemStack> getInputs() {
+	public ArrayList<Ingredients> getInputs() {
 		return inputs;
 	}
 
-	public ItemStack getMachine() {
+	public Ingredients getMachine() {
 		return machine;
 	}
 
-	public ArrayList<ItemStack> getOutputs() {
+	public ArrayList<Ingredients> getOutputs() {
 		return outputs;
 	}
 
@@ -72,91 +74,95 @@ public class RecipeEntry {
 		return !outputs.isEmpty() && !machine.isEmpty();
 	}
 
-	public void setInput(int index, ItemStack stack) {
+	public void setInput(int index, Ingredients ingredient) {
 		if (index < 0) {
 			throw new IndexOutOfBoundsException("Invalid input index");
 		}
-		if (inputKeys.contains(new ItemKey(stack))) {
+		if (inputKeys.contains(ingredient)) {
 			return;
 		}
 		if (index >= inputs.size()) {
-			if (stack.isEmpty()) return;
-			inputs.add(stack.copy());
-			inputKeys.add(new ItemKey(stack));
+			if (ingredient.isEmpty()) return;
+			inputs.add(ingredient.copy());
+			inputKeys.add(ingredient);
 		} else {
-			if (stack.isEmpty()) {
+			if (ingredient.isEmpty()) {
+				inputKeys.remove(inputs.get(index));
 				inputs.remove(index);
-				inputKeys.remove(new ItemKey(stack));
 				return;
 			}
-			inputKeys.remove(new ItemKey(inputs.get(index)));
-			inputs.set(index, stack.copy());
-			inputKeys.add(new ItemKey(stack));
+			inputKeys.remove(inputs.get(index));
+			inputs.set(index, ingredient.copy());
+			inputKeys.add(ingredient);
 		}
 	}
 
-	public void setMachine(ItemStack stack) {
-		this.machine = stack.copy();
+	public void setMachine(Ingredients machine) {
+		Necalc.logger.info("Setting machine to: " + machine.serialize());
+		this.machine = machine.copy();
+		this.machine.setValue(1);
 	}
 
-	public void setOutput(int index, ItemStack stack) {
+	public void setOutput(int index, Ingredients ingredient) {
 		if (index < 0) {
 			throw new IndexOutOfBoundsException("Invalid output index");
 		}
-		if (outputKeys.contains(new ItemKey(stack))) {
+		if (outputKeys.contains(ingredient)) {
 			return;
 		}
 		if (index >= outputs.size()) {
-			if (stack.isEmpty()) return;
-			outputs.add(stack.copy());
-			outputKeys.add(new ItemKey(stack));
+			if (ingredient.isEmpty()) return;
+			outputs.add(ingredient.copy());
+			outputKeys.add(ingredient);
 		} else {
-			if (stack.isEmpty()) {
+			if (ingredient.isEmpty()) {
+				outputKeys.remove(outputs.get(index));
 				outputs.remove(index);
-				outputKeys.remove(new ItemKey(stack));
 				return;
 			}
-			outputKeys.remove(new ItemKey(outputs.get(index)));
-			outputs.set(index, stack.copy());
-			outputKeys.add(new ItemKey(stack));
+			outputKeys.remove(outputs.get(index));
+			outputs.set(index, ingredient.copy());
+			outputKeys.add(ingredient);
 		}
 	}
 
-	public void alterInput(int index, ItemStack stack, int inc, double mult) {
+	public void alterInput(int index, Ingredients ingredient, int inc, double mult) {
 		if (index < 0) {
 			throw new IndexOutOfBoundsException("Invalid input index");
 		}
 		if (index >= inputs.size()) {
-			ItemStack temp = stack.copy();
-			temp.setCount(inc);
-			inputs.add(temp);
+			// new input
+			if (ingredient.isEmpty() || inputs.contains(ingredient)) return;
+			ingredient.setValue(inc);
+			inputs.add(ingredient);
 		} else {
-			int current = inputs.get(index).getCount();
+			int current = (int) inputs.get(index).getValue();
 			int newCount = (int) ((current + inc) * mult);
 			if (mult == 0.5 && (current + inc) % 2 != 0) {
 				return; // Prevent halving odd numbers
 			}
 			if (newCount > 0) {
-				inputs.get(index).setCount(newCount);
+				inputs.get(index).setValue(newCount);
 			}
 		}
 	}
 
-	public void alterOutput(int index, ItemStack stack, int inc, double mult) {
+	public void alterOutput(int index, Ingredients ingredient, int inc, double mult) {
 		if (index < 0) {
 			throw new IndexOutOfBoundsException("Invalid output index");
 		}
 		if (index >= outputs.size()) {
-			ItemStack temp = stack.copy();
-			temp.setCount(inc);
-			outputs.add(temp);
+			// new output
+			if (ingredient.isEmpty() || outputs.contains(ingredient)) return;
+			ingredient.setValue(inc);
+			outputs.add(ingredient);
 		} else {
-			int current = outputs.get(index).getCount();
+			int current = (int) outputs.get(index).getValue();
 			int newCount = (int) ((current + inc) * mult);
 			if (newCount <= 0) {
 				outputs.remove(index);
 			} else {
-				outputs.get(index).setCount(newCount);
+				outputs.get(index).setValue(newCount);
 			}
 		}
 	}

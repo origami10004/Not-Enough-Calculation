@@ -1,19 +1,17 @@
 package com.origami10004.necalc.data;
 
-import net.minecraft.item.ItemStack;
-
-import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.calc.Solver;
+import com.origami10004.necalc.data.ingredient.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class CalculatorState {
 	private static int displayRate = 0;
-	private static final List<CalculationTarget> targets = new ArrayList<>();
+	private static final List<Ingredients> targets = new ArrayList<>();
 	private static int[] rateMultiplier = new int[] {1, 60, 1200};
 	private static List<ProductionStep> recipeSteps;
-	private static HashSet<ItemKey> targetItems = new HashSet<>();
+	private static HashSet<Ingredients> targetItems = new HashSet<>();
 
 	private static boolean cached = false;
 
@@ -23,11 +21,11 @@ public class CalculatorState {
 	}
 
 	public static void loadTargets() {
-		List<CalculationTarget> loadedTargets = TargetPersistence.loadTargetData();
+		List<Ingredients> loadedTargets = TargetPersistence.loadTargetData();
 		targets.clear();
 		targets.addAll(loadedTargets);
 		targetItems.clear();
-		targets.forEach(target -> targetItems.add(new ItemKey(target.getTargetItem())));
+		targets.forEach(target -> targetItems.add(target));
 	}
 
 	public static int getTargetNumRows() {
@@ -44,40 +42,41 @@ public class CalculatorState {
 		return old != newRate;
 	}
 
-	public static List<CalculationTarget> getTargets() {
+	public static List<Ingredients> getTargets() {
 		return targets;
 	}
 
-	public static ItemStack getTargetSlot(int index) {
+	public static Ingredients getTargetSlot(int index) {
 		if (index < 0 || index >= targets.size()) {
-			return ItemStack.EMPTY;
+			return Ingredients.EMPTY;
 		}
-		return targets.get(index).getTargetItem();
+		return targets.get(index);
 	}
 
-	public static boolean setTargetSlot(int index, ItemStack stack) {
+	public static boolean setTargetSlot(int index, Ingredients ingredient) {
 		if (index < 0) {
 			return false;
 		} else{
-			ItemKey cur = new ItemKey(stack);
-			if (stack.isEmpty()) {
+			if (ingredient.isEmpty()) {
 				if (index >= targets.size()) return false;
-				CalculationTarget old = targets.get(index);
-				targetItems.remove(new ItemKey(old.getTargetItem()));
+				Ingredients old = targets.get(index);
+				targetItems.remove(old);
 				targets.remove(index);
 				TargetPersistence.saveTargetData(CalculatorState.targets);
 				recalculateRecipes();
 				return true;
 			}
-			if (targetItems.contains(cur)) return false;
+			if (targetItems.contains(ingredient)) return false;
+			Ingredients cur = ingredient.copy();
+			cur.setValue(getMultiplier());
 			if (index >= targets.size()) {
-				targets.add(new CalculationTarget(stack, getMultiplier()));
-				targetItems.add(cur);
+				targets.add(cur);
+				targetItems.add(ingredient);
 			} else {
-				CalculationTarget old = targets.get(index);
-				targetItems.remove(new ItemKey(old.getTargetItem()));
-				targets.set(index, new CalculationTarget(stack, getMultiplier()));
-				targetItems.add(cur);
+				Ingredients old = targets.get(index);
+				targetItems.remove(old);
+				targets.set(index, cur);
+				targetItems.add(ingredient);
 			}
 			TargetPersistence.saveTargetData(CalculatorState.targets);
 			recalculateRecipes();
@@ -89,15 +88,16 @@ public class CalculatorState {
 		if (index < 0 || index >= targets.size()) {
 			return 0.0;
 		}
-		return targets.get(index).getTargetRate() / getMultiplier();
+		return targets.get(index).getValue() / getMultiplier();
 	}
 	public static boolean setTargetSlotRate(int index, double rate) {
 		// This function should never be called with an index that doesn't have a target item
 		if (index < 0 || index >= targets.size()) {
 			return false;
 		}
-		CalculationTarget cur = targets.get(index);
-		if (cur.setTargetRate(rate * getMultiplier())) {
+		Ingredients cur = targets.get(index);
+		if (cur.getValue() != rate * getMultiplier()) {
+			cur.setValue(rate * getMultiplier());
 			TargetPersistence.saveTargetData(CalculatorState.targets);
 			recalculateRecipes();
 			return true;

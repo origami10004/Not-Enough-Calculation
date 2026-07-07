@@ -1,9 +1,7 @@
 package com.origami10004.necalc.gui;
 
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 
 import java.io.IOException;
@@ -11,6 +9,7 @@ import org.lwjgl.input.Mouse;
 
 import com.origami10004.necalc.data.RecipeEntry;
 import com.origami10004.necalc.data.RecipeState;
+import com.origami10004.necalc.data.ingredient.Ingredients;
 
 public class GuiManageRecipes extends GuiCommon{
 	// GUI textures
@@ -72,10 +71,8 @@ public class GuiManageRecipes extends GuiCommon{
 
 				RecipeEntry recipe = RecipeState.getRecipe(index);
 				if (recipe != RecipeEntry.EMPTY) {
-					ItemStack output = recipe.getOutputs().get(0);
-					RenderHelper.enableGUIStandardItemLighting();
-					this.itemRender.renderItemAndEffectIntoGUI(output, slotX + 1, slotY + 1);
-					RenderHelper.disableStandardItemLighting();
+					Ingredients output = recipe.getOutputs().get(0);
+					output.render(this, slotX + 1, slotY + 1);
 				}
 			}
 		}
@@ -91,7 +88,7 @@ public class GuiManageRecipes extends GuiCommon{
 		if (recipe != -1) {
 			RecipeEntry entry = RecipeState.getRecipe(recipe);
 			if (entry != RecipeEntry.EMPTY) {
-				renderToolTip(entry.getOutputs().get(0), mouseX - this.guiLeft, mouseY - this.guiTop);
+				drawHoveringText(entry.getOutputs().get(0).getTooltip(this.mc), mouseX - this.guiLeft, mouseY - this.guiTop);
 			}
 		}
 	}

@@ -95,6 +95,7 @@ dependencies {
 
     compileOnly(libs.jei) { artifact { classifier = "api" } }
     runtimeOnly(deobf(libs.jei))
+    runtimeOnly("curse.maven:nuclearcraft-mod-226254:5340979")
 
     shadow("org.hipparchus:hipparchus-optim:3.1")
     implementation("org.hipparchus:hipparchus-optim:3.1")

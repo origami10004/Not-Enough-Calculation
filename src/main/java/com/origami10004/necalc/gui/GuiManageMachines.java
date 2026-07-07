@@ -6,18 +6,12 @@ import java.util.List;
 import java.util.Map;
 import org.lwjgl.input.Mouse;
 
-import com.origami10004.necalc.Necalc;
-import com.origami10004.necalc.data.CalculatorState;
-import com.origami10004.necalc.data.MachineKey;
 import com.origami10004.necalc.data.MachineState;
+import com.origami10004.necalc.data.ingredient.Ingredients;
 
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
 
 public class GuiManageMachines extends GuiCommon {
 	// GUI textures
@@ -74,7 +68,7 @@ public class GuiManageMachines extends GuiCommon {
 		curY += 17;
 
 		this.tableY = curY;
-		List<Map.Entry<MachineKey, Integer>> machineKeys = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
+		List<Map.Entry<Ingredients, Integer>> machineKeys = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
 		for (int row = 0; row < ROWS; row++) {
 			for (int col = 0; col < COLS; col++) {
 				int index = (row + this.scrollRow) * COLS + col;
@@ -83,18 +77,8 @@ public class GuiManageMachines extends GuiCommon {
 				drawItemSlot(slotX, slotY);
 
 				if (index < machineKeys.size()) {
-					Map.Entry<MachineKey, Integer> entry = machineKeys.get(index);
-					ResourceLocation machineLoc = new ResourceLocation(entry.getKey().registryName);
-					Item machine = Item.REGISTRY.getObject(machineLoc);
-					if (machine == null) {
-						Necalc.logger.warn("Unknown machine in machine data: {}", entry.getKey().registryName);
-						continue;
-					}
-					ItemStack stack = new ItemStack(machine, 1, entry.getKey().meta);
-
-					RenderHelper.enableGUIStandardItemLighting();
-					this.itemRender.renderItemAndEffectIntoGUI(stack, slotX + 1, slotY + 1);
-					RenderHelper.disableStandardItemLighting();
+					Map.Entry<Ingredients, Integer> entry = machineKeys.get(index);
+					entry.getKey().render(this, slotX + 1, slotY + 1);
 				}
 			}
 		}
@@ -104,7 +88,7 @@ public class GuiManageMachines extends GuiCommon {
 
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-		List<Map.Entry<MachineKey, Integer>> machineKeys = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
+		List<Map.Entry<Ingredients, Integer>> machineKeys = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
 		
 		if (editor.hovered(mouseX, mouseY)) {
 			return;
@@ -115,14 +99,10 @@ public class GuiManageMachines extends GuiCommon {
 		int index = getMachineAt(mouseX, mouseY);
 		if (index != -1) {
 			if (index < machineKeys.size()) {
-				Map.Entry<MachineKey, Integer> entry = machineKeys.get(index);
-				ResourceLocation machineLoc = new ResourceLocation(entry.getKey().registryName);
-				Item machine = Item.REGISTRY.getObject(machineLoc);
-				if (machine != null) {
-					ItemStack stack = new ItemStack(machine, 1, entry.getKey().meta);
-					
+				Map.Entry<Ingredients, Integer> entry = machineKeys.get(index);
+				if (entry.getKey() != null && !entry.getKey().isEmpty()) {
 					drawItemExtraInfoTooltip(mouseX - this.guiLeft,
-							mouseY - this.guiTop, stack,
+							mouseY - this.guiTop, entry.getKey(),
 							I18n.format("necalc.gui.machine_speed", entry.getValue()));
 				}
 			}

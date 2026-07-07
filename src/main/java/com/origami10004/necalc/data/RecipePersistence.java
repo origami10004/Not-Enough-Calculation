@@ -1,18 +1,13 @@
 package com.origami10004.necalc.data;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
-import net.minecraft.item.Item;
 
 import com.origami10004.necalc.Necalc;
+import com.origami10004.necalc.data.ingredient.Ingredients;
+import com.origami10004.necalc.data.ingredient.IngredientManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 import java.io.File;
 import java.io.FileReader;
@@ -24,31 +19,10 @@ public class RecipePersistence {
 	private static final File SAVE_FILE = new File(Loader.instance().getConfigDir(), "necalc/recipes.json");
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-	private static class MachineData {
-		public String item;
-		public int meta;
-		public MachineData(ItemStack stack) {
-			this.item = stack.getItem().getRegistryName().toString();
-			this.meta = stack.getMetadata();
-		}
-	}
-	private static class ItemData extends MachineData{
-		public int count;
-		public JsonElement nbt;
-		public ItemData(ItemStack stack) {
-			super(stack);
-			this.count = stack.getCount();
-			if (stack.getTagCompound() != null) {
-				this.nbt = new JsonParser().parse(stack.getTagCompound().toString());
-			} else {
-				this.nbt = null;
-			}
-		}
-	}
 	private static class Recipe {
-		public MachineData machine;
-		public ArrayList<ItemData> inputs;
-		public ArrayList<ItemData> outputs;
+		public String machine;
+		public ArrayList<String> inputs;
+		public ArrayList<String> outputs;
 		public int time;
 	}
 	private static class Wrapper {
@@ -61,15 +35,21 @@ public class RecipePersistence {
 		wrapper.recipes = new ArrayList<>();
 		for (RecipeEntry entry : recipes) {
 			Recipe recipe = new Recipe();
-			recipe.machine = new MachineData(entry.getMachine());
+			Ingredients machine = entry.getMachine().copy();
+			machine.setValue(1);
+			recipe.machine = machine.serialize();
 			recipe.inputs = new ArrayList<>();
 			recipe.outputs = new ArrayList<>();
 			recipe.time = entry.getTime();
-			for (ItemStack input : entry.getInputs()) {
-				recipe.inputs.add(new ItemData(input));
+			for (Ingredients input : entry.getInputs()) {
+				Ingredients tempInput = input.copy();
+				tempInput.setValue((int) tempInput.getValue());
+				recipe.inputs.add(tempInput.serialize());
 			}
-			for (ItemStack output : entry.getOutputs()) {
-				recipe.outputs.add(new ItemData(output));
+			for (Ingredients output : entry.getOutputs()) {
+				Ingredients tempOutput = output.copy();
+				tempOutput.setValue((int) tempOutput.getValue());
+				recipe.outputs.add(tempOutput.serialize());
 			}
 			wrapper.recipes.add(recipe);
 		}
@@ -88,54 +68,24 @@ public class RecipePersistence {
 			Wrapper wrapper = GSON.fromJson(reader, Wrapper.class);
 			if (wrapper == null || wrapper.recipes == null) return recipes;
 			for (Recipe recipe : wrapper.recipes) {
-				ArrayList<ItemStack> inputs = new ArrayList<>();
-				for (ItemData inputData : recipe.inputs) {
-					ResourceLocation itemLoc = new ResourceLocation(inputData.item);
-					Item item = Item.REGISTRY.getObject(itemLoc);
-					if (item == null) {
-						Necalc.logger.warn("Unknown item in recipe data: {}", inputData.item);
-						continue;
-					}
-					ItemStack stack = new ItemStack(item, inputData.count, inputData.meta);
-					if (inputData.nbt != null && inputData.nbt.isJsonObject()) {
-						try {
-							NBTTagCompound nbt = JsonToNBT.getTagFromJson(inputData.nbt.toString());
-							stack.setTagCompound(nbt);
-						} catch (Exception e) {
-							Necalc.logger.warn("Failed to parse NBT for item {}: {}", inputData.item, e.getMessage());
-						}
-					}
-					inputs.add(stack);
+				ArrayList<Ingredients> inputs = new ArrayList<>();
+				for (String inputData : recipe.inputs) {
+					Ingredients input = IngredientManager.deserialize(inputData);
+					if (input.isEmpty()) continue;
+					inputs.add(input);
 				}
-				ResourceLocation machineLoc = new ResourceLocation(recipe.machine.item);
-				Item machineItem = Item.REGISTRY.getObject(machineLoc);
-				if (machineItem == null) {
-					Necalc.logger.warn("Unknown machine in recipe data: {}", recipe.machine.item);
-					continue;
-				}
-				ItemStack machineStack = new ItemStack(machineItem, 1, recipe.machine.meta);
-				MachineState.addMachine(machineStack);
+				Ingredients machine = IngredientManager.deserialize(recipe.machine);
+				if (machine.isEmpty()) continue; // must have machine
+				machine.setValue(1);
+				MachineState.addMachine(machine);
 
-				ArrayList<ItemStack> outputs = new ArrayList<>();
-				for (ItemData outputData : recipe.outputs) {
-					ResourceLocation itemLoc = new ResourceLocation(outputData.item);
-					Item item = Item.REGISTRY.getObject(itemLoc);
-					if (item == null) {
-						Necalc.logger.warn("Unknown item in recipe data: {}", outputData.item);
-						continue;
-					}
-					ItemStack stack = new ItemStack(item, outputData.count, outputData.meta);
-					if (outputData.nbt != null && outputData.nbt.isJsonObject()) {
-						try {
-							NBTTagCompound nbt = JsonToNBT.getTagFromJson(outputData.nbt.toString());
-							stack.setTagCompound(nbt);
-						} catch (Exception e) {
-							Necalc.logger.warn("Failed to parse NBT for item {}: {}", outputData.item, e.getMessage());
-						}
-					}
-					outputs.add(stack);
+				ArrayList<Ingredients> outputs = new ArrayList<>();
+				for (String outputData : recipe.outputs) {
+					Ingredients output = IngredientManager.deserialize(outputData);
+					if (output.isEmpty()) continue;
+					outputs.add(output);
 				}
-				recipes.add(new RecipeEntry(inputs, machineStack, outputs, recipe.time));
+				recipes.add(new RecipeEntry(inputs, machine, outputs, recipe.time));
 			}
 		} catch (IOException e) {
 			Necalc.logger.error("Failed to load recipe data", e);
