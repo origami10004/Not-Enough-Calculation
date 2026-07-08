@@ -28,8 +28,8 @@ import org.lwjgl.opengl.GL11;
 
 public class FluidIngredient extends Ingredients {
 
-	private Fluid fluid;
-	private NBTTagCompound nbt;
+	private final Fluid fluid;
+	private final NBTTagCompound nbt;
 
 	public FluidIngredient(Fluid fluid, NBTTagCompound nbt, double value) {
 		super(value);
@@ -118,35 +118,6 @@ public class FluidIngredient extends Ingredients {
 		GlStateManager.disableBlend();
 	}
 
-	@Override
-	public void renderValue(GuiCommon parent, int x, int y, double customValue) {
-		render(parent, x, y);
-		String text = formatValue(customValue);
-		if (text == "") return;
-		GlStateManager.disableDepth();
-		GlStateManager.disableBlend();
-		GlStateManager.pushMatrix();
-
-		float scale;
-		if (text.length() > 3) {
-			scale = 0.5f;
-		} else {
-			scale = 0.75f;
-		}
-		GlStateManager.scale(scale, scale, 1.0f);
-
-		int width = parent.getFontRenderer().getStringWidth(text);
-
-		float textX = ((x + 16) / scale) - width;
-		float textY = ((y + 16) / scale) - 8;
-
-		parent.getFontRenderer().drawStringWithShadow(text, textX, textY, 0xFFFFFF);
-
-		GlStateManager.popMatrix();
-		GlStateManager.enableBlend();
-		GlStateManager.enableDepth();
-	}
-
 	private static final DecimalFormat ONE_DECIMAL = new DecimalFormat("##.#", DecimalFormatSymbols.getInstance(Locale.ROOT));
 	@Override
 	public String formatValue(double value) {
@@ -219,14 +190,14 @@ public class FluidIngredient extends Ingredients {
 			if (!serialized.startsWith("fluid:")) return Ingredients.EMPTY;
 			String rest = serialized.substring(6);
 			int pipeIdx = rest.lastIndexOf('|');
-			if (pipeIdx < 0) return null;
+			if (pipeIdx < 0) return Ingredients.EMPTY;
 			String fluidName = rest.substring(0, pipeIdx);
 			double amount    = Double.parseDouble(rest.substring(pipeIdx + 1));
 			Fluid fluid = FluidRegistry.getFluid(fluidName);
-			if (fluid == null) return null;
+			if (fluid == null) return Ingredients.EMPTY;
 			return new FluidIngredient(fluid, amount);
 		} catch (Exception e) {
-			return null;
+			return Ingredients.EMPTY;
 		}
 	}
 
@@ -243,6 +214,6 @@ public class FluidIngredient extends Ingredients {
 	//Helper functions
 	private FluidStack getStack() {
 		// Fluid stack does null checking internally already
-		return new FluidStack(fluid, (int) getValue(), nbt);
+		return new FluidStack(fluid, Math.max(1, (int) getValue()), nbt);
 	}
 }

@@ -1,6 +1,7 @@
 package com.origami10004.necalc.data.ingredient;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 
 import com.origami10004.necalc.gui.GuiCommon;
 
@@ -92,8 +93,36 @@ public abstract class Ingredients {
 		renderValue(parent, x, y, getValue());
 	}
 
+	public void renderValue(GuiCommon parent, int x, int y, double customValue) {
+		render(parent, x, y);
+
+		String text = formatValue(customValue);
+		if (text == "") return;
+		GlStateManager.disableDepth();
+		GlStateManager.disableBlend();
+		GlStateManager.pushMatrix();
+
+		float scale;
+		if (text.length() > 3) {
+			scale = 0.5f;
+		} else {
+			scale = 0.75f;
+		}
+		GlStateManager.scale(scale, scale, 1.0f);
+
+		int width = parent.getFontRenderer().getStringWidth(text);
+
+		float textX = ((x + 16) / scale) - width;
+		float textY = ((y + 16) / scale) - 8;
+
+		parent.getFontRenderer().drawStringWithShadow(text, textX, textY, 0xFFFFFF);
+
+		GlStateManager.popMatrix();
+		GlStateManager.enableBlend();
+		GlStateManager.enableDepth();
+	}
+
 	public abstract void render(GuiCommon parent, int x, int y);
-	public abstract void renderValue(GuiCommon parent, int x, int y, double customValue);
 	public abstract String getDisplayName();
 	public abstract List<String> getTooltip(Minecraft mc);
 	public abstract String formatValue(double value);

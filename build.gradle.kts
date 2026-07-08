@@ -97,6 +97,11 @@ dependencies {
     runtimeOnly(deobf(libs.jei))
     runtimeOnly("curse.maven:nuclearcraft-mod-226254:5340979")
 
+    compileOnly("curse.maven:mekanism-ce-399904:7660563")
+    compileOnly("curse.maven:thaumcraft-223628:2629023")
+    // runtimeOnly(deobf("curse.maven:mekanism-ce-399904:7660563"))
+    // runtimeOnly(deobf("curse.maven:thaumcraft-223628:2629023"))
+
     shadow("org.hipparchus:hipparchus-optim:3.1")
     implementation("org.hipparchus:hipparchus-optim:3.1")
 }

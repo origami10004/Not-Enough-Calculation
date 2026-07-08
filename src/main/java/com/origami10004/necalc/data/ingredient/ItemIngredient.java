@@ -22,9 +22,9 @@ import java.util.Objects;
 
 public class ItemIngredient extends Ingredients {
 
-	private Item item;
-	private int meta;
-	private NBTTagCompound nbt;
+	private final Item item;
+	private final int meta;
+	private final NBTTagCompound nbt;
 
 	// Constructors
 	public ItemIngredient(ItemStack stack, double value) {
@@ -101,36 +101,6 @@ public class ItemIngredient extends Ingredients {
 		RenderHelper.enableGUIStandardItemLighting();
 		parent.getItemRender().renderItemAndEffectIntoGUI(getStack(), x, y);
 		RenderHelper.disableStandardItemLighting();
-	}
-
-	@Override
-	public void renderValue(GuiCommon parent, int x, int y, double customValue) {
-		render(parent, x, y);
-
-		String text = formatValue(customValue);
-		if (text == "") return;
-		GlStateManager.disableDepth();
-		GlStateManager.disableBlend();
-		GlStateManager.pushMatrix();
-
-		float scale;
-		if (text.length() > 3) {
-			scale = 0.5f;
-		} else {
-			scale = 0.75f;
-		}
-		GlStateManager.scale(scale, scale, 1.0f);
-
-		int width = parent.getFontRenderer().getStringWidth(text);
-
-		float textX = ((x + 16) / scale) - width;
-		float textY = ((y + 16) / scale) - 8;
-
-		parent.getFontRenderer().drawStringWithShadow(text, textX, textY, 0xFFFFFF);
-
-		GlStateManager.popMatrix();
-		GlStateManager.enableBlend();
-		GlStateManager.enableDepth();
 	}
 
 	private static final DecimalFormat ONE_DECIMAL = new DecimalFormat("##.#", DecimalFormatSymbols.getInstance(Locale.ROOT));
@@ -240,7 +210,7 @@ public class ItemIngredient extends Ingredients {
 
 	// Helper functions
 	private ItemStack getStack() {
-		ItemStack stack = new ItemStack(item, (int) getValue(), meta);
+		ItemStack stack = new ItemStack(item, Math.max(1, (int) getValue()), meta);
 		stack.setTagCompound(nbt);
 		return stack;
 	}

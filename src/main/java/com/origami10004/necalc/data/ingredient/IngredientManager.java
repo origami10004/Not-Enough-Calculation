@@ -2,6 +2,9 @@ package com.origami10004.necalc.data.ingredient;
 
 import net.minecraft.item.ItemStack;
 
+import com.origami10004.necalc.compat.mekanism.MekanismCompat;
+import com.origami10004.necalc.compat.thaumcraft.ThaumcraftCompat;
+
 public class IngredientManager {
 	public static String serialize(Ingredients ingredient) {
 		return ingredient.serialize();
@@ -22,9 +25,15 @@ public class IngredientManager {
 				return FluidIngredient.deserialize(serialized);
 
 			case "gas":
+				if (MekanismCompat.isLoaded()) {
+					return com.origami10004.necalc.compat.mekanism.GasIngredient.deserialize(serialized);
+				}
 				return Ingredients.EMPTY;
 
 			case "essentia":
+				if (ThaumcraftCompat.isLoaded()) {
+					return com.origami10004.necalc.compat.thaumcraft.EssentiaIngredient.deserialize(serialized);
+				}
 				return Ingredients.EMPTY;
 
 			default:

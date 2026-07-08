@@ -10,6 +10,8 @@ import com.origami10004.necalc.client.KeyInputHandler;
 import com.origami10004.necalc.data.CalculatorState;
 import com.origami10004.necalc.data.RecipeState;
 import com.origami10004.necalc.data.MachineState;
+import com.origami10004.necalc.compat.mekanism.MekanismCompat;
+import com.origami10004.necalc.compat.thaumcraft.ThaumcraftCompat;
 
 public class ClientProxy extends CommonProxy {
 	@Override
@@ -27,6 +29,8 @@ public class ClientProxy extends CommonProxy {
 		CalculatorState.init();
 		RecipeState.init();
 		MachineState.init();
+		MekanismCompat.init();
+		ThaumcraftCompat.init();
 	}
 
 	@Override

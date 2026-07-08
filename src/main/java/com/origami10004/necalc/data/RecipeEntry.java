@@ -98,7 +98,6 @@ public class RecipeEntry {
 	}
 
 	public void setMachine(Ingredients machine) {
-		Necalc.logger.info("Setting machine to: " + machine.serialize());
 		this.machine = machine.copy();
 		this.machine.setValue(1);
 	}

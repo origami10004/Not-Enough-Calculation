@@ -3,7 +3,6 @@ package com.origami10004.necalc.data;
 import java.util.LinkedHashMap;
 import java.util.HashMap;
 
-import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.data.ingredient.Ingredients;
 
 public class MachineState {
@@ -20,13 +19,10 @@ public class MachineState {
 	}
 
 	public static void addMachine(Ingredients machine) {
-		Necalc.logger.info("Adding machine: " + machine.serialize());
 		if (!machineSpeed.containsKey(machine)) {
-			Necalc.logger.info("New machine added: " + machine.serialize());
 			machineSpeed.put(machine, 1);
 			machineCount.put(machine, 1);
 		} else {
-			Necalc.logger.info("Machine already exists, incrementing count: " + machine.serialize());
 			machineCount.put(machine, machineCount.get(machine) + 1);
 		}
 	}
