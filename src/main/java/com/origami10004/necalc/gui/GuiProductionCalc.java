@@ -1,5 +1,6 @@
 package com.origami10004.necalc.gui;
 
+import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.List;
 import org.lwjgl.input.Mouse;
@@ -26,8 +27,8 @@ public class GuiProductionCalc extends GuiCommon {
 	private static final int GUI_WIDTH			= 184;
 	private static final int GUI_HEIGHT			= 300;
 	protected static final int SLOT_SIZE			= 18;
-	protected static final int SLOTS_PER_ROW		= 8;
-	private static final int TARGET_ROWS		= 2;
+	public static final int SLOTS_PER_ROW		= 8;
+	public static final int TARGET_ROWS		= 2;
 
 	protected static final int INDENT_L = 8;
 	private static final int INDENT_R = 8;
@@ -589,5 +590,15 @@ public class GuiProductionCalc extends GuiCommon {
 			}
 		}
 		return -1;
+	}
+
+	public int getTargetScrollRow() {
+		return this.targetScrollRow;
+	}
+
+	public Rectangle getTargetSlotArea(int visRow, int col) {
+		int x = this.gx + INDENT_L + 4 + col * SLOT_SIZE;
+		int y = this.targetGridY + visRow * SLOT_SIZE;
+		return new Rectangle(x, y, SLOT_SIZE, SLOT_SIZE);
 	}
 }

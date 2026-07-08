@@ -180,22 +180,31 @@ public class FluidIngredient extends Ingredients {
 
 	@Override
 	public String serialize() {
-		return "fluid:" + fluid.getName() + "|" + (int) getValue();
+		String result = "fluid:" + fluid.getName() + "|" + (int) getValue();
+		if (nbt != null) {
+			result += ":" + nbt.toString();
+		}
+		return result;
 	}
 
 	public static Ingredients deserialize(String serialized) {
-		// Should be of form "fluid:<fluidname>|<value>"
-		// Could also be "fluid:<modid>:<fluidname>|<value>" for modded fluids
+		// Should be of form "fluid:<fluidname>|<value>[:<nbt>]"
+		// Could also be "fluid:<modid>:<fluidname>|<value>[:<nbt>]" for modded fluids
 		try {
 			if (!serialized.startsWith("fluid:")) return Ingredients.EMPTY;
 			String rest = serialized.substring(6);
 			int pipeIdx = rest.lastIndexOf('|');
 			if (pipeIdx < 0) return Ingredients.EMPTY;
 			String fluidName = rest.substring(0, pipeIdx);
-			double amount    = Double.parseDouble(rest.substring(pipeIdx + 1));
+			String p[] = rest.substring(pipeIdx + 1).split(":", 2);
+			double amount = Double.parseDouble(p[0]);
 			Fluid fluid = FluidRegistry.getFluid(fluidName);
+			NBTTagCompound nbt = null;
+			if (p.length > 1 && !p[1].isEmpty()) {
+				nbt = net.minecraft.nbt.JsonToNBT.getTagFromJson(p[1]);
+			}
 			if (fluid == null) return Ingredients.EMPTY;
-			return new FluidIngredient(fluid, amount);
+			return new FluidIngredient(fluid, nbt, amount);
 		} catch (Exception e) {
 			return Ingredients.EMPTY;
 		}

@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 
+import java.awt.Rectangle;
 import java.io.IOException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -22,8 +23,8 @@ public class GuiRecipeEditor extends GuiCommon {
 	// constants for gui layout
 	private static final int GUI_WIDTH = 184;
 	private static final int GUI_HEIGHT = 266;
-	private static final int IO_ROWS = 2;
-	private static final int SLOTS_PER_ROW = 8;
+	public static final int IO_ROWS = 2;
+	public static final int SLOTS_PER_ROW = 8;
 	private static final int SLOT_SIZE = 18;
 	private static final int FIELD_WIDTH = 50;
 	private static final int FIELD_HEIGHT = 18;
@@ -516,5 +517,31 @@ public class GuiRecipeEditor extends GuiCommon {
 			}
 		}
 		return -1;
+	}
+
+	public int getInputScrollRow() {
+		return this.inputScrollRow;
+	}
+
+	public int getOutputScrollRow() {
+		return this.outputScrollRow;
+	}
+
+	public Rectangle getInputSlotArea(int visRow, int col) {
+		int x = this.gx + 12 + col * SLOT_SIZE;
+		int y = this.inputGrid + visRow * SLOT_SIZE;
+		return new Rectangle(x, y, SLOT_SIZE, SLOT_SIZE);
+	}
+
+	public Rectangle getMachineSlotArea() {
+		int x = this.gx + 12;
+		int y = this.machineY;
+		return new Rectangle(x, y, SLOT_SIZE, SLOT_SIZE);
+	}
+
+	public Rectangle getOutputSlotArea(int visRow, int col) {
+		int x = this.gx + 12 + col * SLOT_SIZE;
+		int y = this.outputGrid + visRow * SLOT_SIZE;
+		return new Rectangle(x, y, SLOT_SIZE, SLOT_SIZE);
 	}
 }

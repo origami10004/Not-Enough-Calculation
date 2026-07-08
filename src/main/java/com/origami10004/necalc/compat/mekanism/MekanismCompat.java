@@ -17,4 +17,9 @@ public class MekanismCompat {
 	public static boolean isLoaded() {
 		return loaded;
 	}
+
+	public static boolean isGasStack(Object obj) {
+		if (!loaded) return false;
+		return (obj != null) && obj instanceof mekanism.api.gas.GasStack;
+	}
 }

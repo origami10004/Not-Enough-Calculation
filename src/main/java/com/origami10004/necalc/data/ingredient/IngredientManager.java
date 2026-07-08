@@ -1,6 +1,7 @@
 package com.origami10004.necalc.data.ingredient;
 
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 
 import com.origami10004.necalc.compat.mekanism.MekanismCompat;
 import com.origami10004.necalc.compat.thaumcraft.ThaumcraftCompat;
@@ -44,5 +45,23 @@ public class IngredientManager {
 	public static Ingredients of(ItemStack stack) {
 		if (stack == null || stack.isEmpty()) return Ingredients.EMPTY;
 		return new ItemIngredient(stack);
+	}
+
+	public static Ingredients of(FluidStack stack) {
+		if (stack == null) return Ingredients.EMPTY;
+		return new FluidIngredient(stack);
+	}
+
+	public static Ingredients of(Object obj) {
+		if (obj instanceof ItemStack) {
+			return of((ItemStack) obj);
+		} else if (obj instanceof FluidStack) {
+			return of((FluidStack) obj);
+		} else if (MekanismCompat.isGasStack(obj)) {
+			return new com.origami10004.necalc.compat.mekanism.GasIngredient((mekanism.api.gas.GasStack) obj);
+		// } else if (ThaumcraftCompat.isEssentiaStack(obj)) {
+		// 	return com.origami10004.necalc.compat.thaumcraft.EssentiaIngredient.of(obj);
+		}
+		return Ingredients.EMPTY;
 	}
 }
