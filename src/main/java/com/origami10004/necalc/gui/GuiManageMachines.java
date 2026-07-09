@@ -7,6 +7,7 @@ import java.util.Map;
 import org.lwjgl.input.Mouse;
 
 import com.origami10004.necalc.data.MachineState;
+import com.origami10004.necalc.data.RecipeState;
 import com.origami10004.necalc.data.ingredient.Ingredients;
 
 import net.minecraft.entity.player.InventoryPlayer;
@@ -39,7 +40,7 @@ public class GuiManageMachines extends GuiCommon {
 	private boolean draggingScroll = false;
 
 	public GuiManageMachines(InventoryPlayer playerInv) {
-		super(new FakeContainer(playerInv, false, 0, 0));
+		super(new NecalcContainer(playerInv, false, 0, 0));
 		this.playerInv = playerInv;
 		this.editor = new SpeedEditHelper(this);
 	}
@@ -220,6 +221,7 @@ public class GuiManageMachines extends GuiCommon {
 			case 3:
 				break;
 			case 4:
+				RecipeState.reset();
 				mc.displayGuiScreen(new GuiRecipeEditor(this.playerInv, this, true));
 				break;
 		}
@@ -237,5 +239,17 @@ public class GuiManageMachines extends GuiCommon {
 			}
 		}
 		return -1;
+	}
+
+	@Override
+	public Ingredients getHoveredStack(int mouseX, int mouseY) {
+		int machine = getMachineAt(mouseX, mouseY);
+		if (machine != -1) {
+			List<Map.Entry<Ingredients, Integer>> machineKeys = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
+			if (machine < machineKeys.size()) {
+				return machineKeys.get(machine).getKey();
+			}
+		}
+		return Ingredients.EMPTY;
 	}
 }

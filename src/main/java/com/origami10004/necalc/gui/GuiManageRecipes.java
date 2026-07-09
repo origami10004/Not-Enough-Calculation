@@ -36,7 +36,7 @@ public class GuiManageRecipes extends GuiCommon{
 	private boolean draggingScroll = false;
 
 	public GuiManageRecipes(InventoryPlayer playerInv) {
-		super(new FakeContainer(playerInv, false, 0, 0));
+		super(new NecalcContainer(playerInv, false, 0, 0));
 		this.playerInv = playerInv;
 	}
 
@@ -189,6 +189,7 @@ public class GuiManageRecipes extends GuiCommon{
 				mc.displayGuiScreen(new GuiManageMachines(this.playerInv));
 				break;
 			case 4:
+				RecipeState.reset();
 				mc.displayGuiScreen(new GuiRecipeEditor(this.playerInv, this, true));
 				break;
 		}
@@ -206,5 +207,17 @@ public class GuiManageRecipes extends GuiCommon{
 			}
 		}
 		return -1;
+	}
+
+	@Override
+	public Ingredients getHoveredStack(int mouseX, int mouseY) {
+		int recipe = getRecipeAt(mouseX, mouseY);
+		if (recipe != -1) {
+			RecipeEntry entry = RecipeState.getRecipe(recipe);
+			if (entry != RecipeEntry.EMPTY) {
+				return entry.getOutputs().get(0);
+			}
+		}
+		return Ingredients.EMPTY;
 	}
 }

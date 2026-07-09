@@ -32,8 +32,9 @@ public abstract class GuiCommon extends GuiContainer {
 	protected abstract int getActiveTab();
 	private ItemStack inventoryHoverStack;
 
-	public GuiCommon(Container container) {
+	public GuiCommon(NecalcContainer container) {
 		super(container);
+		container.setGui(this);
 	}
 
 	protected void drawRectPanel(int x, int y, int w, int h, int fillColor) {
@@ -262,5 +263,9 @@ public abstract class GuiCommon extends GuiContainer {
 
 	public FontRenderer getFontRenderer() {
 		return this.fontRenderer;
+	}
+
+	public Ingredients getHoveredStack(int mouseX, int mouseY) {
+		return Ingredients.EMPTY;
 	}
 }

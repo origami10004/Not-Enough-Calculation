@@ -8,12 +8,17 @@ public class ThaumcraftCompat {
 	private static boolean loaded = false;
 
 	public static void init() {
-		if (Loader.isModLoaded("thaumicenergistics")) {
+		if (Loader.isModLoaded("thaumcraft")) {
 			loaded = true;
-			Necalc.logger.info("Thaumic Energistics detected, essentia support enabled");
+			Necalc.logger.info("Thaumcraft detected, essentia support enabled");
 		}
 	}
 	public static boolean isLoaded() {
 		return loaded;
+	}
+
+	public static boolean isEssentiaStack(Object obj) {
+		if (!isLoaded()) return false;
+		return obj instanceof thaumcraft.api.aspects.Aspect;
 	}
 }

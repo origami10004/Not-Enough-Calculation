@@ -9,6 +9,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.origami10004.necalc.data.CalculatorState;
 import com.origami10004.necalc.data.ProductionStep;
+import com.origami10004.necalc.data.RecipeState;
 import com.origami10004.necalc.data.ingredient.*;
 
 import mcp.MethodsReturnNonnullByDefault;
@@ -76,7 +77,7 @@ public class GuiProductionCalc extends GuiCommon {
 	private int gx, gy; // top left corner of the whole GUI
 
 	public GuiProductionCalc(InventoryPlayer playerInv) {
-		super(new FakeContainer(playerInv, true, 9, 246));
+		super(new NecalcContainer(playerInv, true, 9, 246));
 		this.playerInv = playerInv;
 	}
 
@@ -558,6 +559,7 @@ public class GuiProductionCalc extends GuiCommon {
 				break;
 			case 4:
 				this.editOverlay.close();
+				RecipeState.reset();
 				mc.displayGuiScreen(new GuiRecipeEditor(playerInv, this, true));
 				break;
 		}
@@ -600,5 +602,47 @@ public class GuiProductionCalc extends GuiCommon {
 		int x = this.gx + INDENT_L + 4 + col * SLOT_SIZE;
 		int y = this.targetGridY + visRow * SLOT_SIZE;
 		return new Rectangle(x, y, SLOT_SIZE, SLOT_SIZE);
+	}
+
+	@Override
+	public Ingredients getHoveredStack(int mouseX, int mouseY) {
+		int targetSlot = getTargetSlotAt(mouseX, mouseY);
+		if (targetSlot != -1) {
+			return CalculatorState.getTargetSlot(targetSlot);
+		}
+		int prodRow = getProdRowAt(mouseX, mouseY);
+		if (prodRow != -1) {
+			List<ProductionStep> visible = CalculatorState.getVisibleRecipes();
+			if (prodRow < visible.size()) {
+				ProductionStep step = visible.get(prodRow);
+				int rowX = this.gx + INDENT_L + 1;
+				int rowW = GUI_WIDTH - INDENT_L - INDENT_R - 2;
+				if (visible.size() > TABLE_VIS_ROWS) rowW -= SB_W + 2;
+				int rowY = 1 + prodTableY + (prodRow - prodScrollRow) * TABLE_ROW_H;
+				int iconY = rowY + 2;
+
+				// Primary input
+				Ingredients input = step.getPrimaryInput();
+				if (input != null) {
+					int iconX = rowX + 2;
+					if (mouseX >= iconX && mouseX < iconX + 16 && mouseY >= iconY && mouseY < iconY + 16) {
+						return input;
+					}
+				}
+
+				// Machine
+				int machineIconX = rowX + 40;
+				if (mouseX >= machineIconX && mouseX < machineIconX + 16 && mouseY >= iconY && mouseY < iconY + 16) {
+					return step.getMachine();
+				}
+
+				// Primary output
+				int outputIconX = rowX + 72;
+				if (mouseX >= outputIconX && mouseX < outputIconX + 16 && mouseY >= iconY && mouseY < iconY + 16) {
+					return step.getPrimaryOutput();
+				}
+			}
+		}
+		return Ingredients.EMPTY;
 	}
 }

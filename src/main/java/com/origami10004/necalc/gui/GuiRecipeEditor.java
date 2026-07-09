@@ -56,13 +56,10 @@ public class GuiRecipeEditor extends GuiCommon {
 	private int gx, gy;
 
 	public GuiRecipeEditor(InventoryPlayer playerInv, GuiCommon parent, boolean isNewRecipe) {
-		super(new FakeContainer(playerInv, true, 9, 213));
+		super(new NecalcContainer(playerInv, true, 9, 213));
 		this.parent = parent;
 		this.playerInv = playerInv;
 		this.isNewRecipe = isNewRecipe;
-		if (isNewRecipe) {
-			RecipeState.reset();
-		}
 	}
 	
 	@Override
@@ -543,5 +540,22 @@ public class GuiRecipeEditor extends GuiCommon {
 		int x = this.gx + 12 + col * SLOT_SIZE;
 		int y = this.outputGrid + visRow * SLOT_SIZE;
 		return new Rectangle(x, y, SLOT_SIZE, SLOT_SIZE);
+	}
+
+	@Override
+	public Ingredients getHoveredStack(int mouseX, int mouseY) {
+		int inputSlot = getInputSlotAt(mouseX, mouseY);
+		if (inputSlot != -1) {
+			return RecipeState.getInput(inputSlot);
+		}
+		if (mouseX >= this.gx + 12 && mouseX < this.gx + 12 + SLOT_SIZE
+					&& mouseY >= this.machineY && mouseY < this.machineY + SLOT_SIZE) {
+			return RecipeState.getMachine();
+		}
+		int outputSlot = getOutputSlotAt(mouseX, mouseY);
+		if (outputSlot != -1) {
+			return RecipeState.getOutput(outputSlot);
+		}
+		return Ingredients.EMPTY;
 	}
 }

@@ -122,4 +122,11 @@ public class RecipeState {
 	public static int getRecipeRows() {
 		return recipes.size() / 8 + 1;
 	}
+
+	public static void mergeInputIngredient(Ingredients ingredient) {
+		stagedRecipe.mergeInputIngredient(ingredient);
+	}
+	public static void mergeOutputIngredient(Ingredients ingredient) {
+		stagedRecipe.mergeOutputIngredient(ingredient);
+	}
 }

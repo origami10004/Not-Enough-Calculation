@@ -165,4 +165,34 @@ public class RecipeEntry {
 			}
 		}
 	}
+
+	public void mergeInputIngredient(Ingredients ingredient) {
+		if (ingredient.isEmpty()) return;
+		if (inputKeys.contains(ingredient)) {
+			for (Ingredients ing : inputs) {
+				if (ing.equals(ingredient)) {
+					ing.setValue(ing.getValue() + ingredient.getValue());
+					return;
+				}
+			}
+		} else {
+			inputs.add(ingredient.copy());
+			inputKeys.add(ingredient);
+		}
+	}
+
+	public void mergeOutputIngredient(Ingredients ingredient) {
+		if (ingredient.isEmpty()) return;
+		if (outputKeys.contains(ingredient)) {
+			for (Ingredients ing : outputs) {
+				if (ing.equals(ingredient)) {
+					ing.setValue(ing.getValue() + ingredient.getValue());
+					return;
+				}
+			}
+		} else {
+			outputs.add(ingredient.copy());
+			outputKeys.add(ingredient);
+		}
+	}
 }

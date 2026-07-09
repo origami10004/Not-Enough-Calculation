@@ -5,7 +5,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
@@ -209,7 +208,7 @@ public class ItemIngredient extends Ingredients {
 	}
 
 	// Helper functions
-	private ItemStack getStack() {
+	public ItemStack getStack() {
 		ItemStack stack = new ItemStack(item, Math.max(1, (int) getValue()), meta);
 		stack.setTagCompound(nbt);
 		return stack;

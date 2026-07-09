@@ -221,7 +221,7 @@ public class FluidIngredient extends Ingredients {
 	}
 
 	//Helper functions
-	private FluidStack getStack() {
+	public FluidStack getStack() {
 		// Fluid stack does null checking internally already
 		return new FluidStack(fluid, Math.max(1, (int) getValue()), nbt);
 	}

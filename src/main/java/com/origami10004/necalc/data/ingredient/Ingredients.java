@@ -2,6 +2,7 @@ package com.origami10004.necalc.data.ingredient;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.item.ItemStack;
 
 import com.origami10004.necalc.gui.GuiCommon;
 
@@ -63,6 +64,11 @@ public abstract class Ingredients {
 		@Override
 		public void setValue(double value) {
 			// Do nothing
+		}
+
+		@Override
+		public ItemStack getStack() {
+			return ItemStack.EMPTY;
 		}
 	};
 
@@ -128,6 +134,7 @@ public abstract class Ingredients {
 	public abstract String formatValue(double value);
 	public abstract String serialize();
 	public abstract Ingredients copy();
+	public abstract Object getStack();
 
 	// Forced overrides
 	@Override

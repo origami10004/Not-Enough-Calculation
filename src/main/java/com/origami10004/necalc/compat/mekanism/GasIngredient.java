@@ -164,7 +164,7 @@ public class GasIngredient extends Ingredients {
 	}
 
 	// helper functions
-	private GasStack getStack() {
+	public GasStack getStack() {
 		return new GasStack(gas, Math.max(1, (int) getValue()));
 	}
 

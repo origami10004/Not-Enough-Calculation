@@ -6,8 +6,11 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class FakeContainer extends Container{
-	public FakeContainer(InventoryPlayer playerInv, boolean includeInventory, int invX, int invY) {
+public class NecalcContainer extends Container{
+	private GuiCommon gui;
+
+	public NecalcContainer(InventoryPlayer playerInv, boolean includeInventory, int invX, int invY) {
+		this.gui = gui;
 		if (!includeInventory) return;
 		// Register 9 dummy slots that should not be shown in the GUI (InventoryPlayer indices 0..8)
 		for (int col = 0; col < 9; col++) {
@@ -34,6 +37,14 @@ public class FakeContainer extends Container{
     public boolean canInteractWith(EntityPlayer player) {
         return true;
     }
+
+	public void setGui(GuiCommon gui) {
+		this.gui = gui;
+	}
+
+	public GuiCommon getGui() {
+		return gui;
+	}
 
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int index) {

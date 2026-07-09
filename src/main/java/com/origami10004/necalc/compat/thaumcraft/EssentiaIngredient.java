@@ -26,6 +26,10 @@ public class EssentiaIngredient extends Ingredients {
 		this.essentia = aspect;
 	}
 
+	public EssentiaIngredient(Aspect aspect) {
+		this(aspect, 0.0);
+	}
+
 	public String getDisplayName() {
 		return essentia.getName();
 	}
@@ -142,5 +146,9 @@ public class EssentiaIngredient extends Ingredients {
 		} catch (Exception e) {
 			return Ingredients.EMPTY;
 		}
+	}
+
+	public Aspect getStack() {
+		return essentia;
 	}
 }

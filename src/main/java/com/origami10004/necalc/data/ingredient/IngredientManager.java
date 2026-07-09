@@ -59,8 +59,8 @@ public class IngredientManager {
 			return of((FluidStack) obj);
 		} else if (MekanismCompat.isGasStack(obj)) {
 			return new com.origami10004.necalc.compat.mekanism.GasIngredient((mekanism.api.gas.GasStack) obj);
-		// } else if (ThaumcraftCompat.isEssentiaStack(obj)) {
-		// 	return com.origami10004.necalc.compat.thaumcraft.EssentiaIngredient.of(obj);
+		} else if (ThaumcraftCompat.isEssentiaStack(obj)) {
+			return new com.origami10004.necalc.compat.thaumcraft.EssentiaIngredient((thaumcraft.api.aspects.Aspect) obj);
 		}
 		return Ingredients.EMPTY;
 	}
