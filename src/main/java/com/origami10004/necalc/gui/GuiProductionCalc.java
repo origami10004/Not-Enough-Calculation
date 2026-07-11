@@ -40,6 +40,7 @@ public class GuiProductionCalc extends GuiCommon {
 	private static final int TABLE_VIS_ROWS = 5;
 
 	private static final int HIDE_SIZE = 12;
+	private static String [] rateLabels = {I18n.format("necalc.gui.rate.minute"), I18n.format("necalc.gui.rate.second"), I18n.format("necalc.gui.rate.ticks")};
 
 
 	// Other constants
@@ -64,7 +65,7 @@ public class GuiProductionCalc extends GuiCommon {
 	private int hoveredRecipeRow = -1;
 	private int hoveredRecipeRowTicks = 0;
 	private Ingredients hoveredStepStack = Ingredients.EMPTY;
-	private double hoveredStepValue = 0.0;
+	private String hoveredStepValue = "";
 	private boolean hoverMachine = false;
 
 	// Element positions
@@ -113,7 +114,7 @@ public class GuiProductionCalc extends GuiCommon {
 		// Rate buttons
 		int width = this.fontRenderer.getStringWidth(I18n.format("necalc.gui.rate"));
 		this.fontRenderer.drawString(I18n.format("necalc.gui.rate"), this.gx + INDENT_L + 4, curY + 6, 0xFF000000);
-		String [] rateLabels = {I18n.format("necalc.gui.rate.minute"), I18n.format("necalc.gui.rate.second"), I18n.format("necalc.gui.rate.ticks")};
+		
 		int selectedRate = CalculatorState.getDisplayRate();
 		this.rateBtnY = curY + 4;
 		for (int i = 0; i < 3; i++) {
@@ -172,7 +173,7 @@ public class GuiProductionCalc extends GuiCommon {
 		if (targetSlot != -1) {
 			Ingredients ing = CalculatorState.getTargetSlot(targetSlot);
 			if (!ing.isEmpty()) {
-				double rate = CalculatorState.getTargetSlotRate(targetSlot);
+				String rate = String.format("%.4f", CalculatorState.getTargetSlotRate(targetSlot));
 				
 				this.drawItemExtraInfoTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, ing,
 						I18n.format("necalc.gui.target_rate", rate));
@@ -305,55 +306,66 @@ public class GuiProductionCalc extends GuiCommon {
 			int rowBg = rowHovered ? 0xFFA8B8D8 : 0xFFACACAC;
 			drawRectPanelOutdent(rowX, rowY, rowW, TABLE_ROW_H, rowBg);
 
+			int curX = rowX + 2;
+
 			// Primary input and rate
 			Ingredients input = step.getPrimaryInput();
 			int iconY = rowY + 2;
 			if (input != null) {
-				input.renderValue(this, rowX + 2, iconY, step.getPrimaryInputRate() / CalculatorState.getMultiplier());
+				input.renderValue(this, curX, iconY, step.getPrimaryInputRate() / CalculatorState.getMultiplier());
 				if (rowHovered) {
-					if (mouseX >= rowX + 2 && mouseX < rowX + 2 + 16 && mouseY >= iconY && mouseY < iconY + 16) {
+					if (mouseX >= curX && mouseX < curX + 16 && mouseY >= iconY && mouseY < iconY + 16) {
 						hoveredStepStack = input;
-						hoveredStepValue = step.getPrimaryInputRate() / CalculatorState.getMultiplier();
+						hoveredStepValue = String.format("%.4f", step.getPrimaryInputRate() / CalculatorState.getMultiplier()) + rateLabels[CalculatorState.getDisplayRate()];
 						hoverMachine = false;
 					}
 				}
 			}
+			curX += 18;
 			// More inputs
+			int width = 11;
 			if (step.getInputs().size() > 1) {
-				this.fontRenderer.drawString("+" + (step.getInputs().size() - 1), rowX + 18, iconY + 4, 0xFF000000);
+				String text = "+" + (step.getInputs().size() - 1);
+				this.fontRenderer.drawString(text, curX, iconY + 4, 0xFF000000);
+				width = Math.max(width, this.fontRenderer.getStringWidth(text));
 			}
+			curX += width + 2;
 
 			// Arrow
-			drawArrow(rowX + 28, rowY + TABLE_ROW_H / 2 - 1, 0xFFFFFFFF);
+			drawArrow(curX, rowY + TABLE_ROW_H / 2 - 2, 0xFFFFFFFF);
+			curX += 7;
 
 			// Machine (machine cannot be empty)
-			int machineIconX = rowX + 40;
-			step.getMachine().renderValue(this, machineIconX, iconY);
+			int machineIconX = curX;
+			step.getMachine().renderValue(this, machineIconX, iconY, step.getMachineCount());
 			if (rowHovered) {
 				if (mouseX >= machineIconX && mouseX < machineIconX + 16 && mouseY >= iconY && mouseY < iconY + 16) {
 					hoveredStepStack = step.getMachine();
-					hoveredStepValue = step.getMachine().getValue();
+					hoveredStepValue = String.format("%.4f", step.getMachineCount());
 					hoverMachine = true;
 				}
 			}
+			curX += 18;
 
 			// Arrow
-			drawArrow(rowX + 60, rowY + TABLE_ROW_H / 2 - 1, 0xFFFFFFFF);
+			drawArrow(curX, rowY + TABLE_ROW_H / 2 - 2, 0xFFFFFFFF);
+			curX += 7;
 
 			// Primary output and rate (output cannot be empty)
-			int outputIconX = rowX + 72;
+			int outputIconX = curX;
 			Ingredients output = step.getPrimaryOutput();
 			output.renderValue(this, outputIconX, iconY, step.getPrimaryOutputRate() / CalculatorState.getMultiplier());
 			if (rowHovered) {
 				if (mouseX >= outputIconX && mouseX < outputIconX + 16 && mouseY >= iconY && mouseY < iconY + 16) {
 					hoveredStepStack = output;
-					hoveredStepValue = step.getPrimaryOutputRate() / CalculatorState.getMultiplier();
+					hoveredStepValue = String.format("%.4f", step.getPrimaryOutputRate() / CalculatorState.getMultiplier()) + rateLabels[CalculatorState.getDisplayRate()];
 					hoverMachine = false;
 				}
 			}
+			curX += 18;
 			// More outputs
 			if (step.getOutputs().size() > 1) {
-				this.fontRenderer.drawString("+" + (step.getOutputs().size() - 1), rowX + 88, iconY + 4, 0xFF000000);
+				this.fontRenderer.drawString("+" + (step.getOutputs().size() - 1), curX, iconY + 4, 0xFF000000);
 			}
 
 			// Hide button

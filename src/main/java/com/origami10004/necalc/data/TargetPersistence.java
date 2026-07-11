@@ -31,7 +31,7 @@ public class TargetPersistence {
 		}
 		try (FileWriter writer = new FileWriter(SAVE_FILE)) {
 			GSON.toJson(wrapper, writer);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Necalc.logger.error("Failed to save target data: {}", e.getMessage());
 		}
 	}
@@ -49,7 +49,7 @@ public class TargetPersistence {
 				if (target.isEmpty()) continue;
 				targetSlots.add(target);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Necalc.logger.error("Failed to load target data: {}", e.getMessage());
 		}
 		return targetSlots;

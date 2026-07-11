@@ -37,7 +37,7 @@ public class MachinePersistence {
 		}
 		try (FileWriter writer = new FileWriter(SAVE_FILE)) {
 			GSON.toJson(wrapper, writer);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Necalc.logger.error("Failed to save machine data", e);
 		}
 	}
@@ -55,7 +55,7 @@ public class MachinePersistence {
 					MachineState.initMachineSpeed(data, (int) data.getValue());
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Necalc.logger.error("Failed to load machine data", e);
 		}
 	}

@@ -55,7 +55,7 @@ public class RecipePersistence {
 		}
 		try (FileWriter writer = new FileWriter(SAVE_FILE)) {
 			GSON.toJson(wrapper, writer);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Necalc.logger.error("Failed to save recipe data", e);
 		}
 	}
@@ -87,7 +87,7 @@ public class RecipePersistence {
 				}
 				recipes.add(new RecipeEntry(inputs, machine, outputs, recipe.time));
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Necalc.logger.error("Failed to load recipe data", e);
 		}
 

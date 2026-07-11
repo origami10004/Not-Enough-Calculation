@@ -68,9 +68,9 @@ public class FluidIngredient extends Ingredients {
 	public List<String> getTooltip(Minecraft mc) {
 		List<String> tooltip = new ArrayList<>();
 		tooltip.add(getDisplayName());
-		if (getValue() > 0) {
-			tooltip.add(TextFormatting.GRAY + String.format("%d mB", (int) getValue()));
-		}
+		// if (getValue() > 0) {
+		// 	tooltip.add(TextFormatting.GRAY + String.format("%d mB", (int) getValue()));
+		// }
 		if (mc.gameSettings.advancedItemTooltips && FluidRegistry.getFluidName(fluid) != null) {
 			tooltip.add(TextFormatting.DARK_GRAY + FluidRegistry.getFluidName(fluid));
 		}
@@ -129,7 +129,7 @@ public class FluidIngredient extends Ingredients {
 			if (value >= 10) {
 				return String.format("%.0fmB", value);
 			} else {
-				return ONE_DECIMAL.format(value);
+				return ONE_DECIMAL.format(value) + "mB";
 			}
 		} else if (value < 1000000) {
 			// Thousands
