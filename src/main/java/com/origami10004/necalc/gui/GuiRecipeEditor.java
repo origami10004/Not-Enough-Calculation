@@ -168,6 +168,13 @@ public class GuiRecipeEditor extends GuiCommon {
 
 		drawTabTooltips(mouseX - this.guiLeft, mouseY - this.guiTop, this.gx - this.guiLeft, this.gy - this.guiTop);
 
+		// Help
+		if (mouseX >= this.gx + 160 && mouseX < this.gx + 170 && mouseY >= this.gy + TAB_H + 18 && mouseY < this.gy + TAB_H + 28) {
+			this.drawHoveringText(
+					fontRenderer.listFormattedStringToWidth(I18n.format("necalc.gui.recipe_help"), 100),
+					mouseX - this.guiLeft, mouseY - this.guiTop);
+		}
+
 		// Inputs
 		int hoverSlot = getInputSlotAt(mouseX, mouseY);
 		if (hoverSlot != -1) {

@@ -36,6 +36,7 @@ necalc.gui.recipe.time=Time in ticks
 necalc.gui.recipe.confirm=Confirm
 necalc.gui.recipe.cancel=Cancel
 necalc.gui.recipe.delete=Delete
+necalc.gui.recipe_help=You can shift + scroll on inputs and outputs to increment values, or ctrl + shift + scroll to double them
 
 # recipe manager gui
 necalc.gui.recipe_manager=Encoded Recipes
