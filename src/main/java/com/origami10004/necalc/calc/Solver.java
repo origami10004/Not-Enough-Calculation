@@ -123,6 +123,15 @@ public class Solver {
 				inputItems.remove(target);
 			}
 		}
+
+		// for (int i = 0; i < n; i++) {
+		// 	RecipeEntry recipe = recipes.get(idToRecipe.get(i));
+		// 	Necalc.logger.info("Recipe " + i + " inputs:");
+		// 	for (Ingredients input : recipe.getInputs()) {
+		// 		Integer id = itemToId.get(input);
+		// 		Necalc.logger.info("  " + input + "(" + input.serialize() + ") -> itemId=" + id);
+		// 	}
+		// }
 		
 		LinearObjectiveFunction objectiveFunction = new LinearObjectiveFunction(cost, 0.0);
 		List<LinearConstraint> constraints = new ArrayList<>();
@@ -138,6 +147,15 @@ public class Solver {
 					new NonNegativeConstraint(true));
 			double[] solutionPoint = solution.getPoint();
 			double optimalValue = solution.getValue();
+
+			// for (int i = 0; i < m; i++) {
+			// 	double netFlow = 0;
+			// 	for (int j = 0; j < n; j++) {
+			// 		netFlow += matrix[i][j] * solutionPoint[j];
+			// 	}
+			// 	Necalc.logger.info("Item " + idToItem.get(i) + "(" + idToItem.get(i).serialize() + 
+			// 			") net flow: " + netFlow + " required: " + rates[i]);
+			// }
 
 			for (int i = 0; i < n; i++) {
 				double machineCount = solutionPoint[i];

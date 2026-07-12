@@ -647,13 +647,7 @@ public class GuiProductionCalc extends GuiCommon {
 				if (mouseX >= machineIconX && mouseX < machineIconX + 16 && mouseY >= iconY && mouseY < iconY + 16) {
 					return step.getMachine();
 				}
-
-				// Primary output
-				int outputIconX = rowX + 72;
-				if (mouseX >= outputIconX && mouseX < outputIconX + 16 && mouseY >= iconY && mouseY < iconY + 16) {
-					return step.getPrimaryOutput();
-				}
-
+				
 				// None of the icons were hovered, default to output item
 				return step.getPrimaryOutput();
 			}

@@ -75,13 +75,13 @@ public class FluidIngredient extends Ingredients {
 			tooltip.add(TextFormatting.DARK_GRAY + FluidRegistry.getFluidName(fluid));
 		}
 		
-		String modId = FluidRegistry.getModId(getStack());
-		if (modId != null) {
-			ModContainer modContainer = Loader.instance().getIndexedModList().get(modId);
-			if (modContainer != null) {
-				tooltip.add(TextFormatting.BLUE.toString() + TextFormatting.ITALIC + modContainer.getName());
-			}
-		}
+		// String modId = FluidRegistry.getModId(getStack());
+		// if (modId != null) {
+		// 	ModContainer modContainer = Loader.instance().getIndexedModList().get(modId);
+		// 	if (modContainer != null) {
+		// 		tooltip.add(TextFormatting.BLUE.toString() + TextFormatting.ITALIC + modContainer.getName());
+		// 	}
+		// }
 		return tooltip;
 	}
 
@@ -175,7 +175,9 @@ public class FluidIngredient extends Ingredients {
 		if (this == obj) return true;
 		if (!(obj instanceof FluidIngredient)) return false;
 		FluidIngredient other = (FluidIngredient) obj;
-		return this.fluid.equals(other.fluid);
+		return this.fluid.equals(other.fluid)
+				&& ((this.nbt == null && other.nbt == null)
+						|| (this.nbt != null && other.nbt != null && this.nbt.equals(other.nbt)));
 	}
 
 	@Override

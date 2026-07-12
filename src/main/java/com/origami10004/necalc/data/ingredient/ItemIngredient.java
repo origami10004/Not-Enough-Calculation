@@ -78,19 +78,12 @@ public class ItemIngredient extends Ingredients {
 						: ITooltipFlag.TooltipFlags.NORMAL);
 		String modId = getStack().getItem().getCreatorModId(getStack());
 
-		// if (modId == null || modId.isEmpty()) {
-		// 	ResourceLocation registryName = Item.REGISTRY.getNameForObject(getStack().getItem());
-		// 	if (registryName != null) {
-		// 		modId = registryName.getNamespace();
+		// if (modId != null && !modId.isEmpty()) {
+		// 	ModContainer modContainer = Loader.instance().getIndexedModList().get(modId);
+		// 	if (modContainer != null) {
+		// 		tooltip.add(TextFormatting.BLUE.toString() + TextFormatting.ITALIC + modContainer.getName());
 		// 	}
 		// }
-
-		if (modId != null && !modId.isEmpty()) {
-			ModContainer modContainer = Loader.instance().getIndexedModList().get(modId);
-			if (modContainer != null) {
-				tooltip.add(TextFormatting.BLUE.toString() + TextFormatting.ITALIC + modContainer.getName());
-			}
-		}
 		
 		return tooltip;
 	}

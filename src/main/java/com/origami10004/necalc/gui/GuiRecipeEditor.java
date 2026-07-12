@@ -154,7 +154,8 @@ public class GuiRecipeEditor extends GuiCommon {
 		drawModalRectWithCustomSizedTexture(this.gx + 34, curY + 2, 16, 0, 16, 16, 48, 16);
 		if (!isNewRecipe) {
 			drawButton(this.gx + 52, curY, BUTTON_SIZE, BUTTON_SIZE, "", mouseX, mouseY, false, true);
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+			this.mc.getTextureManager().bindTexture(BUTTON_TEXTURE);
+			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			drawModalRectWithCustomSizedTexture(this.gx + 54, curY + 2, 32, 0, 16, 16, 48, 16);
 		}
 		curY += 26;
