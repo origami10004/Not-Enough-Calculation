@@ -40,7 +40,7 @@ public class GuiProductionCalc extends GuiCommon {
 	private static final int TABLE_VIS_ROWS = 5;
 
 	private static final int HIDE_SIZE = 12;
-	private static String [] rateLabels = {I18n.format("necalc.gui.rate.minute"), I18n.format("necalc.gui.rate.second"), I18n.format("necalc.gui.rate.ticks")};
+	protected static final String [] rateLabels = {I18n.format("necalc.gui.rate.minute"), I18n.format("necalc.gui.rate.second"), I18n.format("necalc.gui.rate.ticks")};
 
 
 	// Other constants
@@ -451,6 +451,13 @@ public class GuiProductionCalc extends GuiCommon {
 					this.prodScrollRow = Math.min(this.prodScrollRow, Math.max(0, CalculatorState.getVisibleRecipes().size() - TABLE_VIS_ROWS));
 					this.prodScrollPercent = (float) this.prodScrollRow / Math.max(1, CalculatorState.getVisibleRecipes().size() - TABLE_VIS_ROWS);
 					return;
+				}
+
+				// Open recipe view (also left click)
+				if (CalculatorState.getVisibleRecipes().size() <= TABLE_VIS_ROWS || mouseY < this.gy + TAB_H + 35) {
+					// open recipe view
+					this.editOverlay.close();
+					mc.displayGuiScreen(new GuiRecipe(this, playerInv, visible.get(prodRow)));
 				}
 			}
 		}

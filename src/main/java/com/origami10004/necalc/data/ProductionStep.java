@@ -79,4 +79,8 @@ public class ProductionStep {
 	public double getPrimaryOutputRate() {
 		return recipePerMinute * outputs.get(0).getValue();
 	}
+
+	public double getRecipeTime() {
+		return 60.0 / recipePerMinute;
+	}
 }
