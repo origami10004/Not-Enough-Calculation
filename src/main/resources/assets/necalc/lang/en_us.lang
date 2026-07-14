@@ -22,6 +22,7 @@ necalc.gui.rate.ticks=/t
 necalc.gui.target_rate=Rate: %s
 necalc.gui.machine_count=Count: %s
 necalc.gui.results=Required Production Rates
+necalc.gui.inputs=Required Input Rates
 necalc.gui.inventory=Inventory
 necalc.gui.show.some=Show Hidden Recipes (%d hidden)
 necalc.gui.show.none=Show Hidden Recipes (none)

@@ -83,4 +83,14 @@ public class ProductionStep {
 	public double getRecipeTime() {
 		return 60.0 / recipePerMinute;
 	}
+
+	public double getInputRate(int index) {
+		if (index < 0 || index >= inputs.size()) return 0.0;
+		return recipePerMinute * inputs.get(index).getValue();
+	}
+
+	public double getOutputRate(int index) {
+		if (index < 0 || index >= outputs.size()) return 0.0;
+		return recipePerMinute * outputs.get(index).getValue();
+	}
 }

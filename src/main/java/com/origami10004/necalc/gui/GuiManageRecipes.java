@@ -10,6 +10,7 @@ import org.lwjgl.input.Mouse;
 import com.origami10004.necalc.data.RecipeEntry;
 import com.origami10004.necalc.data.RecipeState;
 import com.origami10004.necalc.data.ingredient.Ingredients;
+import com.origami10004.necalc.proxy.ClientProxy;
 
 public class GuiManageRecipes extends GuiCommon{
 	// GUI textures
@@ -38,6 +39,7 @@ public class GuiManageRecipes extends GuiCommon{
 	public GuiManageRecipes(InventoryPlayer playerInv) {
 		super(new NecalcContainer(playerInv, false, 0, 0));
 		this.playerInv = playerInv;
+		ClientProxy.lastOpenedGui = this;
 	}
 
 	@Override

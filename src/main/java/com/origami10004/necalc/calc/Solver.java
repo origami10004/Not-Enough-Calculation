@@ -31,8 +31,19 @@ public class Solver {
 
 	private static HashMap<Ingredients, ArrayList<Integer>> itemToRecipe;
 
-	public static List<ProductionStep> steps;
-	public static LinkedHashMap<Ingredients, Double> inputRates;
+	public static class Result {
+		public List<ProductionStep> steps;
+		public LinkedHashMap<Ingredients, Input> inputRates;
+	}
+
+	public static class Input {
+		public double rate;
+		public boolean hidden;
+		public Input(double rate) {
+			this.rate = rate;
+			this.hidden = false;
+		}
+	}
 
 	private static void preprocess() {
 		itemToId = new HashMap<>();
@@ -77,13 +88,14 @@ public class Solver {
 		}
 		
 	}
-	public static void solve() {
-		steps = new ArrayList<>();
+	public static Result solve() {
+		Result res = new Result();
+		res.steps = new ArrayList<>();
 		targets = CalculatorState.getTargets();
 		recipes = RecipeState.getRecipes();
-		inputRates = new LinkedHashMap<>();
+		res.inputRates = new LinkedHashMap<>();
 		if (targets.isEmpty() || recipes.isEmpty()) {
-			return;
+			return res;
 		}
 		preprocess();
 
@@ -119,7 +131,7 @@ public class Solver {
 			if (itemId != null) rates[itemId] = target.getValue();
 			else {
 				// If this happens, none of recipes produce target item, treat it as input item
-				inputRates.put(target, target.getValue());
+				res.inputRates.put(target, new Input(target.getValue()));
 				inputItems.remove(target);
 			}
 		}
@@ -166,12 +178,12 @@ public class Solver {
 				double craftsPerMinute = ((double)(1200 * speed)) / recipe.getTime();
 				double recipePerMinute = machineCount * craftsPerMinute;
 
-				steps.add(new ProductionStep(recipe, machineCount, recipePerMinute));
+				res.steps.add(new ProductionStep(recipe, machineCount, recipePerMinute));
 
 				for (Ingredients input : recipe.getInputs()) {
 					if (inputItems.contains(input)) {
 						double inputRate = ((double)input.getValue()) * recipePerMinute;
-						inputRates.put(input, inputRates.getOrDefault(input, 0.0) + inputRate);
+						res.inputRates.put(input, new Input(res.inputRates.getOrDefault(input, new Input(0.0)).rate + inputRate));
 					}
 				}
 			}
@@ -179,5 +191,6 @@ public class Solver {
 		} catch (Exception e) {
 			Necalc.logger.error("Error during optimization: " + e.getMessage());
 		}
+		return res;
 	}
 }

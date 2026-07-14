@@ -11,12 +11,14 @@ public class CalculatorState {
 	private static final List<Ingredients> targets = new ArrayList<>();
 	private static int[] rateMultiplier = new int[] {1, 60, 1200};
 	private static List<ProductionStep> recipeSteps;
+	private static LinkedHashMap<Ingredients, Solver.Input> recipeInputs;
 	private static HashSet<Ingredients> targetItems = new HashSet<>();
 
 	private static boolean cached = false;
 
 	public static void init() {
 		recipeSteps = new ArrayList<>();
+		recipeInputs = new LinkedHashMap<>();
 		cached = false;
 	}
 
@@ -105,18 +107,30 @@ public class CalculatorState {
 		return false;
 	}
 
-	public static boolean hasHidden() {
+	public static boolean hasHidden(boolean showProd) {
 		getResult();
-		return recipeSteps.stream()
-				.filter(r -> r.isHidden())
-				.count() > 0;
+		if (showProd) {
+			return recipeSteps.stream()
+					.filter(r -> r.isHidden())
+					.count() > 0;
+		} else {
+			return recipeInputs.entrySet().stream()
+					.filter(entry -> entry.getValue().hidden)
+					.count() > 0;
+		}
 	}
 
-	public static int getHiddenCount() {
+	public static int getHiddenCount(boolean showProd) {
 		getResult();
-		return (int) recipeSteps.stream()
-				.filter(r -> r.isHidden())
-				.count();
+		if (showProd) {
+			return (int) recipeSteps.stream()
+					.filter(r -> r.isHidden())
+					.count();
+		} else {
+			return (int) recipeInputs.entrySet().stream()
+					.filter(entry -> entry.getValue().hidden)
+					.count();
+		}
 	}
 
 	public static void showAllRecipes() {
@@ -148,12 +162,32 @@ public class CalculatorState {
 		cached = false;
 	}
 
-	private static void getResult() {
-		if (cached) return;
+	private static boolean getResult() {
+		if (cached) return false;
 		recipeSteps.clear();
-		Solver.solve();
-		recipeSteps.addAll(Solver.steps);
+		recipeInputs.clear();
+		Solver.Result result = Solver.solve();
+		recipeSteps.addAll(result.steps);
+		recipeInputs.putAll(result.inputRates);
 
 		cached = true;
+		return true;
+	}
+
+	public static Map<Ingredients, Solver.Input> getVisibleInputs() {
+		getResult();
+		return recipeInputs.entrySet().stream()
+				.filter(entry -> !entry.getValue().hidden)
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, LinkedHashMap::new));
+	}
+
+	public static void hideInput(Ingredients input) {
+		if (recipeInputs.containsKey(input)) {
+			recipeInputs.get(input).hidden = true;
+		}
+	}
+
+	public static void showAllInputs() {
+		recipeInputs.values().forEach(input -> input.hidden = false);
 	}
 }

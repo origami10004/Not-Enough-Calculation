@@ -9,6 +9,7 @@ import org.lwjgl.input.Mouse;
 import com.origami10004.necalc.data.MachineState;
 import com.origami10004.necalc.data.RecipeState;
 import com.origami10004.necalc.data.ingredient.Ingredients;
+import com.origami10004.necalc.proxy.ClientProxy;
 
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -43,6 +44,7 @@ public class GuiManageMachines extends GuiCommon {
 		super(new NecalcContainer(playerInv, false, 0, 0));
 		this.playerInv = playerInv;
 		this.editor = new SpeedEditHelper(this);
+		ClientProxy.lastOpenedGui = this;
 	}
 
 	@Override

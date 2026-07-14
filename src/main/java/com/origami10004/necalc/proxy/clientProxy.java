@@ -9,11 +9,15 @@ import com.origami10004.necalc.client.KeyBindings;
 import com.origami10004.necalc.client.KeyInputHandler;
 import com.origami10004.necalc.data.CalculatorState;
 import com.origami10004.necalc.data.RecipeState;
+import com.origami10004.necalc.gui.GuiCommon;
 import com.origami10004.necalc.data.MachineState;
 import com.origami10004.necalc.compat.mekanism.MekanismCompat;
 import com.origami10004.necalc.compat.thaumcraft.ThaumcraftCompat;
 
 public class ClientProxy extends CommonProxy {
+
+	public static GuiCommon lastOpenedGui = null;
+
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		super.preInit(event);

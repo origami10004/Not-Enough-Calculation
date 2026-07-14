@@ -65,7 +65,7 @@ public class GuiRecipe extends GuiCommon {
 				if (index >= step.getInputs().size()) break;
 				drawItemSlot(inputX + j * 18, inputY + i * 18);
 				Ingredients currentInput = step.getInputs().get(index);
-				currentInput.renderValue(this, inputX + j * 18 + 1, inputY + i * 18 + 1, currentInput.getValue() / CalculatorState.getMultiplier());
+				currentInput.renderValue(this, inputX + j * 18 + 1, inputY + i * 18 + 1, step.getInputRate(index) / CalculatorState.getMultiplier());
 			}
 		}
 
@@ -81,7 +81,7 @@ public class GuiRecipe extends GuiCommon {
 				if (index >= step.getOutputs().size()) break;
 				drawItemSlot(outputX + j * 18, outputY + i * 18);
 				Ingredients currentOutput = step.getOutputs().get(index);
-				currentOutput.renderValue(this, outputX + j * 18 + 1, outputY + i * 18 + 1, currentOutput.getValue() / CalculatorState.getMultiplier());
+				currentOutput.renderValue(this, outputX + j * 18 + 1, outputY + i * 18 + 1, step.getOutputRate(index) / CalculatorState.getMultiplier());
 			}
 		}
 	}
