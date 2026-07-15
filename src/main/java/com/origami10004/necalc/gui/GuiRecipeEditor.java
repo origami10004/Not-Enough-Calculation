@@ -165,58 +165,64 @@ public class GuiRecipeEditor extends GuiCommon {
 	}
 
 	@Override
-	public void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+	public void renderHoveredToolTip(int mouseX, int mouseY) {
 
-		drawTabTooltips(mouseX - this.guiLeft, mouseY - this.guiTop, this.gx - this.guiLeft, this.gy - this.guiTop);
+		drawTabTooltips(mouseX, mouseY, this.gx, this.gy);
 
 		// Help
 		if (mouseX >= this.gx + 160 && mouseX < this.gx + 170 && mouseY >= this.gy + TAB_H + 18 && mouseY < this.gy + TAB_H + 28) {
 			this.drawHoveringText(
 					fontRenderer.listFormattedStringToWidth(I18n.format("necalc.gui.recipe_help"), 100),
-					mouseX - this.guiLeft, mouseY - this.guiTop);
+					mouseX, mouseY);
 		}
 
 		// Inputs
 		int hoverSlot = getInputSlotAt(mouseX, mouseY);
 		if (hoverSlot != -1) {
 			Ingredients ing = RecipeState.getInput(hoverSlot);
-			this.drawHoveringText(ing.getTooltip(this.mc), mouseX - this.guiLeft, mouseY - this.guiTop);
+			this.drawHoveringText(ing.getTooltip(this.mc), mouseX, mouseY);
 		}
 
 		// Machine
 		if (mouseX >= this.gx + 12 && mouseX < this.gx + 12 + SLOT_SIZE
 					&& mouseY >= this.machineY && mouseY < this.machineY + SLOT_SIZE) {
 			Ingredients ing = RecipeState.getMachine();
-			this.drawHoveringText(ing.getTooltip(this.mc), mouseX - this.guiLeft, mouseY - this.guiTop);
+			this.drawHoveringText(ing.getTooltip(this.mc), mouseX, mouseY);
 		}
 
 		// Outputs
 		hoverSlot = getOutputSlotAt(mouseX, mouseY);
 		if (hoverSlot != -1) {
 			Ingredients ing = RecipeState.getOutput(hoverSlot);
-			this.drawHoveringText(ing.getTooltip(this.mc), mouseX - this.guiLeft, mouseY - this.guiTop);
+			this.drawHoveringText(ing.getTooltip(this.mc), mouseX, mouseY);
 			return;
 		}
 
 		// Buttons
 		if (mouseX >= this.gx + 12 && mouseX < this.gx + 12 + BUTTON_SIZE
 					&& mouseY >= this.buttonY && mouseY < this.buttonY + BUTTON_SIZE) {
-			this.drawHoveringText(I18n.format("necalc.gui.recipe.confirm"), mouseX - this.guiLeft, mouseY - this.guiTop);
+			this.drawHoveringText(I18n.format("necalc.gui.recipe.confirm"), mouseX, mouseY);
 			return;
 		}
 		if (mouseX >= this.gx + 32 && mouseX < this.gx + 32 + BUTTON_SIZE
 					&& mouseY >= this.buttonY && mouseY < this.buttonY + BUTTON_SIZE) {
-			this.drawHoveringText(I18n.format("necalc.gui.recipe.cancel"), mouseX - this.guiLeft, mouseY - this.guiTop);
+			this.drawHoveringText(I18n.format("necalc.gui.recipe.cancel"), mouseX, mouseY);
 			return;
 		}
 		if (!this.isNewRecipe && mouseX >= this.gx + 52 && mouseX < this.gx + 52 + BUTTON_SIZE
 					&& mouseY >= this.buttonY && mouseY < this.buttonY + BUTTON_SIZE) {
-			this.drawHoveringText(I18n.format("necalc.gui.recipe.delete"), mouseX - this.guiLeft, mouseY - this.guiTop);
+			this.drawHoveringText(I18n.format("necalc.gui.recipe.delete"), mouseX, mouseY);
 			return;
 		}
 
-		// Inventory
-		this.drawPlayerInventoryTooltips(mouseX - this.guiLeft, mouseY - this.guiTop);
+
+		super.renderHoveredToolTip(mouseX, mouseY);
+	}
+
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		super.drawScreen(mouseX, mouseY, partialTicks);
+		this.renderHoveredToolTip(mouseX, mouseY);
 	}
 
 	@Override

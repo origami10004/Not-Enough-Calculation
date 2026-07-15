@@ -9,7 +9,6 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import org.lwjgl.input.Keyboard;
 
 import com.origami10004.necalc.gui.GuiProductionCalc;
-import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.proxy.ClientProxy;
 
 public class KeyInputHandler {

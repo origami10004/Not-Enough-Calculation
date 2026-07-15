@@ -14,7 +14,7 @@ plugins {
 val modId: String by project
 val modName: String by project
 val modLicense: String by project
-val modVersion: String = System.getenv("VERSION") ?: "0.0.3-indev"
+val modVersion: String = System.getenv("VERSION") ?: "0.1.1-indev"
 val modGroupId: String by project
 val modAuthors: String by project
 val modDescription: String by project

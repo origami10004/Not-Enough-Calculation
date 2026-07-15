@@ -82,17 +82,23 @@ public class GuiManageRecipes extends GuiCommon{
 	}
 
 	@Override
-	public void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+	public void renderHoveredToolTip(int mouseX, int mouseY) {
 		
-		drawTabTooltips(mouseX - this.guiLeft, mouseY - this.guiTop, this.gx - this.guiLeft, this.gy - this.guiTop);
+		drawTabTooltips(mouseX, mouseY, this.gx, this.gy);
 
 		int recipe = getRecipeAt(mouseX, mouseY);
 		if (recipe != -1) {
 			RecipeEntry entry = RecipeState.getRecipe(recipe);
 			if (entry != RecipeEntry.EMPTY) {
-				drawHoveringText(entry.getOutputs().get(0).getTooltip(this.mc), mouseX - this.guiLeft, mouseY - this.guiTop);
+				drawHoveringText(entry.getOutputs().get(0).getTooltip(this.mc), mouseX, mouseY);
 			}
 		}
+	}
+
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		super.drawScreen(mouseX, mouseY, partialTicks);
+		this.renderHoveredToolTip(mouseX, mouseY);
 	}
 
 	@Override

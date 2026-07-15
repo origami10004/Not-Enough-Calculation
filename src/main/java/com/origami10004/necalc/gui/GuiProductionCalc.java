@@ -17,6 +17,7 @@ import com.origami10004.necalc.calc.Solver;
 import com.origami10004.necalc.proxy.ClientProxy;
 
 import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -27,6 +28,7 @@ import net.minecraft.util.ResourceLocation;
 public class GuiProductionCalc extends GuiCommon {
 	// GUI textures
 	private static final ResourceLocation BG_TEXTURE = new ResourceLocation("necalc", "textures/gui/prod_calc.png");
+	private static final ResourceLocation BUTTON_TEXTURE = new ResourceLocation("necalc", "textures/gui/button_icons.png");
 
 	// constants for GUI layout
 	private static final int GUI_WIDTH			= 184;
@@ -68,10 +70,9 @@ public class GuiProductionCalc extends GuiCommon {
 	private float inputScrollPercent = 0.0f;
 	private boolean draggingInputScroll = false;
 	private final RateEditHelper editOverlay = new RateEditHelper(this);
+	private final RecipeViewHelper recipeViewHelper = new RecipeViewHelper(this);
 
 	// Recipe hovering
-	private int hoveredRecipeRow = -1;
-	private int hoveredRecipeRowTicks = 0;
 	private Ingredients hoveredStepStack = Ingredients.EMPTY;
 	private String hoveredStepValue = "";
 	private boolean hoverMachine = false;
@@ -105,6 +106,7 @@ public class GuiProductionCalc extends GuiCommon {
 		this.gy = guiTop;
 		this.targetGridY = gy + TAB_H + 35;
 		this.editOverlay.reInit(gx, this.targetGridY);
+		this.recipeViewHelper.init(this.gx, this.gy + TAB_H);
 	}
 
 	@Override
@@ -155,7 +157,13 @@ public class GuiProductionCalc extends GuiCommon {
 		this.unhideX = this.gx + GUI_WIDTH - INDENT_R - HIDE_SIZE - 2;
 		this.unhideY = curY + 4;
 		this.drawEyeButton(unhideX, unhideY, mouseX, mouseY, CalculatorState.hasHidden(showProd), false);
-		// Rates table
+
+		this.drawButton(this.gx + 147, this.gy + TAB_H + 77, 12, 12, "", mouseX, mouseY, false, true);
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		this.mc.getTextureManager().bindTexture(BUTTON_TEXTURE);
+		drawModalRectWithCustomSizedTexture(this.gx + 148, this.gy + TAB_H + 78, 0, 0, 10, 10, 30, 10);
+
+		// Production/input table
 		this.prodTableY = curY + 18;
 		if (showProd) {
 			this.drawProdTable(this.prodTableY, mouseX, mouseY);
@@ -170,19 +178,21 @@ public class GuiProductionCalc extends GuiCommon {
 		this.fontRenderer.drawString(I18n.format("necalc.gui.inventory"), this.gx + 8, this.invY + 6, 0xFF000000);
 		this.drawPlayerInventory(this.gx + 8, this.invY + 16, mouseX, mouseY, this.playerInv);
 
+		this.recipeViewHelper.drawExtension(mouseX, mouseY);
+
 		// Rate editor overlay
 		editOverlay.drawOverlay(mouseX, mouseY);
 	}
 
 	@Override
-	public void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+	public void renderHoveredToolTip(int mouseX, int mouseY) {
 		if (editOverlay.hovered(mouseX, mouseY)) return;
 
-		drawTabTooltips(mouseX - this.guiLeft, mouseY - this.guiTop, this.gx - this.guiLeft, this.gy - this.guiTop);
+		drawTabTooltips(mouseX, mouseY, this.gx, this.gy);
 
 		// Help tooltip
 		if (mouseX >= this.gx + 157 && mouseX < this.gx + 171 && mouseY >= this.gy + TAB_H + 18 && mouseY < this.gy + TAB_H + 31) {
-			this.drawHoveringText(I18n.format("necalc.gui.target_help"), mouseX - this.guiLeft, mouseY - this.guiTop);
+			this.drawHoveringText(I18n.format("necalc.gui.target_help"), mouseX, mouseY);
 		}
 
 		// Target table tooltips
@@ -192,7 +202,7 @@ public class GuiProductionCalc extends GuiCommon {
 			if (!ing.isEmpty()) {
 				String rate = String.format("%.4f", CalculatorState.getTargetSlotRate(targetSlot));
 				
-				this.drawItemExtraInfoTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, ing,
+				this.drawItemExtraInfoTooltip(mouseX, mouseY, ing,
 						I18n.format("necalc.gui.target_rate", rate));
 			}
 		}
@@ -201,47 +211,49 @@ public class GuiProductionCalc extends GuiCommon {
 		if (mouseX >= unhideX && mouseX < unhideX + HIDE_SIZE && mouseY >= unhideY && mouseY < unhideY + HIDE_SIZE) {
 			String text;
 			if (CalculatorState.hasHidden(showProd)) {
-				text = I18n.format("necalc.gui.show.some", CalculatorState.getHiddenCount(showProd));
+				if (showProd) {
+					text = I18n.format("necalc.gui.show_recipe.some", CalculatorState.getHiddenCount(showProd));
+				} else {
+					text = I18n.format("necalc.gui.show_input.some", CalculatorState.getHiddenCount(showProd));
+				}
 			} else {
-				text = I18n.format("necalc.gui.show.none");
+				if (showProd) {
+					text = I18n.format("necalc.gui.show_recipe.none");
+				} else {
+					text = I18n.format("necalc.gui.show_input.none");
+				}
 			}
-			this.drawHoveringText(text, mouseX - this.guiLeft, mouseY - this.guiTop);
-		}
-
-		// Production step recipe tooltip (only show after hovering for a while)
-		if (hoveredRecipeRow != -1 && hoveredRecipeRowTicks > 20) {
-			List<ProductionStep> visible = CalculatorState.getVisibleRecipes();
-			if (hoveredRecipeRow < visible.size()) {
-				ProductionStep step = visible.get(hoveredRecipeRow);
-				//this.drawRecipeTooltip(step, mouseX, mouseY);
-			}
+			this.drawHoveringText(text, mouseX, mouseY);
 		}
 
 		// Production step tooltips
 		if (hoveredStepStack != null && !hoveredStepStack.isEmpty()) {
 			if (showProd) {
 				if (hoverMachine) {
-					drawItemExtraInfoTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, hoveredStepStack,
+					drawItemExtraInfoTooltip(mouseX, mouseY, hoveredStepStack,
 							I18n.format("necalc.gui.machine_count", hoveredStepValue));
 				} else {
-					drawItemExtraInfoTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, hoveredStepStack,
+					drawItemExtraInfoTooltip(mouseX, mouseY, hoveredStepStack,
 							I18n.format("necalc.gui.target_rate", hoveredStepValue));
 				}
 			} else {
-				drawHoveringText(hoveredStepStack.getTooltip(this.mc), mouseX - this.guiLeft, mouseY - this.guiTop);
+				drawHoveringText(hoveredStepStack.getTooltip(this.mc), mouseX, mouseY);
 			}
 		}
 
-		// Inventory tooltips
-		this.drawPlayerInventoryTooltips(mouseX - this.guiLeft, mouseY - this.guiTop);
+		this.recipeViewHelper.drawTooltip(mouseX, mouseY);
+		super.renderHoveredToolTip(mouseX, mouseY);
+	}
+
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		super.drawScreen(mouseX, mouseY, partialTicks);
+		this.renderHoveredToolTip(mouseX, mouseY);
 	}
 
 	@Override
 	public void updateScreen() {
 		super.updateScreen();
-		if (hoveredRecipeRow != -1) {
-			hoveredRecipeRowTicks++;
-		}
 		editOverlay.updateCursorCounter();
 	}
 
@@ -276,20 +288,11 @@ public class GuiProductionCalc extends GuiCommon {
 	}
 
 	private void drawEyeButton(int x, int y, int mouseX, int mouseY, boolean active, boolean crossed) {
-		boolean hovered = mouseX >= x && mouseX < x + HIDE_SIZE && mouseY >= y && mouseY < y + HIDE_SIZE;
-		int cx = x + HIDE_SIZE / 2;
-		int cy = y + HIDE_SIZE / 2;
-		int lineColor = active ? 0xFF000000 : 0xFF8B8B8B;
-		int bg = !active ? 0xFF999999 : (hovered ? 0xFFA8B8D8 : 0xFFC6C6C6);
-
 		this.drawButton(x, y, HIDE_SIZE, HIDE_SIZE, "", mouseX, mouseY, false, active);
 
-		drawRect(cx - 2, cy - 2, cx + 2, cy + 3, lineColor);
-		drawRect(cx - 3, cy - 1, cx + 3, cy + 2, lineColor);
-		drawRect(cx - 4, cy, cx + 4, cy + 1, lineColor);
-		drawRect(cx - 2, cy - 1, cx + 2, cy + 2, bg);
-		drawRect(cx - 3, cy, cx + 3, cy + 1, bg);
-		drawRect(cx - 1, cy, cx + 1, cy + 1, lineColor);
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		this.mc.getTextureManager().bindTexture(BUTTON_TEXTURE);
+		drawModalRectWithCustomSizedTexture(x + 1, y + 1, active ? 10 : 20, 0, 10, 10, 30, 10);
 	}
 
 	private void drawProdTable(int y, int mouseX, int mouseY) {
@@ -319,18 +322,6 @@ public class GuiProductionCalc extends GuiCommon {
 
 			ProductionStep step = visible.get(idx);
 			boolean rowHovered = mouseX >= rowX && mouseX < rowX + rowW && mouseY >= rowY && mouseY < rowY + TABLE_ROW_H;
-			if (rowHovered) {
-				// Update hovered row for tooltip timer
-				if (hoveredRecipeRow != idx) {
-					hoveredRecipeRow = idx;
-					hoveredRecipeRowTicks = 0;
-				}
-			} else {
-				if (hoveredRecipeRow == idx) {
-					hoveredRecipeRow = -1;
-					hoveredRecipeRowTicks = 0;
-				}
-			}
 
 			int rowBg = rowHovered ? 0xFFA8B8D8 : 0xFFACACAC;
 			drawRectPanelOutdent(rowX, rowY, rowW, TABLE_ROW_H, rowBg);
@@ -537,8 +528,7 @@ public class GuiProductionCalc extends GuiCommon {
 					// Open recipe view (also left click)
 					if (CalculatorState.getVisibleRecipes().size() <= TABLE_VIS_ROWS || mouseY < this.gy + TAB_H + 35) {
 						// open recipe view
-						this.editOverlay.close();
-						mc.displayGuiScreen(new GuiRecipe(this, playerInv, visible.get(prodRow)));
+						this.recipeViewHelper.open(visible.get(prodRow));
 						return;
 					}
 				} else {
@@ -718,18 +708,11 @@ public class GuiProductionCalc extends GuiCommon {
 	}
 
 	private int getTargetSlotAt(int mouseX, int mouseY) {
-		for (int row = 0; row < TARGET_ROWS; row++) {
-			int actual = row + this.targetScrollRow;
-			for(int col = 0; col < SLOTS_PER_ROW; col++) {
-				int slotX = this.gx + INDENT_L + 4 + col * SLOT_SIZE;
-				if (mouseX >= slotX && mouseX < slotX + SLOT_SIZE
-							&& mouseY >= this.targetGridY + row * SLOT_SIZE
-							&& mouseY < this.targetGridY + row * SLOT_SIZE + SLOT_SIZE) {
-					return actual * SLOTS_PER_ROW + col;
-				}
-			}
-		}
-		return -1;
+		int row = this.targetScrollRow + (mouseY - this.targetGridY) / SLOT_SIZE;
+		int col = (mouseX - (this.gx + INDENT_L + 4)) / SLOT_SIZE;
+		if (row < 0 || row >= TARGET_ROWS) return -1;
+		if (col < 0 || col >= SLOTS_PER_ROW) return -1;
+		return row * SLOTS_PER_ROW + col;
 	}
 	private int getProdRowAt(int mouseX, int mouseY) {
 		int rowX = this.gx + INDENT_L + 1;
@@ -737,13 +720,9 @@ public class GuiProductionCalc extends GuiCommon {
 		if (mouseX < rowX || mouseX >= rowX + rowW) return -1;
 
 		int prodY = this.gy + TAB_H + 35 + 6 + TARGET_ROWS * SLOT_SIZE + 18;
-		for(int i = 0; i < TABLE_VIS_ROWS; i++) {
-			int rowY = prodY + i * TABLE_ROW_H;
-			if (mouseY >= rowY && mouseY < rowY + TABLE_ROW_H) {
-				return i + this.prodScrollRow;
-			}
-		}
-		return -1;
+		if (mouseY < prodY || mouseY >= prodY + TABLE_VIS_ROWS * TABLE_ROW_H) return -1;
+
+		return this.prodScrollRow + (mouseY - (prodY)) / TABLE_ROW_H;
 	}
 
 	public int getTargetScrollRow() {
@@ -758,6 +737,11 @@ public class GuiProductionCalc extends GuiCommon {
 
 	@Override
 	public Ingredients getHoveredStack(int mouseX, int mouseY) {
+		if (mouseX < this.gx) {
+			return recipeViewHelper.getHoveredStack(mouseX, mouseY);
+		} else if (mouseX >= this.gx + GUI_WIDTH || mouseY < this.gy || mouseY >= this.gy + GUI_HEIGHT + TAB_H) {
+			return Ingredients.EMPTY;
+		}
 		int targetSlot = getTargetSlotAt(mouseX, mouseY);
 		if (targetSlot != -1) {
 			return CalculatorState.getTargetSlot(targetSlot);
@@ -800,5 +784,10 @@ public class GuiProductionCalc extends GuiCommon {
 			}
 		}
 		return Ingredients.EMPTY;
+	}
+
+	@Override
+	public List<Rectangle> getExtraGuiArea() {
+		return recipeViewHelper.area();
 	}
 }

@@ -1,51 +1,53 @@
 package com.origami10004.necalc.gui;
 
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.client.resources.I18n;
-
-import java.io.IOException;
-import org.lwjgl.input.Keyboard;
-
-import com.origami10004.necalc.data.ProductionStep;
-import com.origami10004.necalc.data.ingredient.Ingredients;
 import com.origami10004.necalc.data.CalculatorState;
 import com.origami10004.necalc.data.MachineState;
+import com.origami10004.necalc.data.ProductionStep;
+import com.origami10004.necalc.data.ingredient.Ingredients;
 
-public class GuiRecipe extends GuiCommon {
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.awt.Rectangle;
+
+public class RecipeViewHelper {
 	private static final ResourceLocation ARROW_TEXTURE = new ResourceLocation("necalc", "textures/gui/arrow.png");
 
-	private final ProductionStep step;
 	private final GuiProductionCalc parent;
-
-	// instance variables
+	private boolean isOpen = false;
+	private ProductionStep step = null;
 	private int inputX, inputY;
 	private int outputX, outputY;
 	private int inputRows, inputCols;
 	private int outputRows, outputCols;
+	private int xSize, ySize;
+	private int guiLeft, guiTop;
 
-	@Override
-	protected int getActiveTab() {
-		return -1;
-	}
+	private int parentX, parentY;
 
-	public GuiRecipe(GuiProductionCalc parent, InventoryPlayer playerInventory, ProductionStep step) {
-		super(new NecalcContainer(playerInventory, false, 0, 0));
+	public RecipeViewHelper(GuiProductionCalc parent) {
 		this.parent = parent;
-		this.step = step;
 	}
 
-	@Override
-	public void initGui() {
+	public void init(int x, int y) {
+		this.parentX = x;
+		this.parentY = y;
+
+		if (!isOpen()) return;
+
 		this.inputCols = formatRows(step.getInputs().size());
 		this.inputRows = (int) Math.ceil((double) step.getInputs().size() / inputCols);
 		this.outputCols = formatRows(step.getOutputs().size());
 		this.outputRows = (int) Math.ceil((double) step.getOutputs().size() / outputCols);
 
 		this.xSize = 44 + inputCols * 18 + outputCols * 18;
-		this.ySize = Math.max(inputRows, outputRows) * 18 + 100;
-		super.initGui();
+		this.ySize = Math.max(Math.max(inputRows, outputRows) * 18 + 14, 65);
+
+		this.guiLeft = parentX - xSize;
+		this.guiTop = parentY + 92;
 
 		this.inputX = guiLeft + 7;
 		this.inputY = guiTop + (ySize - inputRows * 18) / 2;
@@ -53,45 +55,55 @@ public class GuiRecipe extends GuiCommon {
 		this.outputY = guiTop + (ySize - outputRows * 18) / 2;
 	}
 
-	@Override
-	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-		this.drawDefaultBackground();
-		drawRectPanel(guiLeft, guiTop, xSize, ySize);
-		this.fontRenderer.drawString(I18n.format("necalc.gui.recipe.title"), guiLeft + 8, guiTop + 6, 0xFF000000);
+	public void open(ProductionStep step) {
+		this.step = step;
+		this.isOpen = true;
+		init(this.parentX, this.parentY);
+	}
 
+	public boolean isOpen() {
+		return this.isOpen && this.step != null;
+	}
+	
+	public void drawExtension(int mouseX, int mouseY) {
+		if (!isOpen()) return;
+
+		parent.drawRectPanel(guiLeft, guiTop, xSize, ySize);
+		
 		for (int i = 0; i < inputRows; i++) {
 			for (int j = 0; j < inputCols; j++) {
 				int index = i * inputCols + j;
 				if (index >= step.getInputs().size()) break;
-				drawItemSlot(inputX + j * 18, inputY + i * 18);
+				parent.drawItemSlot(inputX + j * 18, inputY + i * 18);
 				Ingredients currentInput = step.getInputs().get(index);
-				currentInput.renderValue(this, inputX + j * 18 + 1, inputY + i * 18 + 1, step.getInputRate(index) / CalculatorState.getMultiplier());
+				currentInput.renderValue(parent, inputX + j * 18 + 1, inputY + i * 18 + 1, step.getInputRate(index) / CalculatorState.getMultiplier());
 			}
 		}
 
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		mc.getTextureManager().bindTexture(ARROW_TEXTURE);
-		drawModalRectWithCustomSizedTexture(this.inputX + inputCols * 18 + 4, this.guiTop + (this.ySize - 15) / 2, 0, 0, 22, 15, 22, 15);
+		parent.mc.getTextureManager().bindTexture(ARROW_TEXTURE);
+		GuiProductionCalc.drawModalRectWithCustomSizedTexture(this.inputX + inputCols * 18 + 4, this.guiTop + (this.ySize - 15) / 2, 0, 0, 22, 15, 22, 15);
 
-		step.getMachine().renderValue(this, this.inputX + inputCols * 18 + 7, this.guiTop + (this.ySize - 15) / 2 - 20, step.getMachineCount());
+		step.getMachine().renderValue(parent, this.inputX + inputCols * 18 + 7, this.guiTop + (this.ySize - 15) / 2 - 20, step.getMachineCount());
 
 		for (int i = 0; i < outputRows; i++) {
 			for (int j = 0; j < outputCols; j++) {
 				int index = i * outputCols + j;
 				if (index >= step.getOutputs().size()) break;
-				drawItemSlot(outputX + j * 18, outputY + i * 18);
+				parent.drawItemSlot(outputX + j * 18, outputY + i * 18);
 				Ingredients currentOutput = step.getOutputs().get(index);
-				currentOutput.renderValue(this, outputX + j * 18 + 1, outputY + i * 18 + 1, step.getOutputRate(index) / CalculatorState.getMultiplier());
+				currentOutput.renderValue(parent, outputX + j * 18 + 1, outputY + i * 18 + 1, step.getOutputRate(index) / CalculatorState.getMultiplier());
 			}
 		}
 	}
 
-	@Override
-	public void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+	public void drawTooltip(int mouseX, int mouseY) {
+		if (!isOpen()) return;
+
 		// machine
 		if (mouseX >= this.inputX + inputCols * 18 + 7 && mouseX < this.inputX + inputCols * 18 + 7 + 16 &&
 				mouseY >= this.guiTop + (this.ySize - 15) / 2 - 20 && mouseY < this.guiTop + (this.ySize - 15) / 2 - 20 + 16) {
-			this.drawItemExtraInfoTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, step.getMachine(), I18n.format("necalc.gui.machine_count", step.getMachineCount()));
+			parent.drawItemExtraInfoTooltip(mouseX, mouseY, step.getMachine(), I18n.format("necalc.gui.machine_count", step.getMachineCount()));
 		}
 		// arrow
 		if (mouseX >= this.inputX + inputCols * 18 + 4 && mouseX < this.inputX + inputCols * 18 + 4 + 22 &&
@@ -99,7 +111,7 @@ public class GuiRecipe extends GuiCommon {
 			double time = step.getRecipeTime();
 			String secStr = String.format("%.2f", time / 20.0);
 			String tickStr = String.format("%.2f", time);
-			this.drawHoveringText(I18n.format("necalc.gui.recipe.time", secStr, tickStr, MachineState.getMachineSpeeds().get(step.getMachine())), mouseX - this.guiLeft, mouseY - this.guiTop);
+			parent.drawHoveringText(I18n.format("necalc.gui.arrow_time", secStr, tickStr, MachineState.getMachineSpeeds().get(step.getMachine())), mouseX, mouseY);
 		}
 
 		// inputs
@@ -107,7 +119,7 @@ public class GuiRecipe extends GuiCommon {
 			int index = getInputAt(mouseX, mouseY);
 			Ingredients currentInput = step.getInputs().get(index);
 			String text = String.format("%.4f", step.getPrimaryInputRate() / CalculatorState.getMultiplier()) + GuiProductionCalc.rateLabels[CalculatorState.getDisplayRate()];
-			this.drawItemExtraInfoTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, currentInput, I18n.format("necalc.gui.target_rate", text));
+			parent.drawItemExtraInfoTooltip(mouseX, mouseY, currentInput, I18n.format("necalc.gui.target_rate", text));
 		}
 
 		// outputs
@@ -115,19 +127,33 @@ public class GuiRecipe extends GuiCommon {
 			int index = getOutputAt(mouseX, mouseY);
 			Ingredients currentOutput = step.getOutputs().get(index);
 			String text = String.format("%.4f", step.getPrimaryInputRate() / CalculatorState.getMultiplier()) + GuiProductionCalc.rateLabels[CalculatorState.getDisplayRate()];
-			this.drawItemExtraInfoTooltip(mouseX - this.guiLeft, mouseY - this.guiTop, currentOutput, I18n.format("necalc.gui.target_rate", text));
+			parent.drawItemExtraInfoTooltip(mouseX, mouseY, currentOutput, I18n.format("necalc.gui.target_rate", text));
 		}
-	}
-	
-	@Override
-	public void keyTyped(char typedChar, int keyCode) throws IOException {
-		if (keyCode == Keyboard.KEY_ESCAPE || typedChar == 'e') {
-			mc.displayGuiScreen(parent);
-			return;
-		}
-		super.keyTyped(typedChar, keyCode);
 	}
 
+	public List<Rectangle> area() {
+		if (!isOpen()) return null;
+		List<Rectangle> res = new ArrayList<>();
+		res.add(new Rectangle(guiLeft, guiTop, xSize, ySize));
+		return res;
+	}
+
+	public Ingredients getHoveredStack(int mouseX, int mouseY) {
+		if (!isOpen()) return Ingredients.EMPTY;
+		int inputIndex = getInputAt(mouseX, mouseY);
+		if (inputIndex != -1) {
+			return step.getInputs().get(inputIndex);
+		}
+		if (mouseX >= this.inputX + inputCols * 18 + 7 && mouseX < this.inputX + inputCols * 18 + 7 + 16 &&
+				mouseY >= this.guiTop + (this.ySize - 15) / 2 - 20 && mouseY < this.guiTop + (this.ySize - 15) / 2 - 20 + 16) {
+			return step.getMachine();
+		}
+		int outputIndex = getOutputAt(mouseX, mouseY);
+		if (outputIndex != -1) {
+			return step.getOutputs().get(outputIndex);
+		}
+		return Ingredients.EMPTY;
+	}
 
 	// Helpers
 	private int formatRows(int count) {
@@ -167,4 +193,5 @@ public class GuiRecipe extends GuiCommon {
 		if (index >= step.getOutputs().size()) return -1;
 		return index;
 	}
+
 }

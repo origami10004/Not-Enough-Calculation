@@ -90,22 +90,22 @@ public class GuiManageMachines extends GuiCommon {
 	}
 
 	@Override
-	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+	protected void renderHoveredToolTip(int mouseX, int mouseY) {
 		List<Map.Entry<Ingredients, Integer>> machineKeys = new ArrayList<>(MachineState.getMachineSpeeds().entrySet());
 		
 		if (editor.hovered(mouseX, mouseY)) {
 			return;
 		}
 
-		drawTabTooltips(mouseX - this.guiLeft, mouseY - this.guiTop, this.gx - this.guiLeft, this.gy - this.guiTop);
+		drawTabTooltips(mouseX, mouseY, this.gx, this.gy);
 
 		int index = getMachineAt(mouseX, mouseY);
 		if (index != -1) {
 			if (index < machineKeys.size()) {
 				Map.Entry<Ingredients, Integer> entry = machineKeys.get(index);
 				if (entry.getKey() != null && !entry.getKey().isEmpty()) {
-					drawItemExtraInfoTooltip(mouseX - this.guiLeft,
-							mouseY - this.guiTop, entry.getKey(),
+					drawItemExtraInfoTooltip(mouseX,
+							mouseY, entry.getKey(),
 							I18n.format("necalc.gui.machine_speed", entry.getValue()));
 				}
 			}
@@ -114,8 +114,14 @@ public class GuiManageMachines extends GuiCommon {
 		if (mouseX >= this.gx + 174 && mouseX < this.gx + 188 && mouseY >= this.gy + TAB_H + 3 && mouseY < this.gy + TAB_H + 16) {
 			this.drawHoveringText(
 					fontRenderer.listFormattedStringToWidth(I18n.format("necalc.gui.machine_help"), 100),
-					mouseX - this.guiLeft, mouseY - this.guiTop);
+					mouseX, mouseY);
 		}
+	}
+
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		super.drawScreen(mouseX, mouseY, partialTicks);
+		this.renderHoveredToolTip(mouseX, mouseY);
 	}
 
 	@Override
@@ -174,9 +180,6 @@ public class GuiManageMachines extends GuiCommon {
 	public void handleMouseInput() throws IOException {
 		int scroll = Mouse.getEventDWheel();
 		if (scroll != 0) {
-			int mouseX = Mouse.getEventX() * this.width / this.mc.displayWidth;
-			int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
-
 			int scrollRows = Math.max(0, MachineState.getMachineRows() - ROWS);
 			if (scrollRows <= 0) return;
 			if (scroll > 0) {

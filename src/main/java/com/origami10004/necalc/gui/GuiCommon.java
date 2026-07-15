@@ -16,6 +16,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.List;
+import java.awt.Rectangle;
 
 public abstract class GuiCommon extends GuiContainer {
 	protected static final int TAB_H			= 28;
@@ -267,5 +268,9 @@ public abstract class GuiCommon extends GuiContainer {
 
 	public Ingredients getHoveredStack(int mouseX, int mouseY) {
 		return Ingredients.EMPTY;
+	}
+
+	public List<Rectangle> getExtraGuiArea() {
+		return null;
 	}
 }
