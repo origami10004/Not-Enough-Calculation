@@ -22,9 +22,15 @@ necalc.gui.rate.ticks=/t
 necalc.gui.target_rate=速率：%s
 necalc.gui.machine_count=数量：%s
 necalc.gui.results=所需生产速率
+necalc.gui.inputs=所需输入速率
 necalc.gui.inventory=物品栏
-necalc.gui.show.some=显示隐藏配方（%d）
-necalc.gui.show.none=显示隐藏配方（无）
+necalc.gui.show_recipe.some=显示隐藏配方（%d）
+necalc.gui.show_recipe.none=显示隐藏配方（无）
+necalc.gui.show_input.some=显示隐藏配方（%d）
+necalc.gui.show_input.none=显示隐藏配方（无）
+
+# recipe viewer
+necalc.gui.arrow_time=处理时间：%s秒（%s刻），加速倍率：%dx
 
 # recipe editor gui
 necalc.gui.recipe.add=新建配方
@@ -36,7 +42,8 @@ necalc.gui.recipe.time=时间（刻）
 necalc.gui.recipe.confirm=确认
 necalc.gui.recipe.cancel=取消
 necalc.gui.recipe.delete=删除
-necalc.gui.recipe_help=使用 Shift + 滚轮来递增数量，或者使用 Ctrl + Shift + 滚轮加倍数量
+necalc.gui.recipe_help=按住 Shift 滚动滚轮来增减输入和输出的数量，按住 Ctrl + Shift 滚动滚轮则可令数量翻倍。
+
 
 # recipe manager gui
 necalc.gui.recipe_manager=已编码配方
