@@ -26,8 +26,8 @@ necalc.gui.inputs=Required Input Rates
 necalc.gui.inventory=Inventory
 necalc.gui.show_recipe.some=Show Hidden Recipes (%d hidden)
 necalc.gui.show_recipe.none=Show Hidden Recipes (none)
-necalc.gui.show_input.some=Show Hidden Recipes (%d hidden)
-necalc.gui.show_input.none=Show Hidden Recipes (none)
+necalc.gui.show_input.some=Show Hidden Inputs (%d hidden)
+necalc.gui.show_input.none=Show Hidden Inputs (none)
 
 # recipe viewer
 necalc.gui.arrow_time=Processing time: %s seconds (%s ticks) with %dx speed up
