@@ -93,11 +93,6 @@ public class GuiProductionCalc extends GuiCommon {
 	}
 
 	@Override
-	public boolean doesGuiPauseGame() {
-		return false;
-	}
-
-	@Override
 	public void initGui() {
 		this.xSize = GUI_WIDTH;
 		this.ySize = GUI_HEIGHT + TAB_H;
@@ -689,7 +684,7 @@ public class GuiProductionCalc extends GuiCommon {
 				break;
 			case 1:
 				this.editOverlay.close();
-				// mc.displayGuiScreen(new GuiFlowChart(playerInv, container));
+				mc.displayGuiScreen(new GuiFlowChart(playerInv));
 				break;
 			case 2:
 				this.editOverlay.close();

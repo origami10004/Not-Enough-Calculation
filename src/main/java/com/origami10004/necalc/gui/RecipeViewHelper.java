@@ -156,7 +156,7 @@ public class RecipeViewHelper {
 	}
 
 	// Helpers
-	private int formatRows(int count) {
+	public static int formatRows(int count) {
 		if (count <= 3) return 1;
 		if (count == 4) return 2;
 		if (count <= 9) return 3;

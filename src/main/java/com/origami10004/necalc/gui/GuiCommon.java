@@ -37,6 +37,11 @@ public abstract class GuiCommon extends GuiContainer {
 		super(container);
 		container.setGui(this);
 	}
+	
+	@Override
+	public boolean doesGuiPauseGame() {
+		return false;
+	}
 
 	protected void drawRectPanel(int x, int y, int w, int h, int fillColor) {
 		assert w > 6 && h > 6 : "Panel too small for borders";

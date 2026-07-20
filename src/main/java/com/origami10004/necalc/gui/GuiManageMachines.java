@@ -218,7 +218,7 @@ public class GuiManageMachines extends GuiCommon {
 				mc.displayGuiScreen(new GuiProductionCalc(this.playerInv));
 				break;
 			case 1:
-				//mc.displayGuiScreen(new GuiFlowChart(this.playerInv));
+				mc.displayGuiScreen(new GuiFlowChart(this.playerInv));
 				break;
 			case 2:
 				mc.displayGuiScreen(new GuiManageRecipes(this.playerInv));
