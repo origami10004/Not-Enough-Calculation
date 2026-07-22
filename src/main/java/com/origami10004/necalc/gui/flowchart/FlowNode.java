@@ -3,8 +3,8 @@ package com.origami10004.necalc.gui.flowchart;
 import com.origami10004.necalc.gui.GuiFlowChart;
 
 public class FlowNode {
-	private double canvasX;
-	private double canvasY;
+	protected double canvasX;
+	protected double canvasY;
 	private int width = 0;
 	private int height = 0;
 	private double dragOffsetX = 0;
@@ -55,13 +55,8 @@ public class FlowNode {
 	}
 
 	public void draw(GuiFlowChart gui) {
-		int screenX = FlowControl.toScreenX(canvasX);
-		int screenY = FlowControl.toScreenY(canvasY);
-		int screenWidth = (int) (width * FlowControl.getZoom());
-		int screenHeight = (int) (height * FlowControl.getZoom());
-
 		// Draw the node as a rectangle
-		gui.drawRect(screenX, screenY, screenX + screenWidth, screenY + screenHeight, 0xFFAAAAAA);
+		gui.drawRect((int) canvasX, (int) canvasY, (int) (canvasX + width), (int) (canvasY + height), 0xFFAAAAAA);
 	}
 
 	public void startDragging(double mouseX, double mouseY) {
@@ -72,5 +67,12 @@ public class FlowNode {
 
 	public void stopDragging() {
 		isDragging = false;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+	public int getWidth() {
+		return width;
 	}
 }

@@ -192,4 +192,8 @@ public class CalculatorState {
 	public static void showAllInputs() {
 		recipeInputs.values().forEach(input -> input.hidden = false);
 	}
+
+	public static List<ProductionStep> getAllRecipes() {
+		return recipeSteps;
+	}
 }

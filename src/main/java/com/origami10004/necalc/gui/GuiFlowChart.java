@@ -2,12 +2,16 @@ package com.origami10004.necalc.gui;
 
 import java.io.IOException;
 
+import org.lwjgl.opengl.GL11;
+
 import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.data.RecipeState;
 import com.origami10004.necalc.gui.flowchart.FlowControl;
 import com.origami10004.necalc.gui.flowchart.FlowNode;
 import com.origami10004.necalc.proxy.ClientProxy;
 
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 
@@ -41,7 +45,7 @@ public class GuiFlowChart extends GuiCommon {
 		this.ySize = GUI_HEIGHT + TAB_H;
 		super.initGui();
 
-		FlowControl.init();
+		FlowControl.init(this);
 	}
 
 	@Override
@@ -51,13 +55,35 @@ public class GuiFlowChart extends GuiCommon {
 		drawModalRectWithCustomSizedTexture(guiLeft, guiTop + TAB_H, 0, 0, GUI_WIDTH, GUI_HEIGHT, GUI_WIDTH, GUI_HEIGHT);
 		drawTabStrip(guiLeft, guiTop);
 
+		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		int scissorX = this.guiLeft + 8;
+		int scissorY = this.height - (this.guiTop + TAB_H + 17 + 274); // flip Y
+		int scissorW = 534;
+		int scissorH = 274;
+
+		// Scale by Minecraft's GUI scale factor
+		int scale = new ScaledResolution(mc).getScaleFactor();
+		GL11.glScissor(
+			scissorX * scale,
+			scissorY * scale,
+			scissorW * scale,
+			scissorH * scale
+		);
+
 		for (int i = 0; i < FlowControl.getEdges().size(); i++) {
 			FlowControl.getEdges().get(i).draw();
 		}
 
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(-FlowControl.getPanX(), -FlowControl.getPanY(), 0);
+		GlStateManager.scale((float) FlowControl.getZoom(), (float) FlowControl.getZoom(), 1.0f);
+		
 		for (int i = 0; i < FlowControl.getNodes().size(); i++) {
 			FlowControl.getNodes().get(i).draw(this);
 		}
+
+		GlStateManager.popMatrix();
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
 	}
 
@@ -72,21 +98,22 @@ public class GuiFlowChart extends GuiCommon {
 			}
 		}
 
-		double cx = FlowControl.toCanvasX(mouseX);
-		double cy = FlowControl.toCanvasY(mouseY);
-
-		// dragging node
-		for (int i = 0; i < FlowControl.getNodes().size(); i++) {
-			FlowNode node = FlowControl.getNodes().get(i);
-			if (node.containsPoint(cx, cy)) {
-				Necalc.logger.info("Clicked on node at canvas coordinates: (" + cx + ", " + cy + ")");
-				node.startDragging(cx, cy);
-				draggingNode = node;
-				return;
-			}
-		}
-		// Panning
 		if (mouseX >= guiLeft + 8 && mouseX < guiLeft + 542 && mouseY >= guiTop + 17 + 28 && mouseY < guiTop + 291 + 28) {
+			double cx = FlowControl.toCanvasX(mouseX);
+			double cy = FlowControl.toCanvasY(mouseY);
+
+			// dragging node
+			for (int i = 0; i < FlowControl.getNodes().size(); i++) {
+				FlowNode node = FlowControl.getNodes().get(i);
+				if (node.containsPoint(cx, cy)) {
+					Necalc.logger.info("Clicked on node at canvas coordinates: (" + cx + ", " + cy + ")");
+					node.startDragging(cx, cy);
+					draggingNode = node;
+					return;
+				}
+			}
+			
+			// Panning
 			Necalc.logger.info("Panning started at screen coordinates: (" + mouseX + ", " + mouseY + ")");
 			isPanning = true;
 			panStartX = mouseX;
