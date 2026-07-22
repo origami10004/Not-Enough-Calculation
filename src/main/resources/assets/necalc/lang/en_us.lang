@@ -7,7 +7,7 @@ necalc.key.open_calc_gui=Open production calculator
 
 # gui tabs
 necalc.gui.tab.main=Production Planner
-necalc.gui.tab.flow=Flow Chart View (Coming soon!)
+necalc.gui.tab.flow=Flow Chart View
 necalc.gui.tab.recipes=Recipe Manager
 necalc.gui.tab.machine=Machine Speed Manager
 necalc.gui.tab.add=Add Recipe
@@ -51,3 +51,6 @@ necalc.gui.recipe_manager=Encoded Recipes
 necalc.gui.machine_manager=Machine manager
 necalc.gui.machine_speed=Machine speed: %d
 necalc.gui.machine_help=Use this menu to edit machine speeds for all recipes using the machine
+
+# Flowchart gui
+necalc.gui.flowchart=Flowchart view

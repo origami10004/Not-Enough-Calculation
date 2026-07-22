@@ -1,8 +1,9 @@
 package com.origami10004.necalc.gui.flowchart;
 
 import com.origami10004.necalc.gui.GuiFlowChart;
+import com.origami10004.necalc.data.ingredient.Ingredients;
 
-public class FlowNode {
+public abstract class FlowNode {
 	protected double canvasX;
 	protected double canvasY;
 	private int width = 0;
@@ -54,10 +55,6 @@ public class FlowNode {
 		return x >= canvasX && x <= canvasX + width && y >= canvasY && y <= canvasY + height;
 	}
 
-	public void draw(GuiFlowChart gui) {
-		// Draw the node as a rectangle
-		gui.drawRect((int) canvasX, (int) canvasY, (int) (canvasX + width), (int) (canvasY + height), 0xFFAAAAAA);
-	}
 
 	public void startDragging(double mouseX, double mouseY) {
 		isDragging = true;
@@ -75,4 +72,8 @@ public class FlowNode {
 	public int getWidth() {
 		return width;
 	}
+
+	public abstract void draw(GuiFlowChart gui);
+	public abstract void drawHoveredToolTip(GuiFlowChart gui, int mouseX, int mouseY);
+	public abstract Ingredients hoveredStack(int mouseX, int mouseY);
 }

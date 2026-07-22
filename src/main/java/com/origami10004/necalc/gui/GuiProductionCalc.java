@@ -46,7 +46,7 @@ public class GuiProductionCalc extends GuiCommon {
 	private static final int TABLE_VIS_ROWS = 5;
 
 	private static final int HIDE_SIZE = 12;
-	protected static final String [] rateLabels = {I18n.format("necalc.gui.rate.minute"), I18n.format("necalc.gui.rate.second"), I18n.format("necalc.gui.rate.ticks")};
+	public static final String [] rateLabels = {I18n.format("necalc.gui.rate.minute"), I18n.format("necalc.gui.rate.second"), I18n.format("necalc.gui.rate.ticks")};
 
 
 	// Other constants

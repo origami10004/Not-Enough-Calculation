@@ -33,10 +33,10 @@ public class FlowControl {
 		return (int) ((canvasY - panY) * zoom);
 	}
 	public static double toCanvasX(int screenX) {
-		return screenX / zoom + panX;
+		return (screenX / zoom) + panX;
 	}
 	public static double toCanvasY(int screenY) {
-		return screenY / zoom + panY;
+		return (screenY / zoom) + panY;
 	}
 
 	public static void reset() {

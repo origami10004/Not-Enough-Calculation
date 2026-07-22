@@ -9,6 +9,7 @@ import com.origami10004.necalc.data.ingredient.Ingredients;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.I18n;
 
 public class FlowRecipeNode extends FlowNode {
 	private static final ResourceLocation ARROW_TEXTURE = new ResourceLocation("necalc", "textures/gui/arrow.png");
@@ -92,5 +93,76 @@ public class FlowRecipeNode extends FlowNode {
 	@Override
 	public double getOutputY(int index) {
 		return canvasY + this.getHeight() / 2.0;
+	}
+
+	@Override
+	public void drawHoveredToolTip(GuiFlowChart gui, int mouseX, int mouseY) {
+		int canvasMouseX = (int) FlowControl.toCanvasX(mouseX);
+		int canvasMouseY = (int) FlowControl.toCanvasY(mouseY);
+		
+		if (getInputAt(canvasMouseX, canvasMouseY) != -1) {
+			int index = getInputAt(canvasMouseX, canvasMouseY);
+			Ingredients ingredient = step.getInputs().get(index);
+			String text = String.format("%.4f", step.getInputRate(index) / CalculatorState.getMultiplier()) + GuiProductionCalc.rateLabels[CalculatorState.getDisplayRate()];
+			gui.drawItemExtraInfoTooltip(mouseX, mouseY, ingredient, I18n.format("necalc.gui.target_rate", text));
+			return;
+		}
+
+		if (getOutputAt(canvasMouseX, canvasMouseY) != -1) {
+			int index = getOutputAt(canvasMouseX, canvasMouseY);
+			Ingredients ingredient = step.getOutputs().get(index);
+			String text = String.format("%.4f", step.getOutputRate(index) / CalculatorState.getMultiplier()) + GuiProductionCalc.rateLabels[CalculatorState.getDisplayRate()];
+			gui.drawItemExtraInfoTooltip(mouseX, mouseY, ingredient, I18n.format("necalc.gui.target_rate", text));
+			return;
+		}
+
+		if (canvasMouseX >= this.inputX + inputCols * 18 + 7 && canvasMouseX < this.inputX + inputCols * 18 + 7 + 16 &&
+				canvasMouseY >= this.canvasY + (this.ySize - 15) / 2 - 20 && canvasMouseY < this.canvasY + (this.ySize - 15) / 2 - 20 + 16) {
+			gui.drawItemExtraInfoTooltip(mouseX, mouseY, step.getMachine(), I18n.format("necalc.gui.machine_count", step.getMachineCount()));
+		}
+	}
+
+	@Override
+	public Ingredients hoveredStack(int mouseX, int mouseY) {
+		int canvasMouseX = (int) FlowControl.toCanvasX(mouseX);
+		int canvasMouseY = (int) FlowControl.toCanvasY(mouseY);
+
+		if (getInputAt(canvasMouseX, canvasMouseY) != -1) {
+			int index = getInputAt(canvasMouseX, canvasMouseY);
+			return step.getInputs().get(index);
+		}
+
+		if (getOutputAt(canvasMouseX, canvasMouseY) != -1) {
+			int index = getOutputAt(canvasMouseX, canvasMouseY);
+			return step.getOutputs().get(index);
+		}
+
+		if (canvasMouseX >= this.inputX + inputCols * 18 + 7 && canvasMouseX < this.inputX + inputCols * 18 + 7 + 16 &&
+				canvasMouseY >= this.canvasY + (this.ySize - 15) / 2 - 20 && canvasMouseY < this.canvasY + (this.ySize - 15) / 2 - 20 + 16) {
+			return step.getMachine();
+		}
+
+		return Ingredients.EMPTY;
+	}
+
+	private int getInputAt(int mouseCanvasX, int mouseCanvasY) {
+		if (mouseCanvasX < inputX || mouseCanvasX >= inputX + inputCols * 18 || mouseCanvasY < inputY || mouseCanvasY >= inputY + inputRows * 18) {
+			return -1;
+		}
+		int col = (mouseCanvasX - inputX) / 18;
+		int row = (mouseCanvasY - inputY) / 18;
+		int index = row * inputCols + col;
+		if (index >= step.getInputs().size()) return -1;
+		return index;
+	}
+	private int getOutputAt(int mouseCanvasX, int mouseCanvasY) {
+		if (mouseCanvasX < outputX || mouseCanvasX >= outputX + outputCols * 18 || mouseCanvasY < outputY || mouseCanvasY >= outputY + outputRows * 18) {
+			return -1;
+		}
+		int col = (mouseCanvasX - outputX) / 18;
+		int row = (mouseCanvasY - outputY) / 18;
+		int index = row * outputCols + col;
+		if (index >= step.getOutputs().size()) return -1;
+		return index;
 	}
 }

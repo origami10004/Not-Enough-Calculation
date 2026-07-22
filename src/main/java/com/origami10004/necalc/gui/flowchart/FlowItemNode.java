@@ -3,6 +3,9 @@ package com.origami10004.necalc.gui.flowchart;
 import com.origami10004.necalc.data.CalculatorState;
 import com.origami10004.necalc.data.ingredient.Ingredients;
 import com.origami10004.necalc.gui.GuiFlowChart;
+import com.origami10004.necalc.gui.GuiProductionCalc;
+
+import net.minecraft.client.resources.I18n;
 
 public class FlowItemNode extends FlowNode {
 	private Ingredients ingredient;
@@ -21,5 +24,16 @@ public class FlowItemNode extends FlowNode {
 
 	public void setValue(double value) {
 		this.ingredient.setValue(value);
+	}
+
+	@Override
+	public void drawHoveredToolTip(GuiFlowChart gui, int mouseX, int mouseY) {
+		String text = String.format("%.4f", ingredient.getValue() / CalculatorState.getMultiplier()) + GuiProductionCalc.rateLabels[CalculatorState.getDisplayRate()];
+		gui.drawItemExtraInfoTooltip(mouseX, mouseY, ingredient, I18n.format("necalc.gui.target_rate", text));
+	}
+
+	@Override
+	public Ingredients hoveredStack(int mouseX, int mouseY) {
+		return ingredient;
 	}
 }

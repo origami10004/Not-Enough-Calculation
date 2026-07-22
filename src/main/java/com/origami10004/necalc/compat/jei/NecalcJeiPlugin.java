@@ -4,6 +4,7 @@ import com.origami10004.necalc.gui.GuiProductionCalc;
 import com.origami10004.necalc.gui.GuiRecipeEditor;
 import com.origami10004.necalc.gui.GuiManageRecipes;
 import com.origami10004.necalc.gui.GuiManageMachines;
+import com.origami10004.necalc.gui.GuiFlowChart;
 
 import mezz.jei.api.JEIPlugin;
 import mezz.jei.api.recipe.transfer.IRecipeTransferRegistry;
@@ -28,6 +29,7 @@ public class NecalcJeiPlugin implements IModPlugin {
 		registry.addAdvancedGuiHandlers(new NecalcGuiHandler<>(GuiManageMachines.class));
 		registry.addAdvancedGuiHandlers(new NecalcGuiHandler<>(GuiManageRecipes.class));
 		registry.addAdvancedGuiHandlers(new NecalcGuiHandler<>(GuiRecipeEditor.class));
+		registry.addAdvancedGuiHandlers(new NecalcGuiHandler<>(GuiFlowChart.class));
 
 		IRecipeTransferRegistry transferRegistry = registry.getRecipeTransferRegistry();
 		transferRegistry.addUniversalRecipeTransferHandler(new NecalcRecipeTransferHandler());

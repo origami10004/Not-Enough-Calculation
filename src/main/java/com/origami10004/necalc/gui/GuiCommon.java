@@ -185,7 +185,7 @@ public abstract class GuiCommon extends GuiContainer {
 		}
 	}
 
-	protected void drawItemExtraInfoTooltip(int mouseX, int mouseY, Ingredients ing, String extraInfo) {
+	public void drawItemExtraInfoTooltip(int mouseX, int mouseY, Ingredients ing, String extraInfo) {
 		
 		List<String> tooltip = ing.getTooltip(this.mc);
 		tooltip.add(1, extraInfo);

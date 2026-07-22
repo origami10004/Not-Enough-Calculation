@@ -9,11 +9,13 @@ import com.origami10004.necalc.data.RecipeState;
 import com.origami10004.necalc.gui.flowchart.FlowControl;
 import com.origami10004.necalc.gui.flowchart.FlowNode;
 import com.origami10004.necalc.proxy.ClientProxy;
+import com.origami10004.necalc.data.ingredient.Ingredients;
 
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.I18n;
 
 public class GuiFlowChart extends GuiCommon {
 	private static final ResourceLocation BG_TEXTURE = new ResourceLocation("necalc", "textures/gui/flowchart.png");
@@ -54,6 +56,7 @@ public class GuiFlowChart extends GuiCommon {
 		mc.getTextureManager().bindTexture(BG_TEXTURE);
 		drawModalRectWithCustomSizedTexture(guiLeft, guiTop + TAB_H, 0, 0, GUI_WIDTH, GUI_HEIGHT, GUI_WIDTH, GUI_HEIGHT);
 		drawTabStrip(guiLeft, guiTop);
+		this.fontRenderer.drawString(I18n.format("necalc.gui.flowchart" ), this.guiLeft + 8, this.guiTop + TAB_H + 6, 0xFF000000);
 
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		int scissorX = this.guiLeft + 8;
@@ -106,7 +109,6 @@ public class GuiFlowChart extends GuiCommon {
 			for (int i = 0; i < FlowControl.getNodes().size(); i++) {
 				FlowNode node = FlowControl.getNodes().get(i);
 				if (node.containsPoint(cx, cy)) {
-					Necalc.logger.info("Clicked on node at canvas coordinates: (" + cx + ", " + cy + ")");
 					node.startDragging(cx, cy);
 					draggingNode = node;
 					return;
@@ -114,7 +116,6 @@ public class GuiFlowChart extends GuiCommon {
 			}
 			
 			// Panning
-			Necalc.logger.info("Panning started at screen coordinates: (" + mouseX + ", " + mouseY + ")");
 			isPanning = true;
 			panStartX = mouseX;
 			panStartY = mouseY;
@@ -170,5 +171,32 @@ public class GuiFlowChart extends GuiCommon {
 				mc.displayGuiScreen(new GuiRecipeEditor(this.playerInv, this, true));
 				break;
 		}
+	}
+
+	@Override
+	public void renderHoveredToolTip(int mouseX, int mouseY) {
+		for (int i = 0; i < FlowControl.getNodes().size(); i++) {
+			if (FlowControl.getNodes().get(i).containsPoint(FlowControl.toCanvasX(mouseX), FlowControl.toCanvasY(mouseY))) {
+				FlowControl.getNodes().get(i).drawHoveredToolTip(this, mouseX, mouseY);
+				return;
+			}
+		}
+		super.renderHoveredToolTip(mouseX, mouseY);
+	}
+
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		super.drawScreen(mouseX, mouseY, partialTicks);
+		this.renderHoveredToolTip(mouseX, mouseY);
+	}
+
+	@Override
+	public Ingredients getHoveredStack(int mouseX, int mouseY) {
+		for (int i = 0; i < FlowControl.getNodes().size(); i++) {
+			if (FlowControl.getNodes().get(i).containsPoint(FlowControl.toCanvasX(mouseX), FlowControl.toCanvasY(mouseY))) {
+				return FlowControl.getNodes().get(i).hoveredStack(mouseX, mouseY);
+			}
+		}
+		return Ingredients.EMPTY;
 	}
 }
