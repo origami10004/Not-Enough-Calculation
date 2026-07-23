@@ -501,10 +501,10 @@ public class GuiProductionCalc extends GuiCommon {
 		}
 
 		// Production step hide/show toggle (left click)
-		int prodRow = getProdRowAt(mouseX, mouseY);
-		if (prodRow != -1) {
-			if (mouseButton == 0) {
-				if (showProd) {
+		if (showProd) {
+			int prodRow = getProdRowAt(mouseX, mouseY);
+			if (prodRow != -1 && prodRow < CalculatorState.getVisibleRecipes().size()) {
+				if (mouseButton == 0) {
 					List<ProductionStep> visible = CalculatorState.getVisibleRecipes();
 					int rowX = gx + INDENT_L + 1;
 					int rowW = GUI_WIDTH - INDENT_L - INDENT_R - 2;
@@ -521,22 +521,27 @@ public class GuiProductionCalc extends GuiCommon {
 					}
 
 					// Open recipe view (also left click)
-					if (CalculatorState.getVisibleRecipes().size() <= TABLE_VIS_ROWS || mouseY < this.gy + TAB_H + 35) {
+					if (mouseX < rowX + rowW) {
 						// open recipe view
 						this.recipeViewHelper.open(visible.get(prodRow));
 						return;
 					}
-				} else {
+				}
+			}
+		} else {
+			int inputRow = getInputRowAt(mouseX, mouseY);
+			if (inputRow != -1 && inputRow < CalculatorState.getVisibleInputs().size()) {
+				if (mouseButton == 0) {
 					List<Map.Entry<Ingredients, Solver.Input>> visible = new ArrayList<>(CalculatorState.getVisibleInputs().entrySet());
 					int rowX = gx + INDENT_L + 1;
 					int rowW = GUI_WIDTH - INDENT_L - INDENT_R - 2;
 					if (visible.size() > TABLE_VIS_ROWS) rowW -= SB_W + 2;
-					int rowY = 1 + prodTableY + (prodRow - inputScrollRow) * TABLE_ROW_H;
+					int rowY = 1 + prodTableY + (inputRow - inputScrollRow) * TABLE_ROW_H;
 					int eyeX = rowX + rowW - 14;
 					int eyeY = rowY + (TABLE_ROW_H - HIDE_SIZE) / 2;
 					if (mouseX >= eyeX && mouseX < eyeX + HIDE_SIZE
 							&& mouseY >= eyeY && mouseY < eyeY + HIDE_SIZE) {
-						CalculatorState.hideInput(visible.get(prodRow).getKey());
+						CalculatorState.hideInput(visible.get(inputRow).getKey());
 						this.inputScrollRow = Math.min(this.inputScrollRow, Math.max(0, CalculatorState.getVisibleInputs().size() - TABLE_VIS_ROWS));
 						this.inputScrollPercent = (float) this.inputScrollRow / Math.max(1, CalculatorState.getVisibleInputs().size() - TABLE_VIS_ROWS);
 						return;
@@ -719,6 +724,16 @@ public class GuiProductionCalc extends GuiCommon {
 
 		return this.prodScrollRow + (mouseY - (prodY)) / TABLE_ROW_H;
 	}
+	private int getInputRowAt(int mouseX, int mouseY) {
+		int rowX = this.gx + INDENT_L + 1;
+		int rowW = GUI_WIDTH - INDENT_L - INDENT_R - 2;
+		if (mouseX < rowX || mouseX >= rowX + rowW) return -1;
+
+		int inputY = this.gy + TAB_H + 35 + 6 + TARGET_ROWS * SLOT_SIZE + 18;
+		if (mouseY < inputY || mouseY >= inputY + TABLE_VIS_ROWS * TABLE_ROW_H) return -1;
+
+		return this.inputScrollRow + (mouseY - (inputY)) / TABLE_ROW_H;
+	}
 
 	public int getTargetScrollRow() {
 		return this.targetScrollRow;
@@ -741,9 +756,9 @@ public class GuiProductionCalc extends GuiCommon {
 		if (targetSlot != -1) {
 			return CalculatorState.getTargetSlot(targetSlot);
 		}
-		int prodRow = getProdRowAt(mouseX, mouseY);
-		if (prodRow != -1) {
-			if (showProd) {
+		if (showProd) {
+			int prodRow = getProdRowAt(mouseX, mouseY);
+			if (prodRow != -1) {
 				List<ProductionStep> visible = CalculatorState.getVisibleRecipes();
 				if (prodRow < visible.size()) {
 					ProductionStep step = visible.get(prodRow);
@@ -771,10 +786,13 @@ public class GuiProductionCalc extends GuiCommon {
 					// None of the other icons were hovered, default to output item
 					return step.getPrimaryOutput();
 				}
-			} else {
+			}
+		} else {
+			int inputRow = getInputRowAt(mouseX, mouseY);
+			if (inputRow != -1) {
 				List<Map.Entry<Ingredients, Solver.Input>> visible = new ArrayList<>(CalculatorState.getVisibleInputs().entrySet());
-				if (prodRow < visible.size()) {
-					return visible.get(prodRow).getKey();
+				if (inputRow < visible.size()) {
+					return visible.get(inputRow).getKey();
 				}
 			}
 		}
