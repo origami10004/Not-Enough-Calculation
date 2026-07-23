@@ -3,6 +3,7 @@ package com.origami10004.necalc.gui;
 import java.io.IOException;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.input.Mouse;
 
 import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.data.RecipeState;
@@ -78,8 +79,8 @@ public class GuiFlowChart extends GuiCommon {
 		}
 
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(-FlowControl.getPanX(), -FlowControl.getPanY(), 0);
 		GlStateManager.scale((float) FlowControl.getZoom(), (float) FlowControl.getZoom(), 1.0f);
+		GlStateManager.translate(-FlowControl.getPanX(), -FlowControl.getPanY(), 0);
 		
 		for (int i = 0; i < FlowControl.getNodes().size(); i++) {
 			FlowControl.getNodes().get(i).draw(this);
@@ -150,6 +151,18 @@ public class GuiFlowChart extends GuiCommon {
 		if (isPanning) {
 			isPanning = false;
 		}
+	}
+
+	@Override
+	public void handleMouseInput() throws IOException {
+		int scroll = Mouse.getEventDWheel();
+		if (scroll != 0) {
+			int mouseX = Mouse.getEventX() * this.width / this.mc.displayWidth;
+			int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
+
+			FlowControl.zoom(scroll, mouseX, mouseY);
+		}
+		super.handleMouseInput();
 	}
 
 	// Helper functions

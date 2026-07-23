@@ -2,6 +2,7 @@ package com.origami10004.necalc.gui.flowchart;
 
 import net.minecraft.client.Minecraft;
 
+import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.data.CalculatorState;
 import com.origami10004.necalc.data.ProductionStep;
 import com.origami10004.necalc.gui.GuiCommon;
@@ -284,5 +285,18 @@ public class FlowControl {
 	}
 	public static int getPanY() {
 		return panY;
+	}
+
+	public static void zoom(int scroll, int mouseX, int mouseY) {
+		double oldZoom = zoom;
+		if (scroll > 0) {
+			zoom *= 1.1;
+		} else if (scroll < 0) {
+			zoom /= 1.1;
+		}
+		zoom = Math.max(0.1, Math.min(zoom, 1.0));
+
+		panX += (mouseX / oldZoom) - (mouseX / zoom);
+		panY += (mouseY / oldZoom) - (mouseY / zoom);
 	}
 }

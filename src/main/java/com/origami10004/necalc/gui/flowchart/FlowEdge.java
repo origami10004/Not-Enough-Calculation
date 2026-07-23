@@ -27,8 +27,22 @@ public class FlowEdge {
 		int y1 = FlowControl.toScreenY(endY());
 
 		int color = 0xFFFFFFFF;
-		// straight line, change to horizontal and vertical instead of diagonal
-		drawline(x0, y0, x1, y1, color, 1.0f);
+
+		if (endX() > startX()) {
+			// regular line
+			int midX = (x0 + x1) / 2;
+			drawline(x0, y0, midX, y0, color, 1.0f);
+			drawline(midX, y0, midX, y1, color, 1.0f);
+			drawline(midX, y1, x1, y1, color, 1.0f);
+		} else {
+			// loopback line
+			int bottomY = FlowControl.toScreenY(Math.max(source.getCanvasY() + source.getHeight(), destination.getCanvasY() + destination.getHeight()) + 10);
+			drawline(x0, y0, FlowControl.toScreenX(startX() + 10), y0, color, 1.0f);
+			drawline(FlowControl.toScreenX(startX() + 10), y0, FlowControl.toScreenX(startX() + 10), bottomY, color, 1.0f);
+			drawline(FlowControl.toScreenX(startX() + 10), bottomY, FlowControl.toScreenX(endX() - 10), bottomY, color, 1.0f);
+			drawline(FlowControl.toScreenX(endX() - 10), bottomY, FlowControl.toScreenX(endX() - 10), y1, color, 1.0f);
+			drawline(FlowControl.toScreenX(endX() - 10), y1, x1, y1, color, 1.0f);
+		}
 	}
 
 	// helper
