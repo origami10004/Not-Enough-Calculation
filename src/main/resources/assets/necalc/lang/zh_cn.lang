@@ -7,7 +7,7 @@ necalc.key.open_calc_gui=打开生产计算器
 
 # gui tabs
 necalc.gui.tab.main=生产计划
-necalc.gui.tab.flow=流程图视图（即将推出！）
+necalc.gui.tab.flow=流程图视图
 necalc.gui.tab.recipes=配方管理器
 necalc.gui.tab.machine=机器速度管理器
 necalc.gui.tab.add=添加配方
@@ -44,7 +44,6 @@ necalc.gui.recipe.cancel=取消
 necalc.gui.recipe.delete=删除
 necalc.gui.recipe_help=按住 Shift 滚动滚轮来增减输入和输出的数量，按住 Ctrl + Shift 滚动滚轮则可令数量翻倍。
 
-
 # recipe manager gui
 necalc.gui.recipe_manager=已编码配方
 
@@ -52,3 +51,6 @@ necalc.gui.recipe_manager=已编码配方
 necalc.gui.machine_manager=机器管理器
 necalc.gui.machine_speed=机器速度：%d
 necalc.gui.machine_help=使用此菜单编辑所有配方中该机器的速度
+
+# Flowchart gui
+necalc.gui.flowchart=流程图视图
