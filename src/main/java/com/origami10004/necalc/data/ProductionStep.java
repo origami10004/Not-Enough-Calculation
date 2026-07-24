@@ -14,14 +14,16 @@ public class ProductionStep {
 	private double machineCount;
 	private double recipePerMinute;
 	private boolean hidden = false;
+	private int recipeTime;
 
-	public ProductionStep(List<Ingredients> inputs, List<Ingredients> outputs, Ingredients machine, double machineCount, double recipePerMinute) {
-		this.inputs = inputs;
-		this.outputs = outputs;
-		this.machine = machine;
-		this.machineCount = machineCount;
-		this.recipePerMinute = recipePerMinute;
-	}
+	// public ProductionStep(List<Ingredients> inputs, List<Ingredients> outputs, Ingredients machine, double machineCount, double recipePerMinute) {
+	// 	this.inputs = inputs;
+	// 	this.outputs = outputs;
+	// 	this.machine = machine;
+	// 	this.machineCount = machineCount;
+	// 	this.recipePerMinute = recipePerMinute;
+	// 	this.recipeTime = 0;
+	// }
 
 	public ProductionStep(RecipeEntry recipe, double machineCount, double recipePerMinute) {
 		this.inputs = recipe.getInputs();
@@ -29,7 +31,7 @@ public class ProductionStep {
 		this.machine = recipe.getMachine();
 		this.machineCount = machineCount;
 		this.recipePerMinute = recipePerMinute;
-
+		this.recipeTime = recipe.getTime();
 	}
 
 	// View management
@@ -81,7 +83,7 @@ public class ProductionStep {
 	}
 
 	public double getRecipeTime() {
-		return 60.0 / recipePerMinute;
+		return recipeTime;
 	}
 
 	public double getInputRate(int index) {
