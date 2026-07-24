@@ -1,6 +1,7 @@
 package com.origami10004.necalc.gui.flowchart;
 
 import com.origami10004.necalc.data.CalculatorState;
+import com.origami10004.necalc.data.MachineState;
 import com.origami10004.necalc.data.ProductionStep;
 import com.origami10004.necalc.gui.GuiFlowChart;
 import com.origami10004.necalc.gui.GuiProductionCalc;
@@ -119,6 +120,14 @@ public class FlowRecipeNode extends FlowNode {
 		if (canvasMouseX >= this.inputX + inputCols * 18 + 7 && canvasMouseX < this.inputX + inputCols * 18 + 7 + 16 &&
 				canvasMouseY >= this.canvasY + (this.ySize - 15) / 2 - 20 && canvasMouseY < this.canvasY + (this.ySize - 15) / 2 - 20 + 16) {
 			gui.drawItemExtraInfoTooltip(mouseX, mouseY, step.getMachine(), I18n.format("necalc.gui.machine_count", step.getMachineCount()));
+		}
+
+		if (canvasMouseX >= this.inputX + inputCols * 18 + 4 && canvasMouseX < this.inputX + inputCols * 18 + 4 + 22 &&
+				canvasMouseY >= this.canvasY + (this.ySize - 15) / 2 && canvasMouseY < this.canvasY + (this.ySize - 15) / 2 + 15) {
+			double time = step.getRecipeTime();
+			String secStr = String.format("%.2f", time / 20.0);
+			String tickStr = String.format("%.2f", time);
+			gui.drawHoveringText(I18n.format("necalc.gui.arrow_time", secStr, tickStr, MachineState.getMachineSpeeds().get(step.getMachine())), mouseX, mouseY);
 		}
 	}
 
