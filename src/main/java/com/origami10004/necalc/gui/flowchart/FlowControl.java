@@ -1,11 +1,7 @@
 package com.origami10004.necalc.gui.flowchart;
 
-import net.minecraft.client.Minecraft;
-
-import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.data.CalculatorState;
 import com.origami10004.necalc.data.ProductionStep;
-import com.origami10004.necalc.gui.GuiCommon;
 import com.origami10004.necalc.gui.GuiFlowChart;
 import com.origami10004.necalc.data.ingredient.Ingredients;
 
@@ -16,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.TreeMap;
+import java.util.Comparator;
 
 public class FlowControl {
 	private static final int COL_PAD = 80;
@@ -150,7 +147,6 @@ public class FlowControl {
 			recipeColumns.computeIfAbsent(recipeLayer.getOrDefault(node, 0), k -> new ArrayList<>()).add(node);
 		}
 		int curX = 0;
-		int colIdx = 0;
 		for (List<FlowRecipeNode> col : recipeColumns.values()) {
 			double x = curX;
 			double y = 0;
@@ -161,7 +157,6 @@ public class FlowControl {
 				maxWidth = Math.max(maxWidth, node.getWidth());
 			}
 			curX += maxWidth + (COL_PAD * 2) + 18;
-			colIdx++;
 		}
 
 		for (Ingredients item : allItems) {
@@ -223,6 +218,31 @@ public class FlowControl {
 			bus.canvasX = busX;
 			bus.canvasY = (count > 0 ? sumY / count : 0) - 9;
 		}
+		Map<Integer, List<FlowItemNode>> xLanes = new HashMap<>();
+		double X_SNAP_TOLERANCE = 10.0;
+
+		for (Ingredients item : allItems) {
+			FlowItemNode node = itemToNode.get(item);
+			if (node == null) continue;
+
+			int laneKey = (int) (Math.round(node.canvasX / X_SNAP_TOLERANCE) * X_SNAP_TOLERANCE);
+			xLanes.computeIfAbsent(laneKey, k -> new ArrayList<>()).add(node);
+		}
+
+		for (List<FlowItemNode> laneNodes : xLanes.values()) {
+			if (laneNodes.size() <= 1) continue;
+			laneNodes.sort(Comparator.comparingDouble(n -> n.canvasY));
+
+			for (int i = 0; i < laneNodes.size() - 1; i++) {
+				FlowItemNode current = laneNodes.get(i);
+				FlowItemNode next = laneNodes.get(i + 1);
+				double requiredMinY = current.canvasY + 18;
+
+				if (next.canvasY < requiredMinY) {
+					next.canvasY = requiredMinY;
+				}
+			}
+		}
 
 		nodes.addAll(recipeNodes);
 		nodes.addAll(itemNodes);
@@ -260,7 +280,7 @@ public class FlowControl {
 		visiting.remove(node);
 		int layer = maxDepth + 1;
 		recipeLayer.put(node, layer);
-		return 1;
+		return layer;
 	}
 
 	public static List<FlowNode> getNodes() {

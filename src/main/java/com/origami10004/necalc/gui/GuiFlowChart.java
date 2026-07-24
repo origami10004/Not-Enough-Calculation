@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.input.Mouse;
 
-import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.data.RecipeState;
 import com.origami10004.necalc.gui.flowchart.FlowControl;
 import com.origami10004.necalc.gui.flowchart.FlowNode;

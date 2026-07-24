@@ -10,7 +10,6 @@ public class NecalcContainer extends Container{
 	private GuiCommon gui;
 
 	public NecalcContainer(InventoryPlayer playerInv, boolean includeInventory, int invX, int invY) {
-		this.gui = gui;
 		if (!includeInventory) return;
 		// Register 9 dummy slots that should not be shown in the GUI (InventoryPlayer indices 0..8)
 		for (int col = 0; col < 9; col++) {

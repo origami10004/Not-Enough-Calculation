@@ -7,8 +7,8 @@ import com.origami10004.necalc.data.ingredient.Ingredients;
 
 public class MachineState {
 	// Integer represents the count of recipes using this machine
-	private static LinkedHashMap<Ingredients, Integer> machineSpeed;
-	private static HashMap<Ingredients, Integer> machineCount;
+	private static LinkedHashMap<Ingredients, Integer> machineSpeed = new LinkedHashMap<>();
+	private static HashMap<Ingredients, Integer> machineCount = new HashMap<>();
 	public static void init() {
 		machineSpeed = new LinkedHashMap<>();
 		machineCount = new HashMap<>();
@@ -23,7 +23,7 @@ public class MachineState {
 			machineSpeed.put(machine, 1);
 			machineCount.put(machine, 1);
 		} else {
-			machineCount.put(machine, machineCount.get(machine) + 1);
+			machineCount.put(machine, machineCount.getOrDefault(machine, 0) + 1);
 		}
 	}
 

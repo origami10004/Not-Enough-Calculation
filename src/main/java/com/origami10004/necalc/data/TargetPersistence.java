@@ -10,7 +10,6 @@ import com.origami10004.necalc.data.ingredient.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.*;
 
 public class TargetPersistence {

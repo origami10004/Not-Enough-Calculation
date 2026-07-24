@@ -12,8 +12,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.common.Loader;
 
 import com.origami10004.necalc.gui.GuiCommon;
 

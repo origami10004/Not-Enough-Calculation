@@ -1,6 +1,5 @@
 package com.origami10004.necalc.data;
 
-import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.data.ingredient.Ingredients;
 
 import java.util.ArrayList;

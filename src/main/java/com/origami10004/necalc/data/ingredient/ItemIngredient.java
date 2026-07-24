@@ -2,14 +2,11 @@ package com.origami10004.necalc.data.ingredient;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.ModContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.Loader;
 
 import com.origami10004.necalc.gui.GuiCommon;
 

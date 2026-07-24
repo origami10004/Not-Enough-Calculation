@@ -88,12 +88,12 @@ public class FlowRecipeNode extends FlowNode {
 
 	@Override
 	public double getInputY(int index) {
-		return canvasY + this.getHeight() / 2.0;
+		return canvasY + 4 + ((this.getHeight() - 8) / step.getInputs().size()) * index + ((this.getHeight() - 8) / step.getInputs().size()) / 2;
 	}
 
 	@Override
 	public double getOutputY(int index) {
-		return canvasY + this.getHeight() / 2.0;
+		return canvasY + 4 + ((this.getHeight() - 8) / step.getOutputs().size()) * index + ((this.getHeight() - 8) / step.getOutputs().size()) / 2;
 	}
 
 	@Override
