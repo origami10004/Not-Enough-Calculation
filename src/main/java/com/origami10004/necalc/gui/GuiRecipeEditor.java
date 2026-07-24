@@ -487,7 +487,7 @@ public class GuiRecipeEditor extends GuiCommon {
 				mc.displayGuiScreen(new GuiProductionCalc(this.playerInv));
 				break;
 			case 1:
-				// mc.displayGuiScreen(new GuiFlowChart(playerInv, container));
+				mc.displayGuiScreen(new GuiFlowChart(playerInv));
 				break;
 			case 2:
 				mc.displayGuiScreen(new GuiManageRecipes(this.playerInv));

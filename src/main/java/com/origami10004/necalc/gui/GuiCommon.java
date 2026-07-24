@@ -37,6 +37,11 @@ public abstract class GuiCommon extends GuiContainer {
 		super(container);
 		container.setGui(this);
 	}
+	
+	@Override
+	public boolean doesGuiPauseGame() {
+		return false;
+	}
 
 	protected void drawRectPanel(int x, int y, int w, int h, int fillColor) {
 		assert w > 6 && h > 6 : "Panel too small for borders";
@@ -90,7 +95,7 @@ public abstract class GuiCommon extends GuiContainer {
 	}
 
 	// I'm ngl idk what the opposite of indent is really
-	protected void drawRectPanelOutdent(int x, int y, int w, int h, int fillColor) {
+	public void drawRectPanelOutdent(int x, int y, int w, int h, int fillColor) {
 		drawRect(x, y, x + w - 1, y + h - 1, 0xFFFFFFFF);
 		drawRect(x + 1, y + 1, x + w, y + h, 0xFF373737);
 		drawRect(x + 1, y + 1, x + w - 1, y + h - 1, fillColor);
@@ -125,7 +130,7 @@ public abstract class GuiCommon extends GuiContainer {
 		}
 	}
 
-	protected void drawItemSlot(int x, int y) {
+	public void drawItemSlot(int x, int y) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(SLOT_TEXTURE);
 		drawModalRectWithCustomSizedTexture(x, y, 0, 0, 18, 18, 18, 18);
@@ -180,7 +185,7 @@ public abstract class GuiCommon extends GuiContainer {
 		}
 	}
 
-	protected void drawItemExtraInfoTooltip(int mouseX, int mouseY, Ingredients ing, String extraInfo) {
+	public void drawItemExtraInfoTooltip(int mouseX, int mouseY, Ingredients ing, String extraInfo) {
 		
 		List<String> tooltip = ing.getTooltip(this.mc);
 		tooltip.add(1, extraInfo);

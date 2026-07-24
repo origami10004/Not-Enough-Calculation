@@ -2,6 +2,7 @@ package com.origami10004.necalc.data;
 
 import com.origami10004.necalc.calc.Solver;
 import com.origami10004.necalc.data.ingredient.*;
+import com.origami10004.necalc.gui.flowchart.FlowControl;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -160,6 +161,7 @@ public class CalculatorState {
 
 	public static void recalculateRecipes() {
 		cached = false;
+		FlowControl.reset();
 	}
 
 	private static boolean getResult() {
@@ -189,5 +191,9 @@ public class CalculatorState {
 
 	public static void showAllInputs() {
 		recipeInputs.values().forEach(input -> input.hidden = false);
+	}
+
+	public static List<ProductionStep> getAllRecipes() {
+		return recipeSteps;
 	}
 }
