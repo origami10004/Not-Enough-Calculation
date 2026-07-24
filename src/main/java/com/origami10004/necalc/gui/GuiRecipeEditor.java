@@ -2,6 +2,7 @@ package com.origami10004.necalc.gui;
 
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
@@ -235,6 +236,33 @@ public class GuiRecipeEditor extends GuiCommon {
 	public void keyTyped(char typedChar, int keyCode) throws IOException {
 		if (Character.isDigit(typedChar) || keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_DELETE || keyCode == Keyboard.KEY_LEFT || keyCode == Keyboard.KEY_RIGHT || keyCode == Keyboard.KEY_ESCAPE) {
 			if (this.timeInputField.textboxKeyTyped(typedChar, keyCode)) return;
+		} else if (this.timeInputField.isFocused()) {
+			boolean ctrlA = keyCode == Keyboard.KEY_A && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
+			boolean ctrlC = keyCode == Keyboard.KEY_C && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
+			boolean ctrlV = keyCode == Keyboard.KEY_V && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
+			boolean ctrlX = keyCode == Keyboard.KEY_X && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
+
+			if (ctrlA) {
+				this.timeInputField.setCursorPositionZero();
+				this.timeInputField.setSelectionPos(this.timeInputField.getText().length());
+			} else if (ctrlC) {
+				String selectedText = this.timeInputField.getSelectedText();
+				if (!selectedText.isEmpty()) {
+					GuiScreen.setClipboardString(selectedText);
+				}
+			} else if (ctrlV) {
+				String clipboardText = GuiScreen.getClipboardString();
+				if (clipboardText != null && !clipboardText.isEmpty()) {
+					String sanitised = clipboardText.replaceAll("[^0-9]", "");
+					this.timeInputField.writeText(sanitised);
+				}
+			} else if (ctrlX) {
+				String selectedText = this.timeInputField.getSelectedText();
+				if (!selectedText.isEmpty()) {
+					GuiScreen.setClipboardString(selectedText);
+					this.timeInputField.writeText("");
+				}
+			}
 		}
 		if (keyCode == Keyboard.KEY_ESCAPE) {
 			mc.displayGuiScreen(parent);

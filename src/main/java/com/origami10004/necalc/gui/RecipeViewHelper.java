@@ -118,7 +118,7 @@ public class RecipeViewHelper {
 		if (getInputAt(mouseX, mouseY) != -1) {
 			int index = getInputAt(mouseX, mouseY);
 			Ingredients currentInput = step.getInputs().get(index);
-			String text = String.format("%.4f", step.getPrimaryInputRate() / CalculatorState.getMultiplier()) + GuiProductionCalc.rateLabels[CalculatorState.getDisplayRate()];
+			String text = String.format("%.4f", step.getInputRate(index) / CalculatorState.getMultiplier()) + GuiProductionCalc.rateLabels[CalculatorState.getDisplayRate()];
 			parent.drawItemExtraInfoTooltip(mouseX, mouseY, currentInput, I18n.format("necalc.gui.target_rate", text));
 		}
 
@@ -126,7 +126,7 @@ public class RecipeViewHelper {
 		if (getOutputAt(mouseX, mouseY) != -1) {
 			int index = getOutputAt(mouseX, mouseY);
 			Ingredients currentOutput = step.getOutputs().get(index);
-			String text = String.format("%.4f", step.getPrimaryInputRate() / CalculatorState.getMultiplier()) + GuiProductionCalc.rateLabels[CalculatorState.getDisplayRate()];
+			String text = String.format("%.4f", step.getOutputRate(index) / CalculatorState.getMultiplier()) + GuiProductionCalc.rateLabels[CalculatorState.getDisplayRate()];
 			parent.drawItemExtraInfoTooltip(mouseX, mouseY, currentOutput, I18n.format("necalc.gui.target_rate", text));
 		}
 	}

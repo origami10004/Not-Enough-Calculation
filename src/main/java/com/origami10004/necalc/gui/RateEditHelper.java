@@ -5,6 +5,7 @@ import org.lwjgl.input.Keyboard;
 import com.origami10004.necalc.data.CalculatorState;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
@@ -109,10 +110,41 @@ public class RateEditHelper {
 			return true;
 		}
 
+		boolean ctrlA = keyCode == Keyboard.KEY_A && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
+		boolean ctrlC = keyCode == Keyboard.KEY_C && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
+		boolean ctrlV = keyCode == Keyboard.KEY_V && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
+		boolean ctrlX = keyCode == Keyboard.KEY_X && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
+
 		if (Character.isDigit(typedChar) || keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_DELETE || keyCode == Keyboard.KEY_LEFT || keyCode == Keyboard.KEY_RIGHT) {
 			this.rateInputField.textboxKeyTyped(typedChar, keyCode);
-		} else if (typedChar == '.' && !rateInputField.getText().contains(".")) {
+		} else if (typedChar == '.' && !this.rateInputField.getText().contains(".")) {
 			this.rateInputField.textboxKeyTyped(typedChar, keyCode);
+		} else if (ctrlA) {
+			this.rateInputField.setCursorPositionZero();
+			this.rateInputField.setSelectionPos(this.rateInputField.getText().length());
+		} else if (ctrlC) {
+			String selectedText = this.rateInputField.getSelectedText();
+			if (!selectedText.isEmpty()) {
+				GuiScreen.setClipboardString(selectedText);
+			}
+		} else if (ctrlV) {
+			String clipboardText = GuiScreen.getClipboardString();
+			if (clipboardText != null && !clipboardText.isEmpty()) {
+				String sanitised = clipboardText.replaceAll("[^0-9.]", "");
+				if (this.rateInputField.getText().contains(".")) {
+					sanitised = sanitised.replaceAll("\\.", "");
+				} else if (sanitised.indexOf(".") != sanitised.lastIndexOf(".")) {
+					int first = sanitised.indexOf(".");
+					sanitised = sanitised.substring(0, first + 1) + sanitised.substring(first + 1).replaceAll("\\.", "");
+				}
+				this.rateInputField.writeText(sanitised);
+			}
+		} else if (ctrlX) {
+			String selectedText = this.rateInputField.getSelectedText();
+			if (!selectedText.isEmpty()) {
+				GuiScreen.setClipboardString(selectedText);
+				this.rateInputField.writeText("");
+			}
 		}
 		return true;
 	}

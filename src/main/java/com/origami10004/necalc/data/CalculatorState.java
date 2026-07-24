@@ -194,6 +194,7 @@ public class CalculatorState {
 	}
 
 	public static List<ProductionStep> getAllRecipes() {
+		getResult();
 		return recipeSteps;
 	}
 }

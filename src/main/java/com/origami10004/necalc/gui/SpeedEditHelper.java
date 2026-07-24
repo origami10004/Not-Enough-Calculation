@@ -8,6 +8,7 @@ import org.lwjgl.input.Keyboard;
 import com.origami10004.necalc.data.MachineState;
 import com.origami10004.necalc.data.ingredient.Ingredients;
 
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
@@ -109,8 +110,33 @@ public class SpeedEditHelper {
 			return true;
 		}
 
+		boolean ctrlA = keyCode == Keyboard.KEY_A && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
+		boolean ctrlC = keyCode == Keyboard.KEY_C && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
+		boolean ctrlV = keyCode == Keyboard.KEY_V && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
+		boolean ctrlX = keyCode == Keyboard.KEY_X && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
+
 		if (Character.isDigit(typedChar) || keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_DELETE || keyCode == Keyboard.KEY_LEFT || keyCode == Keyboard.KEY_RIGHT) {
 			this.speedInputField.textboxKeyTyped(typedChar, keyCode);
+		} else if (ctrlA) {
+			this.speedInputField.setCursorPositionZero();
+			this.speedInputField.setSelectionPos(this.speedInputField.getText().length());
+		} else if (ctrlC) {
+			String selectedText = this.speedInputField.getSelectedText();
+			if (!selectedText.isEmpty()) {
+				GuiScreen.setClipboardString(selectedText);
+			}
+		} else if (ctrlV) {
+			String clipboardText = GuiScreen.getClipboardString();
+			if (clipboardText != null && !clipboardText.isEmpty()) {
+				String sanitised = clipboardText.replaceAll("[^0-9]", "");
+				this.speedInputField.writeText(sanitised);
+			}
+		} else if (ctrlX) {
+			String selectedText = this.speedInputField.getSelectedText();
+			if (!selectedText.isEmpty()) {
+				GuiScreen.setClipboardString(selectedText);
+				this.speedInputField.writeText("");
+			}
 		}
 		return true;
 	}
