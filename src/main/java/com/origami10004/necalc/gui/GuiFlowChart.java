@@ -28,7 +28,6 @@ public class GuiFlowChart extends GuiCommon {
 		return 1;
 	}
 
-	private InventoryPlayer playerInv;
 	private FlowNode draggingNode = null;
 	private boolean isPanning = false;
 	private int panStartX = 0;

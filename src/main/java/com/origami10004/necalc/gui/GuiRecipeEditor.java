@@ -39,7 +39,6 @@ public class GuiRecipeEditor extends GuiCommon {
 
 	// instance variables
 	private final GuiCommon parent;
-	private final InventoryPlayer playerInv;
 	private final boolean isNewRecipe;
 	private int inputGrid;
 	private int outputGrid;

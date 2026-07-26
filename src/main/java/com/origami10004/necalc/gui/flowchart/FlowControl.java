@@ -124,7 +124,11 @@ public class FlowControl {
 
 		// Assign nodes to layers
 		Map <FlowRecipeNode, Set<FlowRecipeNode>> children = new HashMap<>();
-		for (FlowRecipeNode node : recipeNodes) children.put(node, new HashSet<>());
+		Map <FlowRecipeNode, Set<FlowRecipeNode>> parents = new HashMap<>();
+		for (FlowRecipeNode node : recipeNodes) {
+			children.put(node, new HashSet<>());
+			parents.put(node, new HashSet<>());
+		}
 		for (Ingredients item : allItems) {
 			List<int[]> consumers = consumerMap.getOrDefault(item, new ArrayList<>());
 			List<int[]> producers = producerMap.getOrDefault(item, new ArrayList<>());
@@ -132,19 +136,39 @@ public class FlowControl {
 				for (int[] producer : producers) {
 					if (producer[0] != consumer[0]) {
 						children.get(recipeNodes.get(consumer[0])).add(recipeNodes.get(producer[0]));
+						parents.get(recipeNodes.get(producer[0])).add(recipeNodes.get(consumer[0]));
 					}
 				}
 			}
 		}
-		Map<FlowRecipeNode, Integer> recipeLayer = new HashMap<>();
+		Map<FlowRecipeNode, Integer> nodeToLayer = new HashMap<>();
+		Map<Integer, List<FlowRecipeNode>> layerToNode = new HashMap<>();
+		int maxLayer = 0;
 		for (FlowRecipeNode node : recipeNodes) {
-			assignLayer(node, children, recipeLayer, new HashSet<>());
+			int layer = assignLayer(node, children, nodeToLayer, layerToNode, new HashSet<>());
+			maxLayer = Math.max(maxLayer, layer);
+		}
+		for (int i = maxLayer; i >= 0; i--) {
+			// really shouldnt be possible but just in case
+			if (!layerToNode.containsKey(i)) continue;
+			for (int j = 0; j < layerToNode.get(i).size(); j++) {
+				FlowRecipeNode node = layerToNode.get(i).get(j);
+				
+				int minParentLayer = Integer.MAX_VALUE;
+				if (parents.get(node).isEmpty()) continue;
+				for (FlowRecipeNode parent : parents.get(node)) {
+					minParentLayer = Math.min(minParentLayer, nodeToLayer.get(parent));
+				}
+				if (nodeToLayer.get(node) < minParentLayer - 1) {
+					nodeToLayer.put(node, minParentLayer - 1);
+				}
+			}
 		}
 
 		// Position nodes
 		Map<Integer, List<FlowRecipeNode>> recipeColumns = new TreeMap<>();
 		for (FlowRecipeNode node : recipeNodes) {
-			recipeColumns.computeIfAbsent(recipeLayer.getOrDefault(node, 0), k -> new ArrayList<>()).add(node);
+			recipeColumns.computeIfAbsent(nodeToLayer.getOrDefault(node, 0), k -> new ArrayList<>()).add(node);
 		}
 		int curX = 0;
 		for (List<FlowRecipeNode> col : recipeColumns.values()) {
@@ -219,7 +243,7 @@ public class FlowControl {
 			bus.canvasY = (count > 0 ? sumY / count : 0) - 9;
 		}
 		Map<Integer, List<FlowItemNode>> xLanes = new HashMap<>();
-		double X_SNAP_TOLERANCE = 10.0;
+		double X_SNAP_TOLERANCE = 18;
 
 		for (Ingredients item : allItems) {
 			FlowItemNode node = itemToNode.get(item);
@@ -268,18 +292,20 @@ public class FlowControl {
 
 	private static int assignLayer(FlowRecipeNode node,
 			Map<FlowRecipeNode, Set<FlowRecipeNode>> children,
-			Map<FlowRecipeNode, Integer> recipeLayer,
+			Map<FlowRecipeNode, Integer> nodeToLayer,
+			Map<Integer, List<FlowRecipeNode>> layerToNode,
 			Set<FlowRecipeNode> visiting) {
-		if (recipeLayer.containsKey(node)) return recipeLayer.get(node);
+		if (nodeToLayer.containsKey(node)) return nodeToLayer.get(node);
 		if (visiting.contains(node)) return 0; // Cycle detected
 		visiting.add(node);
 		int maxDepth = 0;
 		for (FlowRecipeNode child : children.get(node)) {
-			maxDepth = Math.max(maxDepth, assignLayer(child, children, recipeLayer, visiting));
+			maxDepth = Math.max(maxDepth, assignLayer(child, children, nodeToLayer, layerToNode, visiting));
 		}
 		visiting.remove(node);
 		int layer = maxDepth + 1;
-		recipeLayer.put(node, layer);
+		nodeToLayer.put(node, layer);
+		layerToNode.computeIfAbsent(layer, k -> new ArrayList<>()).add(node);
 		return layer;
 	}
 

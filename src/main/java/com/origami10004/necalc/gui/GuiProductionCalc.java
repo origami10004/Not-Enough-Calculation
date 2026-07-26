@@ -55,9 +55,6 @@ public class GuiProductionCalc extends GuiCommon {
 		return 0;
 	}
 
-	// instance variables
-	private InventoryPlayer playerInv;
-
 	// scrolling
 	protected int targetScrollRow = 0;
 	private float targetScrollPercent = 0.0f;

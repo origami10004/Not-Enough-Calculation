@@ -32,7 +32,6 @@ public class GuiManageMachines extends GuiCommon {
 	}
 
 	// instance variables
-	private InventoryPlayer playerInv;
 	private int gx, gy;
 	private int tableY;
 	private SpeedEditHelper editor;

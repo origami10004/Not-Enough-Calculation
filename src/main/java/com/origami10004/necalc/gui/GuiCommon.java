@@ -31,6 +31,7 @@ public abstract class GuiCommon extends GuiContainer {
 	
 	protected abstract int getActiveTab();
 	private ItemStack inventoryHoverStack;
+	protected InventoryPlayer playerInv;
 
 	public GuiCommon(NecalcContainer container) {
 		super(container);
@@ -276,5 +277,10 @@ public abstract class GuiCommon extends GuiContainer {
 
 	public List<Rectangle> getExtraGuiArea() {
 		return null;
+	}
+
+	public GuiCommon reopen(InventoryPlayer inv) {
+		this.playerInv = inv;
+		return this;
 	}
 }

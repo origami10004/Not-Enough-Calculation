@@ -29,7 +29,6 @@ public class GuiManageRecipes extends GuiCommon{
 	}
 
 	// instance variables
-	private InventoryPlayer playerInv;
 	private int gx, gy;
 	private int tableY;
 	private int scrollRow = 0;

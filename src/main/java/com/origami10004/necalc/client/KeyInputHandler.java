@@ -18,7 +18,7 @@ public class KeyInputHandler {
 			// Open the GUI here
 			Minecraft mc = Minecraft.getMinecraft();
 			if (ClientProxy.lastOpenedGui != null) {
-				mc.displayGuiScreen(ClientProxy.lastOpenedGui);
+				mc.displayGuiScreen(ClientProxy.lastOpenedGui.reopen(mc.player.inventory));
 			} else {
 				mc.displayGuiScreen(new GuiProductionCalc(mc.player.inventory));
 			}
@@ -35,7 +35,7 @@ public class KeyInputHandler {
 				if (mc.currentScreen instanceof GuiInventory || mc.currentScreen instanceof GuiContainerCreative) {
 					// Open GUI only when the player is in the inventory screen
 					if (ClientProxy.lastOpenedGui != null) {
-						mc.displayGuiScreen(ClientProxy.lastOpenedGui);
+						mc.displayGuiScreen(ClientProxy.lastOpenedGui.reopen(mc.player.inventory));
 					} else {
 						mc.displayGuiScreen(new GuiProductionCalc(mc.player.inventory));
 					}

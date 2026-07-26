@@ -27,7 +27,7 @@ public class ProdCalcItem extends Item {
 		if (worldIn.isRemote) {
 			// open GUI
 			if (ClientProxy.lastOpenedGui != null) {
-				Minecraft.getMinecraft().displayGuiScreen(ClientProxy.lastOpenedGui);
+				Minecraft.getMinecraft().displayGuiScreen(ClientProxy.lastOpenedGui.reopen(playerIn.inventory));
 			} else {
 				Minecraft.getMinecraft().displayGuiScreen(new GuiProductionCalc(playerIn.inventory));
 			}
