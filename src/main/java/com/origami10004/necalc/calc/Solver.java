@@ -99,9 +99,9 @@ public class Solver {
 		int n = idToRecipe.size();
 		int m = idToItem.size();
 
-		double[][] matrix = new double[m][n];
+		double[][] matrix = new double[m][n + m];
 		double[] rates = new double[m];
-		double[] cost = new double[n];
+		double[] cost = new double[n + m];
 
 		Arrays.fill(cost, 1.0);
 		
@@ -120,6 +120,15 @@ public class Solver {
 				Integer itemId = itemToId.get(input);
 				if (itemId != null) matrix[itemId][i] -= ((double)input.getValue()) * craftsPerMinute;
 			}
+		}
+
+		// Failsafe table
+		for (int i = 0; i < m; i++) {
+			matrix[i][n + i] = 1.0;
+		}
+		// set cost, arbitary value surely i wont need to increase this
+		for (int i = 0; i < m; i++) {
+			cost[n + i] = 1000000.0;
 		}
 
 		// Rates input
@@ -182,6 +191,14 @@ public class Solver {
 						double inputRate = ((double)input.getValue()) * recipePerMinute;
 						res.inputRates.put(input, new Input(res.inputRates.getOrDefault(input, new Input(0.0)).rate + inputRate));
 					}
+				}
+			}
+
+			for (int i = 0; i < m; i++) {
+				double inputRate = solutionPoint[n + i];
+				if (inputRate > 1e-9) {
+					Ingredients inputItem = idToItem.get(i);
+					res.inputRates.put(inputItem, new Input(res.inputRates.getOrDefault(inputItem, new Input(0.0)).rate + inputRate));
 				}
 			}
 
