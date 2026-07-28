@@ -59,34 +59,31 @@ public class Solver {
 				itemToRecipe.computeIfAbsent(output.copy(), k -> new ArrayList<>()).add(i);
 			}
 		}
-		Queue<Ingredients> bfsq = new LinkedList<>();
 
 		for (Ingredients target : targets) {
-			bfsq.add(target);
+			dfs(target);
 		}
-		while (!bfsq.isEmpty()) {
-			Ingredients current = bfsq.poll();
-			if (itemToId.containsKey(current)) {
-				continue;
-			}
-			if (itemToRecipe.containsKey(current)) {
-				itemToId.put(current, idToItem.size());
-				idToItem.add(current);
-				for (int recipeIndex : itemToRecipe.get(current)) {
-					if (!recipeToId.containsKey(recipeIndex)) {
-						recipeToId.put(recipeIndex, idToRecipe.size());
-						idToRecipe.add(recipeIndex);
-						RecipeEntry recipe = recipes.get(recipeIndex);
-						for (Ingredients input : recipe.getInputs()) {
-							bfsq.add(input.copy());
-						}
+	}
+	private static void dfs(Ingredients item) {
+		if (itemToId.containsKey(item)) {
+			return;
+		}
+		if (itemToRecipe.containsKey(item)) {
+			itemToId.put(item, idToItem.size());
+			idToItem.add(item);
+			for (int recipeIndex : itemToRecipe.get(item)) {
+				if (!recipeToId.containsKey(recipeIndex)) {
+					RecipeEntry recipe = recipes.get(recipeIndex);
+					for (Ingredients input : recipe.getInputs()) {
+						dfs(input.copy());
 					}
+					recipeToId.put(recipeIndex, idToRecipe.size());
+					idToRecipe.add(recipeIndex);
 				}
-			} else {
-				inputItems.add(current);
 			}
+		} else {
+			inputItems.add(item);
 		}
-		
 	}
 	public static Result solve() {
 		Result res = new Result();
@@ -169,7 +166,7 @@ public class Solver {
 			// 			") net flow: " + netFlow + " required: " + rates[i]);
 			// }
 
-			for (int i = 0; i < n; i++) {
+			for (int i = n - 1; i >= 0; i--) {
 				double machineCount = solutionPoint[i];
 				if (machineCount < 1e-9) continue;
 
