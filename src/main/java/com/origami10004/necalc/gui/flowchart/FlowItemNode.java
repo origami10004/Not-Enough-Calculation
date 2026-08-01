@@ -36,4 +36,9 @@ public class FlowItemNode extends FlowNode {
 	public Ingredients hoveredStack(int mouseX, int mouseY) {
 		return ingredient;
 	}
+
+	@Override
+	public int getColour() {
+		return ingredient.getColour();
+	}
 }

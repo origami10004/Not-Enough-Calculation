@@ -12,6 +12,7 @@ public class FlowEdge {
 	private final int sourceIndex;
 	private final FlowNode destination;
 	private final int destinationIndex;
+	private static final float LINE_WIDTH = 2.0f;
 
 	public FlowEdge(FlowNode source, int sourceIndex, FlowNode destination, int destinationIndex) {
 		this.source = source;
@@ -27,21 +28,26 @@ public class FlowEdge {
 		int y1 = FlowControl.toScreenY(endY());
 
 		int color = 0xFFFFFFFF;
+		if (source.getColour() != -1) {
+			color = source.getColour();
+		} else if (destination.getColour() != -1) {
+			color = destination.getColour();
+		}
 
 		if (endX() > startX()) {
 			// regular line
 			int midX = (x0 + x1) / 2;
-			drawline(x0, y0, midX, y0, color, 1.0f);
-			drawline(midX, y0, midX, y1, color, 1.0f);
-			drawline(midX, y1, x1, y1, color, 1.0f);
+			drawline(x0, y0, midX, y0, color);
+			drawline(midX, y0, midX, y1, color);
+			drawline(midX, y1, x1, y1, color);
 		} else {
 			// loopback line
 			int bottomY = FlowControl.toScreenY(Math.max(source.getCanvasY() + source.getHeight(), destination.getCanvasY() + destination.getHeight()) + 10);
-			drawline(x0, y0, FlowControl.toScreenX(startX() + 10), y0, color, 1.0f);
-			drawline(FlowControl.toScreenX(startX() + 10), y0, FlowControl.toScreenX(startX() + 10), bottomY, color, 1.0f);
-			drawline(FlowControl.toScreenX(startX() + 10), bottomY, FlowControl.toScreenX(endX() - 10), bottomY, color, 1.0f);
-			drawline(FlowControl.toScreenX(endX() - 10), bottomY, FlowControl.toScreenX(endX() - 10), y1, color, 1.0f);
-			drawline(FlowControl.toScreenX(endX() - 10), y1, x1, y1, color, 1.0f);
+			drawline(x0, y0, FlowControl.toScreenX(startX() + 10), y0, color);
+			drawline(FlowControl.toScreenX(startX() + 10), y0, FlowControl.toScreenX(startX() + 10), bottomY, color);
+			drawline(FlowControl.toScreenX(startX() + 10), bottomY, FlowControl.toScreenX(endX() - 10), bottomY, color);
+			drawline(FlowControl.toScreenX(endX() - 10), bottomY, FlowControl.toScreenX(endX() - 10), y1, color);
+			drawline(FlowControl.toScreenX(endX() - 10), y1, x1, y1, color);
 		}
 	}
 
@@ -58,7 +64,7 @@ public class FlowEdge {
 	private double endY() {
 		return destination.getInputY(destinationIndex);
 	}
-	private void drawline(int x0, int y0, int x1, int y1, int color, float width) {
+	private void drawline(int x0, int y0, int x1, int y1, int color) {
 		// Implementation for drawing a line on the screen
 		float r = ((color >> 16) & 0xFF) / 255.0f;
 		float g = ((color >> 8) & 0xFF) / 255.0f;
@@ -68,7 +74,7 @@ public class FlowEdge {
 
 		GlStateManager.disableTexture2D();
 		GlStateManager.enableBlend();
-		GlStateManager.glLineWidth(width);
+		GlStateManager.glLineWidth(LINE_WIDTH);
 
 		Tessellator tess = Tessellator.getInstance();
 		BufferBuilder buf = tess.getBuffer();

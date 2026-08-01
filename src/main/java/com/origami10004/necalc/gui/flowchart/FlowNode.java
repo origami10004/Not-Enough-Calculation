@@ -72,6 +72,9 @@ public abstract class FlowNode {
 	public int getWidth() {
 		return width;
 	}
+	public int getColour() {
+		return -1;
+	}
 
 	public abstract void draw(GuiFlowChart gui);
 	public abstract void drawHoveredToolTip(GuiFlowChart gui, int mouseX, int mouseY);

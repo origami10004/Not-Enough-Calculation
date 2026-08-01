@@ -4,6 +4,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -195,6 +196,43 @@ public class ItemIngredient extends Ingredients {
 	@Override
 	public int hashCode() {
 		return Objects.hash(ItemIngredient.class, item, meta, nbt);
+	}
+
+	@Override
+	public int getColour() {
+		int tintColour = Minecraft.getMinecraft().getItemColors().colorMultiplier(getStack(), 0);
+		if (tintColour != -1) {
+			return tintColour;
+		}
+
+		TextureAtlasSprite sprite = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getParticleIcon(this.item, this.meta);
+		if (sprite == null) return 0xFFFFFF;
+
+		if (sprite.getFrameCount() > 0) {
+			int[][] frameData = sprite.getFrameTextureData(0);
+			if (frameData != null && frameData.length > 0 && frameData[0].length > 0) {
+				int[] pixels = frameData[0];
+				long r = 0, g = 0, b = 0;
+				int count = 0;
+				for (int pixel : pixels) {
+					int alpha = (pixel >> 24) & 0xFF;
+					if (alpha > 128) {
+						r += (pixel >> 16) & 0xFF;
+						g += (pixel >> 8) & 0xFF;
+						b += pixel & 0xFF;
+						count++;
+					}
+				}
+				if (count > 0) {
+					r /= count;
+					g /= count;
+					b /= count;
+					return (int)((r << 16) | (g << 8) | b);
+				}
+			}
+		}
+
+		return 0xFFFFFF;
 	}
 
 	// Helper functions

@@ -127,6 +127,10 @@ public abstract class Ingredients {
 		GlStateManager.enableBlend();
 		GlStateManager.enableDepth();
 	}
+	
+	public int getColour() {
+		return 0xFFFFFF;
+	}
 
 	public abstract void render(GuiCommon parent, int x, int y);
 	public abstract String getDisplayName();
