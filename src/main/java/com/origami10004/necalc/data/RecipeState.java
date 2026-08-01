@@ -129,4 +129,8 @@ public class RecipeState {
 	public static void mergeOutputIngredient(Ingredients ingredient) {
 		stagedRecipe.mergeOutputIngredient(ingredient);
 	}
+
+	public static RecipeEntry getStagedRecipe() {
+		return stagedRecipe;
+	}
 }

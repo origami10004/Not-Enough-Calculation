@@ -46,12 +46,13 @@ public class GuiRecipeEditor extends GuiCommon {
 	private int buttonY;
 	private GuiTextField timeInputField;
 
-	private int inputScrollRow = 0;
+	protected int inputScrollRow = 0;
 	private float inputScrollPercent = 0.0f;
 	private boolean draggingInputScroll = false;
-	private int outputScrollRow = 0;
+	protected int outputScrollRow = 0;
 	private float outputScrollPercent = 0.0f;
 	private boolean draggingOutputScroll = false;
+	private CountEditHelper editOverlay = new CountEditHelper(this);
 
 	private int gx, gy;
 
@@ -78,6 +79,7 @@ public class GuiRecipeEditor extends GuiCommon {
 			this.timeInputField.x = this.gx + GUI_WIDTH / 2;
 			this.timeInputField.y = this.gy + 106;
 		}
+		this.editOverlay.reInit(this.gx, this.gy + TAB_H + 29);
 	}
 
 	@Override
@@ -162,10 +164,13 @@ public class GuiRecipeEditor extends GuiCommon {
 		
 		this.fontRenderer.drawString(I18n.format("necalc.gui.inventory"), this.gx + 8, curY, 0xFF000000);
 		drawPlayerInventory(this.gx + 8, curY + 11, mouseX, mouseY, this.playerInv);
+
+		this.editOverlay.drawOverlay(mouseX, mouseY);
 	}
 
 	@Override
 	public void renderHoveredToolTip(int mouseX, int mouseY) {
+		if (this.editOverlay.hovered(mouseX, mouseY))  return;
 
 		drawTabTooltips(mouseX, mouseY, this.gx, this.gy);
 
@@ -229,10 +234,13 @@ public class GuiRecipeEditor extends GuiCommon {
 	public void updateScreen() {
 		super.updateScreen();
 		this.timeInputField.updateCursorCounter();
+		this.editOverlay.updateCursorCounter();
 	}
 
 	@Override
 	public void keyTyped(char typedChar, int keyCode) throws IOException {
+		if (this.editOverlay.keyTyped(typedChar, keyCode)) return;
+
 		if (Character.isDigit(typedChar) || keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_DELETE || keyCode == Keyboard.KEY_LEFT || keyCode == Keyboard.KEY_RIGHT || keyCode == Keyboard.KEY_ESCAPE) {
 			if (this.timeInputField.textboxKeyTyped(typedChar, keyCode)) return;
 		} else if (this.timeInputField.isFocused()) {
@@ -283,7 +291,7 @@ public class GuiRecipeEditor extends GuiCommon {
 			int inputSlot = getInputSlotAt(mouseX, mouseY);
 			int outputSlot = getOutputSlotAt(mouseX, mouseY);
 
-			if (inputSlot != -1) {
+			if (inputSlot != -1 && !editOverlay.isOpen()) {
 				if (shiftPressed && ctrlPressed) {
 					if (scroll > 0) {
 						RecipeState.alterInput(inputSlot, Ingredients.EMPTY, 0, 2);
@@ -300,7 +308,7 @@ public class GuiRecipeEditor extends GuiCommon {
 					return;
 				}
 			}
-			if (outputSlot != -1) {
+			if (outputSlot != -1 && !editOverlay.isOpen()) {
 				if (shiftPressed && ctrlPressed) {
 					if (scroll > 0) {
 						RecipeState.alterOutput(outputSlot, Ingredients.EMPTY, 0, 2);
@@ -374,6 +382,9 @@ public class GuiRecipeEditor extends GuiCommon {
 
 	@Override
 	public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+
+		if (this.editOverlay.mouseClicked(mouseX, mouseY, mouseButton)) return;
+
 		for (int i = 0; i < TAB_COUNT; i++) {
 			int tx = gx + TAB_LEFT_PAD + i * (TAB_W + 2);
 			if (mouseX >= tx && mouseX < tx + TAB_W && mouseY >= gy + 2 && mouseY < gy + 2 + TAB_H) {
@@ -406,6 +417,12 @@ public class GuiRecipeEditor extends GuiCommon {
 						(currentIng.isEmpty() || currentIng.equals(heldItem))) {
 					RecipeState.alterInput(inputSlot, heldItem, 1, 1);
 				}
+			} else if (mouseButton == 2) {
+				if (!RecipeState.getInput(inputSlot).isEmpty()) {
+					int slotScreenX = this.gx + 12 + (inputSlot % SLOTS_PER_ROW) * SLOT_SIZE;
+					int slotScreenY = this.inputGrid + (inputSlot / SLOTS_PER_ROW - this.inputScrollRow) * SLOT_SIZE;
+					this.editOverlay.openInputSlot(inputSlot, slotScreenX, slotScreenY);
+				}
 			}
 			return;
 		}
@@ -431,6 +448,12 @@ public class GuiRecipeEditor extends GuiCommon {
 				if (!heldItem.isEmpty() && 
 						(currentIng.isEmpty() || currentIng.equals(heldItem))) {
 					RecipeState.alterOutput(outputSlot, heldItem, 1, 1);
+				}
+			} else if (mouseButton == 2) {
+				if (!RecipeState.getOutput(outputSlot).isEmpty()) {
+					int slotScreenX = this.gx + 12 + (outputSlot % SLOTS_PER_ROW) * SLOT_SIZE;
+					int slotScreenY = this.outputGrid + (outputSlot / SLOTS_PER_ROW - this.outputScrollRow) * SLOT_SIZE;
+					this.editOverlay.openOutputSlot(outputSlot, slotScreenX, slotScreenY);
 				}
 			}
 			return;
@@ -511,15 +534,19 @@ public class GuiRecipeEditor extends GuiCommon {
 	private void onTabClicked(int index) {
 		switch (index) {
 			case 0:
+				this.editOverlay.close();
 				mc.displayGuiScreen(new GuiProductionCalc(this.playerInv));
 				break;
 			case 1:
+				this.editOverlay.close();
 				mc.displayGuiScreen(new GuiFlowChart(playerInv));
 				break;
 			case 2:
+				this.editOverlay.close();
 				mc.displayGuiScreen(new GuiManageRecipes(this.playerInv));
 				break;
 			case 3:
+				this.editOverlay.close();
 				mc.displayGuiScreen(new GuiManageMachines(this.playerInv));
 				break;
 			case 4:

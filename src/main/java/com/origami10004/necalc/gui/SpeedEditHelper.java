@@ -100,7 +100,12 @@ public class SpeedEditHelper {
 	public boolean keyTyped(char typedChar, int keyCode) {
 		if (!isOpen) return false;
 		if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
-			MachineState.setMachineSpeed(machine, Integer.parseInt(speedInputField.getText()));
+			String text = speedInputField.getText();
+			if (text == "" || Integer.parseInt(text) <= 0) {
+				MachineState.setMachineSpeed(machine, 1);
+			} else {
+				MachineState.setMachineSpeed(machine, Integer.parseInt(speedInputField.getText()));
+			}
 			close();
 			return true;
 		}
