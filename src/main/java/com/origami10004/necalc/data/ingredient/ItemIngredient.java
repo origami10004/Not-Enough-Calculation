@@ -9,6 +9,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.gui.GuiCommon;
 
 import java.text.DecimalFormat;
@@ -22,6 +23,7 @@ public class ItemIngredient extends Ingredients {
 	private final Item item;
 	private final int meta;
 	private final NBTTagCompound nbt;
+	private int colour = -1;
 
 	// Constructors
 	public ItemIngredient(ItemStack stack, double value) {
@@ -200,13 +202,15 @@ public class ItemIngredient extends Ingredients {
 
 	@Override
 	public int getColour() {
+		if (this.colour != -1) return this.colour;
+
 		int tintColour = Minecraft.getMinecraft().getItemColors().colorMultiplier(getStack(), 0);
 		if (tintColour != -1) {
-			return tintColour;
+			return this.colour = tintColour;
 		}
 
 		TextureAtlasSprite sprite = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getParticleIcon(this.item, this.meta);
-		if (sprite == null) return 0xFFFFFF;
+		if (sprite == null) return this.colour = 0xFFFFFF;
 
 		if (sprite.getFrameCount() > 0) {
 			int[][] frameData = sprite.getFrameTextureData(0);
@@ -227,12 +231,11 @@ public class ItemIngredient extends Ingredients {
 					r /= count;
 					g /= count;
 					b /= count;
-					return (int)((r << 16) | (g << 8) | b);
+					return this.colour = (int)((r << 16) | (g << 8) | b);
 				}
 			}
 		}
-
-		return 0xFFFFFF;
+		return this.colour = 0xFFFFFF;
 	}
 
 	// Helper functions

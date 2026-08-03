@@ -65,20 +65,35 @@ public class FlowControl {
 		// Build consumer and producer maps
 		Map<Ingredients, List<int[]>> consumerMap = new HashMap<>();
 		Map<Ingredients, List<int[]>> producerMap = new HashMap<>();
+		Map<Ingredients, List<Integer>> netConsumerMap = new HashMap<>();
+		Map<Ingredients, List<Integer>> netProducerMap = new HashMap<>();
 		Set<Ingredients> allItems = new HashSet<>();
 
 		for (int i = 0; i < steps.size(); i++) {
 			ProductionStep step = steps.get(i);
 			List<Ingredients> inputs = step.getInputs();
 			List<Ingredients> outputs = step.getOutputs();
+			Map<Ingredients, Double> netOutputs = new HashMap<>();
 
 			for (int j = 0; j < inputs.size(); j++) {
 				consumerMap.computeIfAbsent(inputs.get(j), k -> new ArrayList<>()).add(new int[]{i, j});
 				allItems.add(inputs.get(j));
+				netOutputs.put(inputs.get(j), netOutputs.getOrDefault(inputs.get(j), 0.0) - step.getInputRate(j));
 			}
 			for (int j = 0; j < outputs.size(); j++) {
 				producerMap.computeIfAbsent(outputs.get(j), k -> new ArrayList<>()).add(new int[]{i, j});
 				allItems.add(outputs.get(j));
+				netOutputs.put(outputs.get(j), netOutputs.getOrDefault(outputs.get(j), 0.0) + step.getOutputRate(j));
+			}
+
+			for (Map.Entry<Ingredients, Double> entry : netOutputs.entrySet()) {
+				Ingredients item = entry.getKey();
+				double netRate = entry.getValue();
+				if (netRate < 0) {
+					netConsumerMap.computeIfAbsent(item, k -> new ArrayList<>()).add(i);
+				} else if (netRate > 0) {
+					netProducerMap.computeIfAbsent(item, k -> new ArrayList<>()).add(i);
+				}
 			}
 		}
 
@@ -130,13 +145,13 @@ public class FlowControl {
 			parents.put(node, new HashSet<>());
 		}
 		for (Ingredients item : allItems) {
-			List<int[]> consumers = consumerMap.getOrDefault(item, new ArrayList<>());
-			List<int[]> producers = producerMap.getOrDefault(item, new ArrayList<>());
-			for (int[] consumer : consumers) {
-				for (int[] producer : producers) {
-					if (producer[0] != consumer[0]) {
-						children.get(recipeNodes.get(consumer[0])).add(recipeNodes.get(producer[0]));
-						parents.get(recipeNodes.get(producer[0])).add(recipeNodes.get(consumer[0]));
+			List<Integer> consumers = netConsumerMap.getOrDefault(item, new ArrayList<>());
+			List<Integer> producers = netProducerMap.getOrDefault(item, new ArrayList<>());
+			for (Integer consumer : consumers) {
+				for (Integer producer : producers) {
+					if (producer != consumer) {
+						children.get(recipeNodes.get(consumer)).add(recipeNodes.get(producer));
+						parents.get(recipeNodes.get(producer)).add(recipeNodes.get(consumer));
 					}
 				}
 			}

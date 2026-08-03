@@ -28,6 +28,7 @@ public class FluidIngredient extends Ingredients {
 
 	private final Fluid fluid;
 	private final NBTTagCompound nbt;
+	private int colour = -1;
 
 	public FluidIngredient(Fluid fluid, NBTTagCompound nbt, double value) {
 		super(value);
@@ -218,6 +219,47 @@ public class FluidIngredient extends Ingredients {
 	@Override
 	public int hashCode() {
 		return Objects.hash(FluidIngredient.class, fluid);
+	}
+
+	@Override
+	public int getColour() {
+		if (this.colour != -1) return this.colour;
+
+		this.colour = fluid.getColor(this.getStack());
+		
+		if (this.colour == 0xFFFFFF || this.colour == 0) {
+			TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(
+					fluid.getStill() != null
+							? fluid.getStill().toString()
+							: TextureMap.LOCATION_MISSING_TEXTURE.toString());
+			if (sprite == null) return this.colour = 0xFFFFFF;
+
+			if (sprite.getFrameCount() > 0) {
+				int[][] frameData = sprite.getFrameTextureData(0);
+				if (frameData != null && frameData.length > 0 && frameData[0].length > 0) {
+					int[] pixels = frameData[0];
+					long r = 0, g = 0, b = 0;
+					int count = 0;
+					for (int pixel : pixels) {
+						int alpha = (pixel >> 24) & 0xFF;
+						if (alpha > 128) {
+							r += (pixel >> 16) & 0xFF;
+							g += (pixel >> 8) & 0xFF;
+							b += pixel & 0xFF;
+							count++;
+						}
+					}
+					if (count > 0) {
+						r /= count;
+						g /= count;
+						b /= count;
+						return this.colour = (int)((r << 16) | (g << 8) | b);
+					}
+				}
+			}
+			return this.colour = 0xFFFFFF;
+		}
+		return this.colour;
 	}
 
 	//Helper functions
