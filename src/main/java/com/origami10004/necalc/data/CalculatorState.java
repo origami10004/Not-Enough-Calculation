@@ -15,6 +15,7 @@ public class CalculatorState {
 	private static LinkedHashMap<Ingredients, Solver.Input> recipeInputs;
 	private static HashSet<Ingredients> targetItems = new HashSet<>();
 
+	private static boolean recentReset = false;
 	private static boolean cached = false;
 
 	public static void init() {
@@ -162,6 +163,15 @@ public class CalculatorState {
 	public static void recalculateRecipes() {
 		cached = false;
 		FlowControl.reset();
+		recentReset = true;
+	}
+
+	public static void done() {
+		recentReset = false;
+	}
+
+	public static boolean hasRecentReset() {
+		return recentReset;
 	}
 
 	private static boolean getResult() {

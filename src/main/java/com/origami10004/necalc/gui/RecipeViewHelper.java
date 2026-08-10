@@ -64,9 +64,20 @@ public class RecipeViewHelper {
 	public boolean isOpen() {
 		return this.isOpen && this.step != null;
 	}
+
+	public void close() {
+		this.isOpen = false;
+		this.step = null;
+	}
 	
 	public void drawExtension(int mouseX, int mouseY) {
 		if (!isOpen()) return;
+
+		if (CalculatorState.hasRecentReset()) {
+			close();
+			CalculatorState.done();
+			return;
+		}
 
 		parent.drawRectPanel(guiLeft, guiTop, xSize, ySize);
 		
