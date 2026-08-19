@@ -232,17 +232,12 @@ public class GuiManageMachines extends GuiCommon {
 	}
 
 	private int getMachineAt(int mouseX, int mouseY) {
-		for (int row = 0; row < ROWS; row++) {
-			for (int col = 0; col < COLS; col++) {
-				int index = (row + this.scrollRow) * COLS + col;
-				int slotX = this.gx + 8 + col * SLOT_SIZE;
-				int slotY = this.tableY + row * SLOT_SIZE;
-				if (mouseX >= slotX && mouseX < slotX + SLOT_SIZE && mouseY >= slotY && mouseY < slotY + SLOT_SIZE) {
-					return index;
-				}
-			}
+		int row = (mouseY - this.tableY) / SLOT_SIZE;
+		int col = (mouseX - this.gx - 8) / SLOT_SIZE;
+		if (row < 0 || row >= ROWS || col < 0 || col >= COLS) {
+			return -1;
 		}
-		return -1;
+		return (row + this.scrollRow) * COLS + col;
 	}
 
 	@Override

@@ -705,11 +705,11 @@ public class GuiProductionCalc extends GuiCommon {
 	}
 
 	private int getTargetSlotAt(int mouseX, int mouseY) {
-		int row = this.targetScrollRow + (mouseY - this.targetGridY) / SLOT_SIZE;
+		int row = (mouseY - this.targetGridY) / SLOT_SIZE;
 		int col = (mouseX - (this.gx + INDENT_L + 4)) / SLOT_SIZE;
 		if (row < 0 || row >= TARGET_ROWS) return -1;
 		if (col < 0 || col >= SLOTS_PER_ROW) return -1;
-		return row * SLOTS_PER_ROW + col;
+		return (this.targetScrollRow + row) * SLOTS_PER_ROW + col;
 	}
 	private int getProdRowAt(int mouseX, int mouseY) {
 		int rowX = this.gx + INDENT_L + 1;

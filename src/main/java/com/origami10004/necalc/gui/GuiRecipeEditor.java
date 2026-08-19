@@ -555,33 +555,21 @@ public class GuiRecipeEditor extends GuiCommon {
 	}
 
 	private int getInputSlotAt(int mouseX, int mouseY) {
-		for (int row = 0; row < IO_ROWS; row++) {
-			int actual = row + this.inputScrollRow;
-			for(int col = 0; col < SLOTS_PER_ROW; col++) {
-				int slotX = this.gx + 12 + col * SLOT_SIZE;
-				if (mouseX >= slotX && mouseX < slotX + SLOT_SIZE
-							&& mouseY >= this.inputGrid + row * SLOT_SIZE
-							&& mouseY < this.inputGrid + row * SLOT_SIZE + SLOT_SIZE) {
-					return actual * SLOTS_PER_ROW + col;
-				}
-			}
+		int row = (mouseY - this.inputGrid) / SLOT_SIZE;
+		int col = (mouseX - (this.gx + 12)) / SLOT_SIZE;
+		if (row < 0 || row >= IO_ROWS || col < 0 || col >= SLOTS_PER_ROW) {
+			return -1;
 		}
-		return -1;
+		return (row + this.inputScrollRow) * SLOTS_PER_ROW + col;
 	}
 
 	private int getOutputSlotAt(int mouseX, int mouseY) {
-		for (int row = 0; row < IO_ROWS; row++) {
-			int actual = row + this.outputScrollRow;
-			for(int col = 0; col < SLOTS_PER_ROW; col++) {
-				int slotX = this.gx + 12 + col * SLOT_SIZE;
-				if (mouseX >= slotX && mouseX < slotX + SLOT_SIZE
-							&& mouseY >= this.outputGrid + row * SLOT_SIZE
-							&& mouseY < this.outputGrid + row * SLOT_SIZE + SLOT_SIZE) {
-					return actual * SLOTS_PER_ROW + col;
-				}
-			}
+		int row = (mouseY - this.outputGrid) / SLOT_SIZE;
+		int col = (mouseX - (this.gx + 12)) / SLOT_SIZE;
+		if (row < 0 || row >= IO_ROWS || col < 0 || col >= SLOTS_PER_ROW) {
+			return -1;
 		}
-		return -1;
+		return (row + this.outputScrollRow) * SLOTS_PER_ROW + col;
 	}
 
 	public int getInputScrollRow() {
