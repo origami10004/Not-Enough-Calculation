@@ -555,6 +555,7 @@ public class GuiRecipeEditor extends GuiCommon {
 	}
 
 	private int getInputSlotAt(int mouseX, int mouseY) {
+		if (mouseY < this.inputGrid) return -1;
 		int row = (mouseY - this.inputGrid) / SLOT_SIZE;
 		int col = (mouseX - (this.gx + 12)) / SLOT_SIZE;
 		if (row < 0 || row >= IO_ROWS || col < 0 || col >= SLOTS_PER_ROW) {
@@ -564,6 +565,7 @@ public class GuiRecipeEditor extends GuiCommon {
 	}
 
 	private int getOutputSlotAt(int mouseX, int mouseY) {
+		if (mouseY < this.outputGrid) return -1;
 		int row = (mouseY - this.outputGrid) / SLOT_SIZE;
 		int col = (mouseX - (this.gx + 12)) / SLOT_SIZE;
 		if (row < 0 || row >= IO_ROWS || col < 0 || col >= SLOTS_PER_ROW) {

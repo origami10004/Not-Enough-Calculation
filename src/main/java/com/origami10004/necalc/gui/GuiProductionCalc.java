@@ -705,6 +705,7 @@ public class GuiProductionCalc extends GuiCommon {
 	}
 
 	private int getTargetSlotAt(int mouseX, int mouseY) {
+		if (mouseY < this.targetGridY) return -1;
 		int row = (mouseY - this.targetGridY) / SLOT_SIZE;
 		int col = (mouseX - (this.gx + INDENT_L + 4)) / SLOT_SIZE;
 		if (row < 0 || row >= TARGET_ROWS) return -1;

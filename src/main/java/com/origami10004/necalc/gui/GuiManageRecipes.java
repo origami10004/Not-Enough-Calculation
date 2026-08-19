@@ -203,6 +203,7 @@ public class GuiManageRecipes extends GuiCommon{
 	}
 
 	private int getRecipeAt(int mouseX, int mouseY) {
+		if (mouseY < this.tableY) return -1;
 		int row = (mouseY - this.tableY) / SLOT_SIZE;
 		int col = (mouseX - this.gx - 8) / SLOT_SIZE;
 		if (row < 0 || row >= ROWS || col < 0 || col >= COLS) {
