@@ -25,6 +25,7 @@ necalc.gui.results=所需生产速率
 necalc.gui.inputs=所需输入速率
 necalc.gui.outputs=输出速率
 necalc.gui.inventory=物品栏
+necalc.gui.hide_recipe=隐藏配方
 necalc.gui.show_recipe.some=显示隐藏配方（%d）
 necalc.gui.show_recipe.none=显示隐藏配方（无）
 necalc.gui.show_input.some=显示隐藏输入（%d）

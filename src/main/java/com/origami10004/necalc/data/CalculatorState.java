@@ -166,11 +166,9 @@ public class CalculatorState {
 
 	public static void hideRecipe(int index) {
 		getResult();
-		if (index < 0 || index >= recipeSteps.size()) return;
-		recipeSteps.stream()
-				.filter(r -> !r.isHidden())
-				.collect(Collectors.toList())
-				.get(index).hide();
+		List<ProductionStep> visible = getVisibleRecipes();
+		if (index < 0 || index >= visible.size()) return;
+		visible.get(index).hide();
 	}
 
 	public static int getMultiplier() {

@@ -21,7 +21,12 @@ public class FlowEdge {
 		this.destinationIndex = destinationIndex;
 	}
 
+	public boolean isVisible() {
+		return source.isVisible() && destination.isVisible();
+	}
+
 	public void draw() {
+		if (!isVisible()) return;
 		int x0 = FlowControl.toScreenX(startX());
 		int y0 = FlowControl.toScreenY(startY());
 		int x1 = FlowControl.toScreenX(endX());

@@ -52,7 +52,11 @@ public abstract class FlowNode {
 	}
 
 	public boolean containsPoint(double x, double y) {
-		return x >= canvasX && x <= canvasX + width && y >= canvasY && y <= canvasY + height;
+		return isVisible() && x >= canvasX && x <= canvasX + width && y >= canvasY && y <= canvasY + height;
+	}
+
+	public boolean isVisible() {
+		return true;
 	}
 
 

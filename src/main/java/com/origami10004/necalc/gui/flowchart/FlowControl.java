@@ -17,7 +17,6 @@ import java.util.Comparator;
 public class FlowControl {
 	private static final int COL_PAD = 80;
 	private static final int ROW_PAD = 30;
-	private static final double EPSILON = 1e-9;
 	private static int panX = -50;
 	private static int panY = -50;
 	private static double zoom = 1.0;
@@ -101,7 +100,6 @@ public class FlowControl {
 		// Item nodes
 		Map <Ingredients, FlowItemNode> itemToNode = new HashMap<>();
 		for (Ingredients item : allItems) {
-			Ingredients temp = item.copy();
 			List<int[]> consumers = consumerMap.getOrDefault(item, new ArrayList<>());
 			List<int[]> producers = producerMap.getOrDefault(item, new ArrayList<>());
 			double totalConsumed = 0.0;
@@ -114,18 +112,18 @@ public class FlowControl {
 				ProductionStep step = steps.get(producer[0]);
 				totalProduced += step.getOutputRate(producer[1]);
 			}
-			temp.setValue(Math.max(totalConsumed, totalProduced));
 			FlowItemNode itemNode;
-			if (totalConsumed > totalProduced + EPSILON) {
-				itemNode = new FlowInputNode(temp, 0, 0);
-			} else if (totalProduced > totalConsumed + EPSILON) {
-				if (CalculatorState.getTargets().contains(item)) {
-					itemNode = new FlowOutputNode(temp, 0, 0);
-				} else {
-					itemNode = new FlowExcessNode(temp, 0, 0);
-				}
+			if (CalculatorState.getTargets().contains(item)) {
+				itemNode = new FlowOutputNode(item.copy(), 0, 0, totalProduced, totalConsumed);
 			} else {
-				itemNode = new FlowItemNode(temp, 0, 0);
+				itemNode = new FlowItemNode(item.copy(), 0, 0, totalProduced, totalConsumed);
+			}
+
+			for (int[] consumer : consumers) {
+				recipeNodes.get(consumer[0]).addInputNode(consumer[1], itemNode);
+			}
+			for (int[] producer : producers) {
+				recipeNodes.get(producer[0]).addOutputNode(producer[1], itemNode);
 			}
 
 			itemToNode.put(item, itemNode);

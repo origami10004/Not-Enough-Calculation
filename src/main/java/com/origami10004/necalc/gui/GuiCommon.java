@@ -203,6 +203,14 @@ public abstract class GuiCommon extends GuiContainer {
 		this.drawHoveringText(tooltip, mouseX, mouseY);
 	}
 
+	public void drawItemExtraInfoTooltip(int mouseX, int mouseY, Ingredients ing, String[] extraInfo) {
+		List<String> tooltip = ing.getTooltip(this.mc);
+		for (String info : extraInfo) {
+			tooltip.add(info);
+		}
+		this.drawHoveringText(tooltip, mouseX, mouseY);
+	}
+
 	private static final DecimalFormat ONE_DECIMAL = new DecimalFormat("##.#", DecimalFormatSymbols.getInstance(Locale.ROOT));
 	private static final DecimalFormat TWO_DECIMAL = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ROOT));
 	protected String formatValue(double value) {

@@ -26,6 +26,38 @@ public class FlowRecipeNode extends FlowNode {
 	private int inputY;
 	private int outputX;
 	private int outputY;
+	private FlowItemNode[] inputNodes;
+	private FlowItemNode[] outputNodes;
+	private boolean previouslyHidden = false;
+
+	public ProductionStep getStep() {
+		return step;
+	}
+
+	@Override
+	public boolean isVisible() {
+		return !step.isHidden();
+	}
+
+	public int getHideX() {
+		return (int) canvasX + xSize - 14;
+	}
+
+	public int getHideY() {
+		return (int) canvasY + 2;
+	}
+
+	public boolean isOnHideButton(double x, double y) {
+		return x >= getHideX() && x < getHideX() + 12 && y >= getHideY() && y < getHideY() + 12;
+	}
+
+	public void addInputNode(int index, FlowItemNode node) {
+		inputNodes[index] = node;
+	}
+
+	public void addOutputNode(int index, FlowItemNode node) {
+		outputNodes[index] = node;
+	}
 
 	public FlowRecipeNode(ProductionStep step, int x, int y) {
 		super(x, y);
@@ -37,13 +69,16 @@ public class FlowRecipeNode extends FlowNode {
 		this.outputRows = (int) Math.ceil((double) step.getOutputs().size() / outputCols);
 
 		this.xSize = 44 + inputCols * 18 + outputCols * 18;
-		this.ySize = Math.max(Math.max(inputRows, outputRows) * 18 + 14, 65);
+		this.ySize = Math.max(Math.max(inputRows * 18 + 14, outputRows * 18 + 36), 65);
 		super.setSize(xSize, ySize);
 
 		this.inputX = x + 7;
 		this.inputY = y + (ySize - inputRows * 18) / 2;
 		this.outputX = x + xSize - 7 - outputCols * 18;
 		this.outputY = y + (ySize - outputRows * 18) / 2;
+
+		this.inputNodes = new FlowItemNode[step.getInputs().size()];
+		this.outputNodes = new FlowItemNode[step.getOutputs().size()];
 	}
 
 	@Override
@@ -55,9 +90,24 @@ public class FlowRecipeNode extends FlowNode {
 		this.outputY = (int) this.canvasY + (ySize - outputRows * 18) / 2;
 	}
 
+	private void synchronizeValues() {
+		if (previouslyHidden == step.isHidden()) return;
+		previouslyHidden = step.isHidden();
+		double sign = previouslyHidden ? -1 : 1;
+		for (int i = 0; i < inputNodes.length; i++) {
+			inputNodes[i].increaseConsumedRate(sign * step.getInputRate(i));
+		}
+		for (int i = 0; i < outputNodes.length; i++) {
+			outputNodes[i].increaseProducedRate(sign * step.getOutputRate(i));
+		}
+	}
+
 	@Override
 	public void draw(GuiFlowChart gui) {
+		synchronizeValues();
+		if (!isVisible()) return;
 		gui.drawRectPanelOutdent((int) this.canvasX, (int) this.canvasY, this.xSize, this.ySize, 0xFFC6C6C6);
+		gui.drawRecipeHideButton(getHideX(), getHideY());
 		for (int i = 0; i < inputRows; i++) {
 			for (int j = 0; j < inputCols; j++) {
 				int index = i * inputCols + j;
@@ -100,6 +150,10 @@ public class FlowRecipeNode extends FlowNode {
 	public void drawHoveredToolTip(GuiFlowChart gui, int mouseX, int mouseY) {
 		int canvasMouseX = (int) FlowControl.toCanvasX(mouseX);
 		int canvasMouseY = (int) FlowControl.toCanvasY(mouseY);
+		if (isOnHideButton(canvasMouseX, canvasMouseY)) {
+			gui.drawHoveringText(I18n.format("necalc.gui.hide_recipe"), mouseX, mouseY);
+			return;
+		}
 		
 		if (getInputAt(canvasMouseX, canvasMouseY) != -1) {
 			int index = getInputAt(canvasMouseX, canvasMouseY);
