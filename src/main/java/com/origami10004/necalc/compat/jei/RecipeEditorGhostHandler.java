@@ -15,6 +15,7 @@ public class RecipeEditorGhostHandler implements IGhostIngredientHandler<GuiReci
 	@Override
 	public <I> List<Target<I>> getTargets(GuiRecipeEditor gui, I ingredient, boolean doStart) {
 		List<Target<I>> targets = new ArrayList<>();
+		if (gui.isCountEditorOpen()) return targets;
 
 		// inputs
 		int rows = GuiRecipeEditor.IO_ROWS;
@@ -31,6 +32,7 @@ public class RecipeEditorGhostHandler implements IGhostIngredientHandler<GuiReci
 
 					@Override
 					public void accept(I ingredient2) {
+						if (gui.isCountEditorOpen()) return;
 						RecipeState.setInput((gui.getInputScrollRow() + rowFinal) * cols + colFinal, IngredientManager.of(ingredient2));
 					}
 				});
@@ -45,6 +47,7 @@ public class RecipeEditorGhostHandler implements IGhostIngredientHandler<GuiReci
 
 			@Override
 			public void accept(I ingredient2) {
+				if (gui.isCountEditorOpen()) return;
 				RecipeState.setMachine(IngredientManager.of(ingredient2));
 			}
 		});
@@ -61,6 +64,7 @@ public class RecipeEditorGhostHandler implements IGhostIngredientHandler<GuiReci
 
 					@Override
 					public void accept(I ingredient2) {
+						if (gui.isCountEditorOpen()) return;
 						RecipeState.setOutput((gui.getOutputScrollRow() + rowFinal) * cols + colFinal, IngredientManager.of(ingredient2));
 					}
 				});

@@ -15,6 +15,7 @@ public class ProductionCalcGhostHandler implements IGhostIngredientHandler<GuiPr
 	@Override
 	public <I> List<Target<I>> getTargets(GuiProductionCalc gui, I ingredient, boolean doStart) {
 		List<Target<I>> targets = new ArrayList<>();
+		if (gui.isRateEditorOpen()) return targets;
 
 		int rows = GuiProductionCalc.TARGET_ROWS;
 		int cols = GuiProductionCalc.SLOTS_PER_ROW;
@@ -30,6 +31,7 @@ public class ProductionCalcGhostHandler implements IGhostIngredientHandler<GuiPr
 
 					@Override
 					public void accept(I ingredient2) {
+						if (gui.isRateEditorOpen()) return;
 						CalculatorState.setTargetSlot((rowFinal + gui.getTargetScrollRow()) * cols + colFinal, IngredientManager.of(ingredient2));
 					}
 				});

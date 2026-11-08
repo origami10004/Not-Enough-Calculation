@@ -124,7 +124,7 @@ public class Solver {
 			RecipeEntry recipe = recipes.get(idToRecipe.get(i));
 			Ingredients machine = recipe.getMachine();
 				int speed = suppliedMachineSpeeds.getOrDefault(machine, 1);
-			double craftsPerMinute = ((double)(1200 * speed)) / recipe.getTime();
+			double craftsPerMinute = ((double)(1200.0 * speed)) / recipe.getTime();
 
 			for (Ingredients output : recipe.getOutputs()) {
 				Integer itemId = itemToId.get(output);
@@ -225,7 +225,7 @@ public class Solver {
 
 				RecipeEntry recipe = recipes.get(idToRecipe.get(i));
 					int speed = suppliedMachineSpeeds.getOrDefault(recipe.getMachine(), 1);
-				double craftsPerMinute = ((double)(1200 * speed)) / recipe.getTime();
+				double craftsPerMinute = ((double)(1200.0 * speed)) / recipe.getTime();
 				double recipePerMinute = machineCount * craftsPerMinute;
 
 				res.steps.add(new ProductionStep(recipe, machineCount, recipePerMinute));

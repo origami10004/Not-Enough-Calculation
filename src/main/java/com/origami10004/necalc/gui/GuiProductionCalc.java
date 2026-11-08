@@ -558,6 +558,7 @@ public class GuiProductionCalc extends GuiCommon {
 		// Target slot set
 		int targetSlot = getTargetSlotAt(mouseX, mouseY);
 		if (targetSlot != -1) {
+			if (editOverlay.isOpen()) return;
 			if (mouseButton == 0) {
 				// left click: set target slot to held item
 				ItemStack heldItem = this.mc.player.inventory.getItemStack();
@@ -919,6 +920,10 @@ public class GuiProductionCalc extends GuiCommon {
 
 	public int getTargetScrollRow() {
 		return this.targetScrollRow;
+	}
+
+	public boolean isRateEditorOpen() {
+		return editOverlay.isOpen();
 	}
 
 	public Rectangle getTargetSlotArea(int visRow, int col) {

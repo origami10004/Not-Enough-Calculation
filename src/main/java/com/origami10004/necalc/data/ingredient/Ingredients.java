@@ -103,7 +103,7 @@ public abstract class Ingredients {
 		render(parent, x, y);
 
 		String text = formatValue(customValue);
-		if (text == "") return;
+		if (text.isEmpty()) return;
 		GlStateManager.disableDepth();
 		GlStateManager.disableBlend();
 		GlStateManager.pushMatrix();

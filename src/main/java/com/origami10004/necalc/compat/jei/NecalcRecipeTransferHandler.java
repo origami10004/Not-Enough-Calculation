@@ -96,11 +96,10 @@ public class NecalcRecipeTransferHandler implements IRecipeTransferHandler<Necal
 			Necalc.logger.warn("Error loading machine data from JEI, recipe registry is null");
 		}
 
-		if ((gui instanceof GuiRecipeEditor)) return null;
-
-
+		GuiCommon parent = gui instanceof GuiRecipeEditor
+				? ((GuiRecipeEditor) gui).getParentGui() : gui;
 		Minecraft mc = Minecraft.getMinecraft();
-		mc.displayGuiScreen(new GuiRecipeEditor(player.inventory, gui, true));
+		mc.displayGuiScreen(new GuiRecipeEditor(player.inventory, parent, true));
 		return null;
 	}
 }

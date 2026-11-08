@@ -97,7 +97,7 @@ public class RateEditHelper {
 		if (!isOpen) return false;
 		if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
 			String text = rateInputField.getText();
-			if (text == "" || Double.parseDouble(text) <= 0.0) {
+			if (text.isEmpty() || Double.parseDouble(text) <= 0.0) {
 				CalculatorState.setTargetSlot(activeSlot, Ingredients.EMPTY);
 			} else {
 				CalculatorState.setTargetSlotRate(activeSlot, Double.parseDouble(text));

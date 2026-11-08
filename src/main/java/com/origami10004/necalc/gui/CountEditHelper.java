@@ -119,7 +119,7 @@ public class CountEditHelper {
 		if (!isOpen) return false;
 		if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
 			String text = countInputField.getText();
-			if (text == "" || Integer.parseInt(text) <= 0) {
+			if (text.isEmpty() || Integer.parseInt(text) <= 0) {
 				if (isInput) {
 					RecipeState.setInput(activeSlot, Ingredients.EMPTY);
 				} else {

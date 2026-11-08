@@ -101,7 +101,7 @@ public class SpeedEditHelper {
 		if (!isOpen) return false;
 		if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
 			String text = speedInputField.getText();
-			if (text == "" || Integer.parseInt(text) <= 0) {
+			if (text.isEmpty() || Integer.parseInt(text) <= 0) {
 				MachineState.setMachineSpeed(machine, 1);
 			} else {
 				MachineState.setMachineSpeed(machine, Integer.parseInt(speedInputField.getText()));

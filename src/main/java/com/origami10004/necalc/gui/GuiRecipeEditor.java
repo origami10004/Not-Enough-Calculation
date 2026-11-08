@@ -408,6 +408,7 @@ public class GuiRecipeEditor extends GuiCommon {
 		// Inputs
 		int inputSlot = getInputSlotAt(mouseX, mouseY);
 		if (inputSlot != -1) {
+			if (editOverlay.isOpen()) return;
 			Ingredients heldItem = IngredientManager.of(mc.player.inventory.getItemStack());
 			if (mouseButton == 0) {
 				RecipeState.setInput(inputSlot, heldItem);
@@ -430,6 +431,7 @@ public class GuiRecipeEditor extends GuiCommon {
 		// Machine
 		if (mouseX >= this.gx + 12 && mouseX < this.gx + 12 + SLOT_SIZE
 					&& mouseY >= this.machineY && mouseY < this.machineY + SLOT_SIZE) {
+			if (editOverlay.isOpen()) return;
 			Ingredients heldItem = IngredientManager.of(mc.player.inventory.getItemStack());
 			if (mouseButton == 0) {
 				RecipeState.setMachine(heldItem);
@@ -440,6 +442,7 @@ public class GuiRecipeEditor extends GuiCommon {
 		// Outputs
 		int outputSlot = getOutputSlotAt(mouseX, mouseY);
 		if (outputSlot != -1) {
+			if (editOverlay.isOpen()) return;
 			Ingredients heldItem = IngredientManager.of(mc.player.inventory.getItemStack());
 			if (mouseButton == 0) {
 				RecipeState.setOutput(outputSlot, heldItem);
@@ -576,6 +579,14 @@ public class GuiRecipeEditor extends GuiCommon {
 
 	public int getInputScrollRow() {
 		return this.inputScrollRow;
+	}
+
+	public boolean isCountEditorOpen() {
+		return editOverlay.isOpen();
+	}
+
+	public GuiCommon getParentGui() {
+		return parent;
 	}
 
 	public int getOutputScrollRow() {
