@@ -2,7 +2,12 @@ package com.origami10004.necalc.gui;
 
 import java.lang.reflect.Field;
 
+import com.origami10004.necalc.Necalc;
 import net.minecraft.client.gui.GuiTextField;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.lwjgl.input.Keyboard;
 
@@ -10,6 +15,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class RateEditHelperTest {
+    private Logger previousLogger;
+
+    @Before
+    public void setUpLogger() {
+        previousLogger = Necalc.logger;
+        Necalc.logger = LogManager.getLogger("necalc-test");
+    }
+
+    @After
+    public void restoreLogger() {
+        Necalc.logger = previousLogger;
+    }
+
     @Test
     public void confirmsDecimalPointWithoutCrashing() throws Exception {
         RateEditHelper editor = editorWithText(".");
