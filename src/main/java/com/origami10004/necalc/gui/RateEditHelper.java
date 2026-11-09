@@ -2,6 +2,7 @@ package com.origami10004.necalc.gui;
 
 import org.lwjgl.input.Keyboard;
 
+import com.origami10004.necalc.Necalc;
 import com.origami10004.necalc.data.CalculatorState;
 import com.origami10004.necalc.data.ingredient.Ingredients;
 
@@ -97,10 +98,19 @@ public class RateEditHelper {
 		if (!isOpen) return false;
 		if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
 			String text = rateInputField.getText();
-			if (text.isEmpty() || Double.parseDouble(text) <= 0.0) {
+			if (text.startsWith(".")) text = "0" + text;
+			if (text.endsWith(".")) text += "0";
+			double rate;
+			try {
+				rate = text.isEmpty() ? 0.0 : Double.parseDouble(text);
+			} catch (NumberFormatException exception) {
+				Necalc.logger.warn("Invalid rate input: " + text, exception);
+				return true;
+			}
+			if (rate <= 0.0) {
 				CalculatorState.setTargetSlot(activeSlot, Ingredients.EMPTY);
 			} else {
-				CalculatorState.setTargetSlotRate(activeSlot, Double.parseDouble(text));
+				CalculatorState.setTargetSlotRate(activeSlot, rate);
 			}
 			close();
 			return true;
